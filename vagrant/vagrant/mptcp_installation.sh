@@ -9,11 +9,11 @@ make
 sudo make install
 
 # MPTCPtrace
-sudo apt-get -y install check libssl-dev libpcap-dev
+sudo apt-get -y install check libssl-dev libpcap-dev autoconf pkg-config
 cd $HOME
 git clone https://github.com/multipath-tcp/mptcptrace
 cd mptcprace
-./autogen
+./autogen.sh
 ./configure
 make
 sudo make install

@@ -110,7 +110,7 @@ To test that MPTCP is working properly, run the following scripts:
 
 ## Tools
 
-[TO BE WRITTEN]
+The following tools are included in the Vagrantfiles and can be useful to show information from experiments.
 
 ### Testing TCP latency
 
@@ -135,6 +135,20 @@ Also we can use the command `ifstat`, which shows us the throughput for the diff
 For that purpose, you could use `tc-netem`. We have included two scripts for changing these values (`set_bw_latency.sh`) and for resetting them (`reset_bw_latency.sh`).
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/set_bw_latency.png" width="800">
+
+### Capture and process PCAP trace
+
+To capture several (but not all) interfaces, you can use tshark (please check script `pcap_capture.sh`).
+
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/pcap_capture.png" width="800">
+
+Later, you can process the captured trace file with MPTCPTRACE (https://github.com/multipath-tcp/mptcptrace) (please check script `pcap_process.sh`).
+
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/pcap_process.png" width="800">
+
+The results can be plotted with xplot.org. **NOTE**: Remember to redirect the DISPLAY to your IP address using `export DISPLAY='<IP address>:0.0'`.
+
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/pcap_process_plot.png" width="800">
 
 ---
 
