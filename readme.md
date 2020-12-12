@@ -126,6 +126,12 @@ To test TCP throughput, you could use `iperf`. We have included two scripts (`te
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/test_throughput_tcp.png" width="800">
 
+### Changing bandwidth and latency of a network interface
+
+For that purpose, you could use `tc-netem`. We have included two scripts for changing these values (`set_bw_latency.sh`) and for resetting them (`reset_bw_latency.sh`).
+
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/set_bw_latency.png" width="800">
+
 ---
 
 # 5GCLARITY testbed setup (from original repository)
