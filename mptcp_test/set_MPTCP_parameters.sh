@@ -1,5 +1,5 @@
 #!/bin/bash
-# Jorge Navarro, UGR (2020)
+# Jorge Navarro-Ortiz (jorgenavarro@ugr.es), University of Granada 2020
 
 # This script assumes the following scenarios:
 #

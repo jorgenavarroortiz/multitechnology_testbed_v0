@@ -1,4 +1,5 @@
 #!/bin/bash
+# Jorge Navarro-Ortiz (jorgenavarro@ugr.es), Univerity of Granada 2020
 
 # Default values
 DURATION=100
@@ -7,17 +8,19 @@ DURATION=100
 # Parsing inputs parameters
 #############################
 
-usage() { echo "Usage: $0 -s <server> [-f <filename>] [-h]" 1>&2; exit 1; }
+usage() { echo "Usage: $0 -s <server> [-d duration] [-f <filename>] [-h]" 1>&2; exit 1; }
 
-while getopts ":s:f:h" opt; do
+while getopts ":s:d:f:h" opt; do
     case "${opt}" in
         s)
             s=1
             SERVER=${OPTARG}
+            echo "SERVER=${SERVER}"
             ;;
         d)
             d=1
             DURATION=${OPTARG}
+            echo "DURATION=${DURATION}"
             ;;
         f)
             f=1

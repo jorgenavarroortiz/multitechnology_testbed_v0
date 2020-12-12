@@ -1,6 +1,5 @@
 #!/bin/bash
-#
-# Jorge Navarro-Ortiz, University of Granada, jorgenavarro@ugr.es
+# Jorge Navarro-Ortiz (jorgenavarro@ugr.es), University of Granada 2020
 
 echo "Disabling interface towards Internet..."
 sudo ifconfig eth0 down
