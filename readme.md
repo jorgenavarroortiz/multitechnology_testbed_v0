@@ -1,6 +1,6 @@
-# 5G-CLARITY testbed v0 setup
+# 5GCLARITY testbed setup
 
-Testbed v0 (virtualized environment) for the 5G-CLARITY European Project. Initially started by Daniel Camps (from i2CAT). i2CAT's repository readme can be found below, after UGR's repository readme. Please contact Jorge Navarro-Ortiz (jorgenavarro@ugr.es) or Juan J. Ramos-Munoz (jjramos@ugr.es) for further details.
+UGR's branch from the original repository (i2CAT's free5gc repository). The master repository readme can be found below, after UGR's branch readme. Please contact Jorge Navarro-Ortiz (jorgenavarro@ugr.es) or Juan J. Ramos-Munoz (jjramos@ugr.es) for further details.
 
 ## Setting up the virtual environment
 
@@ -10,26 +10,33 @@ In order to simplify testing with MPTCP, we have developed two Vagrant configura
 
 2. Three VMs for the scenario explained in the master branch (**UE <-> free5GC <-> proxy**). Within this scenario, we also consider the two testbeds considered in the main branch: simple testbed and free5GC testbed.
 
-In both scenarios, a Vagrantfile has been developed to install the required kernel version, packages and the developed scripts, and will clone i2CAT's free5gc repository (master branch). So the deployed VMs should work out of the box. For details, please check the explanations in the master branch. **The developed installation scripts (see the `vagrant` directory) should work on real PCs (as long as they have Intel architecture, e.g. Intel's NUC computers) with few modifications**.
+In both scenarios, a Vagrantfile has been developed to install the required kernel version, packages and the developed scripts, and will clone i2CAT's free5gc repository (master branch). So the deployed VMs should work out of the box. For details, please check the explanations in the master branch. **The developed installation scripts** (see the `vagrant` directory) **should work on real PCs** (as long as they have Intel architecture, e.g. Intel's NUC computers) **with few modifications**.
 
 **Few differences with testbeds from the master branch**
 
 - All functions related to MPTCP are included in the kernel, i.e. there is no need to load modules.
 - **mptcpUe VM**: eth1 and eth2 are configured for using an internal network (ue_5gc) instead of using a bridged adapter. *The IP addresses of eth1 and eth2 are 10.1.1.1/24 and 10.1.1.2/24 instead of 10.0.1.1/24 and 10.0.1.2/24*. The reason is to avoid conflicts with eth0 (NAT interface, with IP 10.0.2.15/24) if we decide later to have eth1 and eth2 in different networks (which will become 10.0.1.0/24 and 10.0.2.0/24 in the original scenario). Additionally, *we added eth3 (with IP 192.168.33.1/24) to manage the VM through SSH*.
 - **free5gc VM**: Similarly, eth1 has IP address 10.1.1.*222*/24, instead of 10.0.1.$(( NUM_UES + 1)). This is done to avoid confusion when using a different number of UEs in the mptcpUe VM, which will produce a different IP address at the free5gc VM. Additionally, *we added eth3 (with IP 192.168.33.2/24) to manage the VM through SSH*.
-- **mptcpProxy VM**: *We only added eth3 (with IP 192.168.33.3/24) to manage the VM through SSH*.
+- **mptcpProxy VM**: *We only added eth2 (with IP 192.168.33.3/24) to manage the VM through SSH*.
+- As usual, all VMs employ eth0 for Internet connection (through VirtualBox's NAT).
 
-### SCENARIO 1: Two virtual machines directly connected
+### VMs installation using Vagrant for scenario 1
 
-In this scenario, two machines are directly connected using network interfaces eth1 and eth2. eth0 is configured with NAT in VirtualBox to connect to Internet. eth3 is configured with IP addresses 192.168.33.1/24 and 192.168.33.2/24 for management (for connecting through SSH). The image shows both VMs employing a network namespace (MPTCPns) and OpenVPN. You can configure whether namespaces or OpenVPN are used.
+Copy the content of the directory `free5gc/vagrant` to your computer. Rename the file `Vagrantfile.2machines` to `Vagrantfile`. **Copy your SSH credentials** for this repository (`id_rsa` and `id_rsa.pub` files) **to the `vagrant/ssh_credentials` directory**. Change to the directory with the `Vagrantfile` file and execute `vagrant up`. The execution will take around 15 minutes (depending on PC).
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1.png" width="512">
+### VMs installation using Vagrant for scenario 2
 
-**VMs installation using Vagrant**
+Copy the content of the directory `free5gc/vagrant` to your computer. Rename the file `Vagrantfile.free5gc` to `Vagrantfile`. **Copy your SSH credentials** for this repository (`id_rsa` and `id_rsa.pub` files) **to the `vagrant/ssh_credentials` directory**. Change to the directory with the `Vagrantfile` file and execute `vagrant up`. The execution will take around 25 minutes (depending on PC).
 
-Copy the content of the directory `free5gc/vagrant` to your computer. Rename the file `Vagrantfile.2machines` to `Vagrantfile`. Copy your SSH credentials for this repository (`id_rsa` and `id_rsa.pub` files) to the `vagrant/ssh_credentials` directory. Change to the directory with the `Vagrantfile` file and execute `vagrant up`. The execution will take around 15 minutes (depending on PC).
+**NOTE**: If you need to reconfigure your keyboard for your specific language, you can run `sudo dpkg-reconfigure keyboard-configuration` in the deployed VMs.
 
-**Launching scenario 1**
+## Launching SCENARIO 1: Two virtual machines directly connected
+
+In this scenario, two machines are directly connected using network interfaces eth1 and eth2. eth0 is configured with NAT in VirtualBox to connect to Internet. eth3 is configured with IP addresses 192.168.33.1/24 and 192.168.33.2/24 for management (for connecting through SSH). The image shows both VMs employing a network namespace (MPTCPns) and OpenVPN. You can configure whether namespaces or OpenVPN are used or not.
+
+<img src="https://bitbucket.i2cat.net/projects/SDWN/repos/free5gc/browse/img/mptcp_scenario1.png?at=refs%2Fheads%2Fugr_v01&raw=" width="800">
+
+**Launching scenario 1 (without namespace/OpenVPN)**
 
 To setup this scenario the following scripts have to be run in this order:
 
@@ -39,7 +46,7 @@ To setup this scenario the following scripts have to be run in this order:
 
 This will setup MPTCP properly in both VMs.
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1_set_MPTCP_parameters.png" width="800">
+<img src="https://bitbucket.i2cat.net/projects/SDWN/repos/free5gc/browse/img/mptcp_scenario1_set_MPTCP_parameters.png?at=refs%2Fheads%2Fugr_v01&raw=" width="1200">
 
 In order to test the correct behaviour of MPTCP, you can run `iperf` and check the throughput in each interface using `ifstat`. For this, you can use:
 
@@ -49,13 +56,13 @@ In order to test the correct behaviour of MPTCP, you can run `iperf` and check t
 
 You can see that there are data sent on both interfaces (`eth1` and `eth2`).
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1_test_throughput.png" width="800">
+<img src="https://bitbucket.i2cat.net/projects/SDWN/repos/free5gc/browse/img/mptcp_scenario1_test_throughput.png?at=refs%2Fheads%2Fugr_v01&raw=" width="1200">
 
 Additionally, you can check that each interface can be active (on), inactive (off) or used as backup (backup) on MPTCP. For that purpose, you can use the `change_interface_state.sh` script. In the following example, the test started with both interfaces as active, then 1) changing `eth2` to `backup` (so it would transfer data only if the other interface is inactive), next 2) changing `eth1` to `off` (so data was transferred using `eth2`), and finally 3) `eth1` becoming active again (so data was transferred only using `eth1`). Similarly, you can perform any other similar tests.
 
 **IMPORTANT**: The `backup` state is only used with the `default` scheduler. In the case of the `roundrobin` scheduler, `backup` is treated as `on` (i.e. the interface remains active).
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1_change_interfaces_state.png" width="800">
+<img src="https://bitbucket.i2cat.net/projects/SDWN/repos/free5gc/browse/img/mptcp_scenario1_change_interfaces_state.png?at=refs%2Fheads%2Fugr_v01&raw=" width="1200">
 
 **Launching scenario 1 with namespace MPTCPns and OpenVPN**
 
@@ -67,13 +74,41 @@ To use a namespace (`MTPCPns`) and OpenVPN in both VMs, you have to run:
 
 In order to perform some experiment, remember to use the namespace `MPTCPns` and its network interfaces. For simplicity, you can run `sudo ip netns exec MPTCPns bash`. In the namespace, you can check the network interfaces by executing `ifconfig` (you should have interfaces `v_mp_1` and `v_mp_2` for both MPTCP paths, with IP addresses 10.1.1.X/24, with X=1..4, and `tun0`, with IP address 10.8.0.1/24 on the server and 10.8.0.2/24 on the client).
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1_test_namespace_ovpn.png" width="512">
+<img src="https://bitbucket.i2cat.net/projects/SDWN/repos/free5gc/browse/img/mptcp_scenario1_test_namespace_ovpn.png?at=refs%2Fheads%2Fugr_v01&raw=" width="800">
 
+## Launching SCENARIO 2: UE <-> free5GC <-> proxy
 
-### SCENARIO 2: UE <-> free5GC <-> proxy
+In this scenario, a VM (mptcpUe) employs two network interfaces (`eth1` and `eth2`) emulating a computer with two wireless access technologies (WATs), e.g. Wi-Fi, Li-Fi or 5G NR. We assume that they are in bridge mode, i.e. connected to the same IP network. This VM is directly connected to a VM (free5gc) implementing the 5G core network. The connection is done through the N3IWF (Non-3GPP InterWorking Function) entity. Since we are employing MPTCP to simultaneously transfer data from both interfaces of mptcpUe VM, it is required that the other end also implements MPTCP. Due to the different kernel versions on both VMs (4.19.142 for MPTCP and 5.0.0-23 for free5GC), another VM (mptcpProxy) is also required. mptcpProxy implements MPTCP for this purpose.
+
+**NOTE**: If required, you can add more network interfaces to the mptcpUe VM to emulate more WATs, as long as the last one is configured for management (i.e. using 192.168.33.1/24). The scripts will utilize consecutive network interfaces starting from eth1, eth2, eth3, etcetera.
+
+**Launch scenario 2 without 5G core network**
+
+The following image shows the scenario.
+
+<img src="https://bitbucket.i2cat.net/projects/SDWN/repos/free5gc/browse/img/mptcp_scenario2_simple.png?at=refs%2Fheads%2Fugr_v01&raw=" width="1200">
+
+To setup this scenario the following scripts have to be run in this order:
+
+- **mptcpProxy**: change to the `$HOME/free5gc/mptcp_test` directory and run `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -g 60.60.0.102 -n 60.60.0 -f 101 -o server`.
+
+- **free5gc**: change to the `$HOME/go/src/free5gc/mptcp_test` directory and run `./configure_free5gc_simple.sh`.
+
+- **mptcpUe**: change to the `$HOME/go/src/free5gc/mptcp_test` directory and run `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -g 10.1.1.222 -n 10.1.1 -u 2 -f 1 -m -o client`.
+
+To test that MPTCP is working properly, run the following scripts:
+
+- **mptcpProxy**: Check that there is a `tap0` interface by running `ifconfig`. Change to the `$HOME/free5gc/mptcp_test` directory and run `./test_throughput_tcp_server.sh`.
+
+- **mptcpUe**: Enter into namespace MPTCPns by running `sudo ip netns exec MPTCPns bash`. Check that there is a `tap0` interface by running `ifconfig`. Then launch `./test_throughput_tcp_client.sh -c 10.8.0.1 & ifstat`. You can change the interfaces state by using the script `change_interface_state.sh`, e.g. `./change_interface_state.sh -i eth2 -s backup`, `./change_interface_state.sh -i eth1 -s off`, etcetera.
+
+**Launch scenario 2 with 5G core network**
+
+[**SCENARIO RUNNING FREE5GC: TO BE DONE AND WRITTEN**]
+
+## Tools
 
 [TO BE WRITTEN]
-
 
 ---
 

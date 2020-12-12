@@ -28,10 +28,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   ####################
 
   config.vm.define "mptcpUe" do |mptcpUe|
-	  mptcpUe.vm.network "private_network", ip: "10.1.1.1", auto_config: true, virtualbox__intnet: "ue_5gc" # Interface 1 connecting to second machine
-	  mptcpUe.vm.network "private_network", ip: "10.1.1.2", auto_config: true, virtualbox__intnet: "ue_5gc" # Interface 2 connecting to second machine
-	  mptcpUe.vm.network "private_network", ip: "192.168.33.1", auto_config: true                           # Interface 3 connecting to host (for management)
-	  mptcpUe.vm.hostname = "mptcpUe"
+    mptcpUe.vm.network "private_network", ip: "10.1.1.1", auto_config: true, virtualbox__intnet: "ue_5gc" # Interface 1 connecting to second machine
+    mptcpUe.vm.network "private_network", ip: "10.1.1.2", auto_config: true, virtualbox__intnet: "ue_5gc" # Interface 2 connecting to second machine
+    mptcpUe.vm.network "private_network", ip: "192.168.33.1", auto_config: true                           # Interface 3 connecting to host (for management)
+    mptcpUe.vm.hostname = "mptcpUe"
     mptcpUe.vm.provider :virtualbox do |vm|
       # Linked clones
       #vm.linked_clone = true
@@ -50,7 +50,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
     # Provisioning
     mptcpUe.vm.provision "file", source: "./vagrant", destination: "$HOME/vagrant"
-    mptcpUe.vm.provision "shell", path: "vagrant/mptcp_kernel_installation_54.sh", privileged: false
+    mptcpUe.vm.provision "shell", path: "vagrant/mptcp_kernel54_installation.sh", privileged: false
     mptcpUe.vm.provision :reload
     mptcpUe.vm.provision "shell", path: "vagrant/mptcp_installation.sh", privileged: false
     mptcpUe.vm.provision "shell", path: "vagrant/go_installation.sh", privileged: false
@@ -85,7 +85,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
     # Provisioning
     free5gc.vm.provision "file", source: "./vagrant", destination: "$HOME/vagrant"
-    free5gc.vm.provision "shell", path: "vagrant/free5gc_kernel_installation.sh", privileged: false
+    free5gc.vm.provision "shell", path: "vagrant/mptcp_kernel54_installation.sh", privileged: false
     free5gc.vm.provision :reload
     free5gc.vm.provision "shell", path: "vagrant/go_installation.sh", privileged: false
     free5gc.vm.provision "shell", path: "vagrant/free5gc_control_plane_installation.sh", privileged: false, env: {"GOPATH" => "/home/vagrant/go", "GOROOT" => "/usr/local/go", "PATH" => "$PATH:/usr/local/go/bin:/home/vagrant/go/bin:/home/vagrant/go/bin", "GO111MODULE" => "off"}
@@ -120,7 +120,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
     # Provisioning
     mptcpProxy.vm.provision "file", source: "./vagrant", destination: "$HOME/vagrant"
-    mptcpProxy.vm.provision "shell", path: "vagrant/mptcp_kernel_installation_54.sh", privileged: false
+    mptcpProxy.vm.provision "shell", path: "vagrant/mptcp_kernel54_installation.sh", privileged: false
     mptcpProxy.vm.provision :reload
     mptcpProxy.vm.provision "shell", path: "vagrant/mptcp_installation.sh", privileged: false
     mptcpProxy.vm.provision "shell", path: "vagrant/proxy_installation.sh", privileged: false
