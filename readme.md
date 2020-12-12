@@ -8,7 +8,7 @@ In order to simplify testing with MPTCP, we have developed two Vagrant configura
 
 1. **Two virtual machines** (VMs) which are **directly connected** by two network interfaces.
 
-2. Three VMs for the scenario explained in the master branch (**UE <-> free5GC <-> proxy**). Within this scenario, we also consider the two testbeds considered in the main branch: simple testbed and free5GC testbed.
+2. Three VMs for the scenario explained in the master branch (**UE <-> free5GC <-> proxy**). Within this scenario, we also include the two testbeds considered in the main branch: simple testbed and free5GC testbed.
 
 In both scenarios, a Vagrantfile has been developed to install the required kernel version, packages and the developed scripts, and will clone i2CAT's free5gc repository (master branch). So the deployed VMs should work out of the box. For details, please check the explanations in the master branch. **The developed installation scripts** (see the `vagrant` directory) **should work on real PCs** (as long as they have Intel architecture, e.g. Intel's NUC computers) **with few modifications**.
 
