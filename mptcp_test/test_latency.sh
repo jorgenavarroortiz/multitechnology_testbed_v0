@@ -1,5 +1,5 @@
 #!/bin/bash
-# Jorge Navarro, UGR (2020)
+# Jorge Navarro-Ortiz (jorgenavarro@ugr.es), University of Granada 2020
 
 #############################
 # Parsing inputs parameters
@@ -38,9 +38,9 @@ fi
 
 # Using mtr to test latency (using TCP)
 if [[ $f == 1 ]]; then
+   echo "Testing latency against ${PEER} and saving results in file ${FILENAME}"
+   sudo mtr -T -P 22 --no-dns -i 0.1 -c 100 $PEER -C | tee $FILENAME
+else
    echo "Testing latency against ${PEER} but not saving results"
    sudo mtr -T -P 22 --no-dns -i 0.1 -c 100 $PEER -C
-else
-  echo "Testing latency against ${PEER} and saving results in file ${FILENAME}"
-  sudo mtr -T -P 22 --no-dns -i 0.1 -c 100 $PEER -C | tee $FILENAME
 fi

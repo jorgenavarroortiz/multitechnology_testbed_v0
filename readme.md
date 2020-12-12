@@ -150,6 +150,18 @@ The results can be plotted with xplot.org. **NOTE**: Remember to redirect the DI
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/pcap_process_plot.png" width="800">
 
+# TCP congestion window
+
+TCP congestion window related information is local, i.e. it is not sent in TCP packets. It is possible to add events for TCP congestion window tracing using the `/sys/kernel/debug/tracing/events/tcp/tcp_probe` file. We have developed some scripts to ease this task.
+
+First, you have to start TCP cwnd tracing using `tcp_probe_start.sh`. After the experiment, you have to stop TCP cwnd tracing and save the information to a file using `tcp_probe_stop.sh`.
+
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/tcp_probe_start_stop.png" width="800">
+
+Later, you can process (`tcp_probe_process.sh`) and plot (`tcp_probe_plot.sh`) the information that you have saved. The last script includes 3 types of plots: 1) congestion window and slow start threshold, 2) smooth RTT, and 3) sender and receiver advertised windows.
+
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/tcp_probe_process_plot.png" width="800">
+
 ---
 
 # 5GCLARITY testbed setup (from original repository)

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Jorge Navarro, UGR (2020)
+# Jorge Navarro-Ortiz (jorgenavarro@ugr.es), University of Granada 2020
 
 #############################
 # Parsing inputs parameters
@@ -21,7 +21,7 @@ while getopts ":i:b:l:" o; do
             INTERFACE=${OPTARG}
             echo "INTERFACE="$INTERFACE
             ;;
-        s)
+        b)
             b=1
             BANDWIDTH=${OPTARG}
             echo "BANDWIDTH="$BANDWIDTH
