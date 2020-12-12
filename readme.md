@@ -1,6 +1,6 @@
-# 5GCLARITY testbed setup
+# 5G-CLARITY testbed v0 setup
 
-UGR's branch from the original repository (i2CAT's free5gc repository). The master repository readme can be found below, after UGR's branch readme. Please contact Jorge Navarro-Ortiz (jorgenavarro@ugr.es) or Juan J. Ramos-Munoz (jjramos@ugr.es) for further details.
+Testbed v0 (virtualized environment) for the 5G-CLARITY European Project. Initially started by Daniel Camps (from i2CAT). i2CAT's repository readme can be found below, after UGR's repository readme. Please contact Jorge Navarro-Ortiz (jorgenavarro@ugr.es) or Juan J. Ramos-Munoz (jjramos@ugr.es) for further details.
 
 ## Setting up the virtual environment
 
