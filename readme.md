@@ -128,7 +128,7 @@ To test TCP throughput, you could use `iperf`. We have included two scripts (`te
 
 Also we can use the command `ifstat`, which shows us the throughput for the different network interfaces in both directions.
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/ifstat.png" width="512">
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/ifstat.png" width="400">
 
 ### Changing bandwidth and latency of a network interface
 
