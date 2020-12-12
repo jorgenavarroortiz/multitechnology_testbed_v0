@@ -120,7 +120,11 @@ We have included a script, `test_latency.sh`, that employs MTR with typical para
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/test_latency_tcp.png" width="800">
 
+### Testing TCP throughput
 
+To test TCP throughput, you could use `iperf`. We have included two scripts (`test_tcp_throughput_server.sh` and `test_tcp_throughput_client.sh`) for simplicity, which save the results.
+
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/test_throughput_tcp.png" width="800">
 
 ---
 
