@@ -164,7 +164,7 @@ Later, you can process (`tcp_probe_process.sh`) and plot (`tcp_probe_plot.sh`) t
 
 ---
 
-# 5GCLARITY testbed setup (from original repository)
+# 5GCLARITY testbed setup (from i2CAT's original repository)
 
 ## Setting up the virtual environment
 
