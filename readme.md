@@ -112,6 +112,16 @@ To test that MPTCP is working properly, run the following scripts:
 
 [TO BE WRITTEN]
 
+### Testing TCP latency
+
+To test TCP latency, you could use MTR (https://github.com/traviscross/mtr). It is included in the Vagrantfiles.
+
+We have included a script, `test_latency.sh`, that employs MTR with typical parameters and save results to a file.
+
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/test_latency_tcp.png" width="800">
+
+
+
 ---
 
 # 5GCLARITY testbed setup (from original repository)
