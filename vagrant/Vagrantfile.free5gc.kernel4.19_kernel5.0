@@ -28,10 +28,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   ####################
 
   config.vm.define "mptcpUe" do |mptcpUe|
-	  mptcpUe.vm.network "private_network", ip: "10.1.1.1", auto_config: true, virtualbox__intnet: "ue_5gc" # Interface 1 connecting to second machine
-	  mptcpUe.vm.network "private_network", ip: "10.1.1.2", auto_config: true, virtualbox__intnet: "ue_5gc" # Interface 2 connecting to second machine
-	  mptcpUe.vm.network "private_network", ip: "192.168.33.1", auto_config: true                           # Interface 3 connecting to host (for management)
-	  mptcpUe.vm.hostname = "mptcpUe"
+    mptcpUe.vm.network "private_network", ip: "10.1.1.1", auto_config: true, virtualbox__intnet: "ue_5gc" # Interface 1 connecting to second machine
+    mptcpUe.vm.network "private_network", ip: "10.1.1.2", auto_config: true, virtualbox__intnet: "ue_5gc" # Interface 2 connecting to second machine
+    mptcpUe.vm.network "private_network", ip: "192.168.33.1", auto_config: true                           # Interface 3 connecting to host (for management)
+    mptcpUe.vm.hostname = "mptcpUe"
     mptcpUe.vm.provider :virtualbox do |vm|
       # Linked clones
       #vm.linked_clone = true

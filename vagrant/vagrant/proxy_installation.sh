@@ -12,4 +12,4 @@ echo "|1|LLVmO4V7aoFrt/d+VXBaez9j9jg=|QfNM3AmF96wO3VjD6/k/39wFjxc= ssh-rsa AAAAB
   # Clone free5gc project
 cd /home/vagrant
 #git clone https://github.com/free5gc/free5gc.git
-git clone ssh://git@bitbucket.i2cat.net:7999/sdwn/free5gc.git
+git clone -b ugr_v01 ssh://git@bitbucket.i2cat.net:7999/sdwn/free5gc.git
