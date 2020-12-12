@@ -140,11 +140,11 @@ For that purpose, you could use `tc-netem`. We have included two scripts for cha
 
 To capture several (but not all) interfaces, you can use tshark (please check script `pcap_capture.sh`).
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/pcap_capture.png" width="800">
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/pcap_capture.png" width="600">
 
 Later, you can process the captured trace file with MPTCPTRACE (https://github.com/multipath-tcp/mptcptrace) (please check script `pcap_process.sh`).
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/pcap_process.png" width="800">
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/pcap_process.png" width="400">
 
 The results can be plotted with xplot.org. **NOTE**: Remember to redirect the DISPLAY to your IP address using `export DISPLAY='<IP address>:0.0'`.
 
