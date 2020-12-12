@@ -106,6 +106,8 @@ To test that MPTCP is working properly, run the following scripts:
 
 [**SCENARIO RUNNING FREE5GC: TO BE DONE AND WRITTEN**]
 
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario2_free5gc.png" width="1200">
+
 ## Tools
 
 [TO BE WRITTEN]
