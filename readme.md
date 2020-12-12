@@ -158,7 +158,7 @@ First, you have to start TCP cwnd tracing using `tcp_probe_start.sh`. After the 
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/tcp_probe_start_stop.png" width="512">
 
-Later, you can process (`tcp_probe_process.sh`) and plot (`tcp_probe_plot.sh`) the information that you have saved. The last script includes 3 types of plots: 1) congestion window and slow start threshold, 2) smooth RTT, and 3) sender and receiver advertised windows.
+Later, you can process (`tcp_probe_process.sh`) and plot (`tcp_probe_plot.sh`) the information that you have saved. The last script includes 3 types of plots: 1) congestion window and slow start threshold, 2) smooth RTT, and 3) sender and receiver advertised windows. For plotting, remember first to redirect the DISPLAY to your IP address using `export DISPLAY='<IP address>:0.0'`.
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/tcp_probe_process_plot.png" width="800">
 
