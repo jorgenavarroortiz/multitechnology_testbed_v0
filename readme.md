@@ -23,7 +23,7 @@ In both scenarios, a Vagrantfile has been developed to install the required kern
 
 In this scenario, two machines are directly connected using network interfaces eth1 and eth2. eth0 is configured with NAT in VirtualBox to connect to Internet. eth3 is configured with IP addresses 192.168.33.1/24 and 192.168.33.2/24 for management (for connecting through SSH). The image shows both VMs employing a network namespace (MPTCPns) and OpenVPN. You can configure whether namespaces or OpenVPN are used.
 
-<img src="https://bitbucket.i2cat.net/projects/SDWN/repos/free5gc/browse/img/mptcp_scenario1.png?at=refs%2Fheads%2Fugr_v01&raw=" width="512">
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1.png" width="512">
 
 **VMs installation using Vagrant**
 
