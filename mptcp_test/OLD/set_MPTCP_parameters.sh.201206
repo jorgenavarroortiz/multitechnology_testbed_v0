@@ -1,0 +1,230 @@
+#!/bin/bash
+# Jorge Navarro, UGR (2020)
+
+# This script assumes the following scenarios (please execute ./configure.sh first). Make sure that the hostname in /etc/hostname
+# is a valid one: mptcpUe1, mptcpUe2, mptcpUe, free5gc or mptcpProxy
+#
+# Scenario 1: direct connection between two machines: mptcpUe1 <-> mptcpUe2
+#   mptcpUe1 with eth0 disabled, eth1 10.1.1.1/24, eth2 10.1.1.2/24, eth3 for management
+#   mptcpUe2 with eth0 disabled, eth1 10.1.1.3/24, eth2 10.1.1.4/24, eth3 for management
+# NOTE: eth0 connects directly to Internet, used to install packages
+#
+# Scenario 2: mptcpUe <-> free5gc <-> mptcpProxy
+#   mptcpUe with eth0 disabled, eth1 10.1.1.1/24, eth2 10.1.1.2/24, eth3 for management
+#   free5gc with eth0 disabled, eth1 10.1.1.222/24, eth2 60.60.0.102/24, eth3 for management
+#   mptcpProxy with eth0 disabled, eth1 60.60.0.101/24, eth2 for management
+# NOTE: eth0 connects directly to Internet, used to install packages
+
+#############################
+# Parsing inputs parameters
+#############################
+
+usage() {
+  echo "Usage: $0 -p <path manager> -s <scheduler> -c <congestion control> [-d]" 1>&2;
+  echo " E.g.: $0 -p fullmesh -s default -c olia";
+  echo "       <path manager> ......... default, fullmesh, ndiffports, binder"
+  echo "       <scheduler> ............ default, roundrobin, redundant"
+  echo "       <congestion control> ... reno, cubic, lia, olia, wvegas, balia, mctcpdesync"
+  echo "       -d ..................... print debug messages"
+  exit 1;
+}
+
+# Default values
+PATHMANAGER=fullmesh
+SCHEDULER=default
+CONGESTIONCONTROL=olia
+
+while getopts ":p:s:c:d" o; do
+    case "${o}" in
+        p)
+            p=1
+            PATHMANAGER=${OPTARG}
+            echo "PATHMANAGER="$PATHMANAGER
+            ;;
+        s)
+            s=1
+            SCHEDULER=${OPTARG}
+            echo "SCHEDULER="$SCHEDULER
+            ;;
+        c)
+            c=1
+            CONGESTIONCONTROL=${OPTARG}
+            echo "CONGESTIONCONTROL="${OPTARG}
+            ;;
+        d)
+            DEBUG=1
+            echo "Include debug messages"
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+if [ -z "${p}" ] || [ -z "${s}" ] || [ -z "${c}" ]; then
+    usage
+fi
+
+##############################
+# Environment configuration
+##############################
+
+# Check OS
+if [ -f /etc/os-release ]; then
+    # freedesktop.org and systemd
+    . /etc/os-release
+    OS=$NAME
+    VER=$VERSION_ID
+else
+    # Fall back to uname, e.g. "Linux <version>", also works for BSD, etc.
+    OS=$(uname -s)
+    VER=$(uname -r)
+    echo "This Linux version is too old: $OS:$VER, we don't support!"
+    exit 1
+fi
+
+#sudo -v
+#if [ $? == 1 ]
+#then
+#    echo "Error: root permission is needed!"
+#    exit 1
+#fi
+
+GOPATH=$HOME/go
+if [ $OS == "Ubuntu" ]; then
+    GOROOT=/usr/local/go
+elif [ $OS == "Fedora" ]; then
+    GOROOT=/usr/lib/golang
+fi
+PATH=$PATH:$GOPATH/bin:$GOROOT/bin
+
+##############################
+# CONFIGURATION
+##############################
+MACHINE=`hostname`
+./configure.sh
+
+bGlobalGW=1
+card1="eth1"
+card2="eth2"
+
+if [[ $bGlobalGW == 1 ]]; then
+  if [[ $MACHINE == "mptcpUe" ]]; then
+    GlobalEth=$card1
+    GlobalGW="10.1.1.222"
+    GWcard1=GlobalGW
+    GWcard2="10.1.1.222"
+  elif [[ $MACHINE == "mptcpUe1" ]]; then
+    GlobalEth=$card1
+    GlobalGW="10.1.1.3"
+    GWcard=GlobalGW
+    GWcard2="10.1.1.4"
+  elif [[ $MACHINE == "mptcpUe2" ]]; then
+    GlobalEth=$card1
+    GlobalGW="10.1.1.1"
+    GWcard1=GlobalGW
+    GWcard2="10.1.1.2"
+  elif [[ $MACHINE == "mptcpProxy" ]]; then
+    GlobalEth=$card1
+    GlobalGW="60.60.0.102"
+    GWcard1=GlobalGW
+  else
+    GlobalEth=$card1
+    GlobalGW=`route -n | grep ${GlobalEth} | grep 0.0.0.0 | awk '{ if ($1=="0.0.0.0") printf $2"\n";}' | head -n 1`
+    GWcard1=GlobalGW
+  fi
+fi
+
+if [[ $bGlobalGW == 1 ]]; then
+  if [[ $DEBUG -eq 1 ]]; then echo ""; echo "[DEBUG] GlobalGW: ${GlobalGW}"; fi
+fi
+
+##############################
+# SETTING MPTCP PARAMETERS
+##############################
+
+# card1 information
+IPcard1=`ifconfig $card1 | grep inet | tr -s ' ' | cut -d' ' -f 3`
+if [[ $DEBUG -eq 1 ]]; then echo "[DEBUG] IPcard1:   ${IPcard1}"; fi
+netmaskcard1bits=`ip -o -f inet addr show $card1 | tr -s ' ' | cut -d' ' -f 4 | cut -d'/' -f 2`
+netmaskcard1=`ifconfig $card1 | grep inet | tr -s ' ' | cut -d' ' -f 5`
+IFS=. read -r i1 i2 i3 i4 <<< $IPcard1
+IFS=. read -r m1 m2 m3 m4 <<< $netmaskcard1
+NETcard1=`printf "%d.%d.%d.%d\n" "$((i1 & m1))" "$((i2 & m2))" "$((i3 & m3))" "$((i4 & m4))"`
+NETcard1=`echo ${NETcard1}/${netmaskcard1bits}`
+if [[ $DEBUG -eq 1 ]]; then echo "[DEBUG] NETcard1:  ${NETcard1}"; fi
+if [[ $DEBUG -eq 1 ]]; then echo "[DEBUG] GWcard1:   ${GWcard1}"; fi
+
+if [[ $MACHINE == *"mptcpUe"* ]]; then
+  # card2 information
+  IPcard2=`ifconfig $card2 | grep inet | tr -s ' ' | cut -d' ' -f 3`
+  if [[ $DEBUG -eq 1 ]]; then echo "[DEBUG] IPcard2:   ${IPcard2}"; fi
+  netmaskcard2bits=`ip -o -f inet addr show $card2 | tr -s ' ' | cut -d' ' -f 4 | cut -d'/' -f 2`
+  netmaskcard2=`ifconfig $card2 | grep inet | tr -s ' ' | cut -d' ' -f 5`
+  IFS=. read -r i1 i2 i3 i4 <<< $IPcard2
+  IFS=. read -r m1 m2 m3 m4 <<< $netmaskcard2
+  NETcard2=`printf "%d.%d.%d.%d\n" "$((i1 & m1))" "$((i2 & m2))" "$((i3 & m3))" "$((i4 & m4))"`
+  NETcard2=`echo ${NETcard2}/${netmaskcard2bits}`
+  if [[ $DEBUG -eq 1 ]]; then echo "[DEBUG] NETcard2:  ${NETcard2}"; fi
+  if [[ $DEBUG -eq 1 ]]; then echo "[DEBUG] GWcard2:   ${GWcard2}"; fi
+fi
+
+# Show MPTCP version
+echo ""; echo "[INFO] Show version and configuration parameters"
+sudo dmesg | grep MPTCP
+
+# Disable interfaces for MPTCP (eth0 = NAT connection, eth3 = connection with host OS)
+if [[ $MACHINE == *"mptcpUe"* ]]; then
+  sudo ip link set dev eth0 multipath off
+  sudo ip link set dev eth3 multipath off
+fi
+if [[ $MACHINE == "mptcpProxy" ]]; then
+  sudo ip link set dev eth0 multipath off
+  sudo ip link set dev eth2 multipath off
+fi
+
+# Normal interface
+sudo ip link set dev $card1 multipath on
+
+# Backup interface
+sudo ip link set dev $card2 multipath on
+
+# Modify tunable variables
+sudo sysctl -w net.mptcp.mptcp_enabled=1     # Default 1
+sudo sysctl -w net.mptcp.mptcp_checksum=1    # Default 1 (both sides have to be 0 in order to disable this)
+sudo sysctl -w net.mptcp.mptcp_syn_retries=3 # Specifies how often we retransmit a SYN with the MP_CAPABLE-option. Default 3
+sudo sysctl -w net.mptcp.mptcp_path_manager=$PATHMANAGER
+sudo sysctl -w net.mptcp.mptcp_scheduler=$SCHEDULER
+
+# Congestion control
+sudo sysctl -w net.ipv4.tcp_congestion_control=$CONGESTIONCONTROL
+
+# Remove previous rules
+for i in {32700..32765}; do sudo ip rule del pref $i 2>/dev/null ; done
+# Create routing tables for each interface
+sudo ip rule add from $IPcard1 table 1 2> /dev/null
+sudo ip route add $NETcard1 dev $card1 scope link table 1 2> /dev/null
+sudo ip route add default via $GWcard1 dev $card1 table 1 2> /dev/null
+if [[ $MACHINE == *"mptcpUe"* ]]; then
+  sudo ip rule add from $IPcard2 table 2 2> /dev/null
+  sudo ip route add $NETcard2 dev $card2 scope link table 2 2> /dev/null
+  sudo ip route add default via $GWcard2 dev $card2 table 2 2> /dev/null
+fi
+
+# Default route for normal internet
+if [[ bGlobalGW == 1 ]]; then
+  sudo ip route add default scope global nexthop via $GlobalGW dev $GlobalEth 2> /dev/null
+fi
+
+##############################
+# SHOWING ROUTING INFORMATION
+##############################
+echo ""; echo "[INFO] Show rules"
+sudo ip rule show
+echo ""; echo "[INFO] Show routes"
+sudo ip route
+echo ""; echo "[INFO] Show routing table 1"
+sudo ip route show table 1
+echo ""; echo "[INFO] Show routing table 2"
+sudo ip route show table 2

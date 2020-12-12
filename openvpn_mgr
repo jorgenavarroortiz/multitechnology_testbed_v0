@@ -1,0 +1,59 @@
+#!/bin/bash
+
+usage() { echo "Usage: $0 [-m <start/stop>] [-M]" 1>&2; exit 1; }
+
+while getopts ":m:M" o; do
+    case "${o}" in
+        m)
+            MODE=${OPTARG}
+            echo "Exec openvpn: "$MODE
+            ;;
+        M)
+            MPTCPns=True
+            echo " ... openvpn running in MPTCP namespace"
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+if [ -z "${MODE}" ]; then
+    usage
+fi
+
+# MPTCP namespace --> UE
+if [ ${MPTCPns} ]
+then
+	GOPATH=$HOME/go
+	MPTCPNS="MPTCPns"
+	EXEC_MPTCPNS="sudo ip netns exec ${MPTCPNS}"
+	if [ $MODE == "start" ]
+	then
+		echo "... Starting openvpn"
+		cd $GOPATH/src/free5gc/ovpn-config-client  # openvpn needs to run from this folder
+		$EXEC_MPTCPNS openvpn ovpn-client1.conf &
+	fi
+	if [ $MODE == "stop" ]
+	then
+		echo "... Killing openvpn"
+		$EXEC_MPTCPNS killall openvpn
+	fi
+fi
+
+# Proxy (no MPTCP namespace)
+if [ -z ${MPTCPns} ]
+then
+	if [ $MODE == "start" ]
+	then
+		echo "... Starting openvpn"
+		cd ovpn-config-proxy/
+		openvpn ovpn-server.conf &
+	fi
+	if [ $MODE == "stop" ]
+	then
+		echo "... Killing openvpn"
+		killall openvpn
+	fi
+fi

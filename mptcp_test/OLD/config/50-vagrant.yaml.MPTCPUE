@@ -1,0 +1,14 @@
+---
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eth1:
+      addresses:
+      - 192.168.13.3/24
+    eth2:
+      addresses:
+      - 192.168.13.4/24
+    eth3:
+      addresses:
+      - 192.168.33.1/24

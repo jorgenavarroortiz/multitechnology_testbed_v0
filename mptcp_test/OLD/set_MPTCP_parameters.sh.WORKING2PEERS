@@ -1,0 +1,128 @@
+#!/bin/bash
+# Jorge Navarro, UGR (2020)
+
+# This script assumes taht eth0 is the interface that connects to the global Internet,
+# eth1 and eth2 are used for MPTCP, and eth3 is for other purposes (e.g. PC management)
+
+MACHINE=`hostname`
+bGlobalGW=0
+
+# CONFIGURATION
+DEBUG=1
+PATHMANAGER=fullmesh   # default, fullmesh, ndiffports, binder
+SCHEDULER=default      # default, roundrobin, redundant
+CONGESTIONCONTROL=olia # reno cubic lia olia wvegas balia mctcpdesync
+ETH2STATE=on           # on, off, backup
+
+if [[ $# -lt 3 ]]; then
+  echo ""; echo "Syntax: $0 [<path manager> <scheduler> <congestion control> <eth2 state>]"
+  echo "  E.g.: $0 fullmesh roundrobin olia backup";
+  echo "        <path manager> ......... default, fullmesh, ndiffports, binder"
+  echo "        <scheduler> ............ default, roundrobin, redundant"
+  echo "        <congestion control> ... reno, cubic, lia, olia, wvegas, balia, mctcpdesync"
+  echo "        <eth2 state> ........... on, off, backup"
+  echo ""
+  exit 0
+fi
+
+if [[ $# -ge 3 ]]; then
+  PATHMANAGER=$1
+  SCHEDULER=$2
+  CONGESTIONCONTROL=$3
+fi
+if [[ $# -ge 4 ]]; then
+  ETH2STATE=$4
+fi
+
+echo ""; 
+if [[ $# -ge 4 ]]; then
+  echo "Configuring ${MACHINE} with MPTCP... PM=${PATHMANAGER}, SCH=${SCHEDULER}, CC=${CONGESTIONCONTROL}, eth2 state=${ETH2STATE}"
+else
+  echo "Configuring ${MACHINE} with MPTCP... PM=${PATHMANAGER}, SCH=${SCHEDULER}, CC=${CONGESTIONCONTROL}"
+fi
+
+if [[ bGlobalGW == 1 ]]; then
+  # Configure routing (we assume eth0 for global Internet, eth1 and eth2 for MPTCP)
+  GlobalEth="eth0"
+  GlobalGW=`route -n | grep ${GlobalEth} | grep 0.0.0.0 | awk '{ if ($1=="0.0.0.0") printf $2"\n";}' | head -n 1`
+  if [[ $DEBUG -eq 1 ]]; then echo ""; echo "[DEBUG] GlobalGW: ${GlobalGW}"; fi
+fi
+
+# eth1 information
+IPeth1=`ifconfig eth1 | grep inet | tr -s ' ' | cut -d' ' -f 3`
+if [[ $DEBUG -eq 1 ]]; then echo "[DEBUG] IPeth1:   ${IPeth1}"; fi
+netmasketh1bits=`ip -o -f inet addr show eth1 | tr -s ' ' | cut -d' ' -f 4 | cut -d'/' -f 2`
+netmasketh1=`ifconfig eth1 | grep inet | tr -s ' ' | cut -d' ' -f 5`
+IFS=. read -r i1 i2 i3 i4 <<< $IPeth1
+IFS=. read -r m1 m2 m3 m4 <<< $netmasketh1
+NETeth1=`printf "%d.%d.%d.%d\n" "$((i1 & m1))" "$((i2 & m2))" "$((i3 & m3))" "$((i4 & m4))"`
+NETeth1=`echo ${NETeth1}/${netmasketh1bits}`
+if [[ $DEBUG -eq 1 ]]; then echo "[DEBUG] NETeth1:  ${NETeth1}"; fi
+GWeth1=$IPeth1
+if [[ $DEBUG -eq 1 ]]; then echo "[DEBUG] GWeth1:   ${GWeth1}"; fi
+
+if [[ $MACHINE == *"mptcpUe"* ]]; then
+  # eth2 information
+  IPeth2=`ifconfig eth2 | grep inet | tr -s ' ' | cut -d' ' -f 3`
+  if [[ $DEBUG -eq 1 ]]; then echo "[DEBUG] IPeth2:   ${IPeth2}"; fi
+  netmasketh2bits=`ip -o -f inet addr show eth2 | tr -s ' ' | cut -d' ' -f 4 | cut -d'/' -f 2`
+  netmasketh2=`ifconfig eth2 | grep inet | tr -s ' ' | cut -d' ' -f 5`
+  IFS=. read -r i1 i2 i3 i4 <<< $IPeth2
+  IFS=. read -r m1 m2 m3 m4 <<< $netmasketh2
+  NETeth2=`printf "%d.%d.%d.%d\n" "$((i1 & m1))" "$((i2 & m2))" "$((i3 & m3))" "$((i4 & m4))"`
+  NETeth2=`echo ${NETeth2}/${netmasketh2bits}`
+  if [[ $DEBUG -eq 1 ]]; then echo "[DEBUG] NETeth2:  ${NETeth2}"; fi
+  GWeth2=$IPeth2
+  if [[ $DEBUG -eq 1 ]]; then echo "[DEBUG] GWeth2:   ${GWeth2}"; fi
+fi
+
+# Show MPTCP version
+echo ""; echo "[INFO] Show version and configuration parameters"
+sudo dmesg | grep MPTCP
+
+# Disable interfaces for MPTCP (eth0 = NAT connection, eth3 = connection with host OS)
+sudo ip link set dev eth0 multipath off
+sudo ip link set dev eth3 multipath off
+
+# Normal interface
+sudo ip link set dev eth1 multipath on
+
+# Backup interface
+sudo ip link set dev eth2 multipath $ETH2STATE
+
+# Modify tunable variables
+sudo sysctl -w net.mptcp.mptcp_enabled=1     # Default 1
+sudo sysctl -w net.mptcp.mptcp_checksum=1    # Default 1 (both sides have to be 0 in order to disable this)
+sudo sysctl -w net.mptcp.mptcp_syn_retries=3 # Specifies how often we retransmit a SYN with the MP_CAPABLE-option. Default 3
+sudo sysctl -w net.mptcp.mptcp_path_manager=$PATHMANAGER
+sudo sysctl -w net.mptcp.mptcp_scheduler=$SCHEDULER
+
+# Congestion control
+sudo sysctl -w net.ipv4.tcp_congestion_control=$CONGESTIONCONTROL
+
+# Remove previous rules
+for i in {32700..32765}; do sudo ip rule del pref $i 2>/dev/null ; done
+# Create routing tables for each interface
+sudo ip rule add from $IPeth1 table 1 2> /dev/null
+sudo ip route add $NETeth1 dev eth1 scope link table 1 2> /dev/null
+sudo ip route add default via $GWeth1 dev eth1 table 1 2> /dev/null
+if [[ $MACHINE == *"mptcpUe"* ]]; then
+  sudo ip rule add from $IPeth2 table 2 2> /dev/null
+  sudo ip route add $NETeth2 dev eth2 scope link table 2 2> /dev/null
+  sudo ip route add default via $GWeth2 dev eth2 table 2 2> /dev/null
+fi
+
+# Default route for normal internet
+if [[ bGlobalGW == 1 ]]; then
+  sudo ip route add default scope global nexthop via $GlobalGW dev $GlobalEth 2> /dev/null
+fi
+
+# Show routing tables
+echo ""; echo "[INFO] Show rules"
+sudo ip rule show
+echo ""; echo "[INFO] Show routes"
+sudo ip route
+echo ""; echo "[INFO] Show routing table 1"
+sudo ip route show table 1
+echo ""; echo "[INFO] Show routing table 2"
+sudo ip route show table 2
