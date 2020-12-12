@@ -1,0 +1,138 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 1 (0x1)
+        Signature Algorithm: sha1WithRSAEncryption
+        Issuer: C=ES, ST=CA, L=Barcelona, O=I2CAT, OU=I2CAT, CN=I2CAT/name=I2CAT/emailAddress=daniel.camps@i2cat.net
+        Validity
+            Not Before: Jun 28 16:34:58 2020 GMT
+            Not After : Jun 26 16:34:58 2030 GMT
+        Subject: C=ES, ST=CA, L=Barcelona, O=I2CAT, OU=I2CAT, CN=server/name=I2CAT/emailAddress=daniel.camps@i2cat.net
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                RSA Public-Key: (4096 bit)
+                Modulus:
+                    00:bc:56:3b:e3:31:e3:4f:c8:d5:73:02:53:51:ae:
+                    87:dd:a4:f0:28:85:58:8c:99:62:6f:9d:c2:53:1e:
+                    1a:4a:13:65:47:70:77:47:56:26:2f:e1:75:b0:c3:
+                    56:b0:f8:fe:d3:2c:f8:18:f0:24:2f:bd:36:09:08:
+                    9e:66:87:b8:86:db:eb:9f:7c:bf:32:f1:e5:a2:5f:
+                    6a:11:97:83:45:73:e0:82:0f:4f:09:24:51:68:0b:
+                    d7:80:92:b0:83:14:f9:c9:19:b9:39:e6:59:c8:32:
+                    03:b6:7a:56:1e:3c:61:73:f5:bb:49:0c:e5:3c:16:
+                    38:cc:a5:25:80:06:11:f6:61:61:b8:af:5e:bf:b2:
+                    b3:fb:f2:b6:33:e3:49:31:4f:83:c4:e0:62:67:5a:
+                    be:ec:73:57:2d:66:c0:22:42:a7:a4:86:e8:4e:7d:
+                    25:25:b1:b9:c1:7d:69:b0:f8:96:4a:63:1d:10:94:
+                    ec:ff:24:b4:81:cb:8a:49:91:fd:eb:3f:c8:f5:00:
+                    53:a4:5d:28:23:48:13:ce:9c:82:da:a0:19:12:27:
+                    50:7d:e7:28:71:6a:47:bc:e9:12:d3:08:63:38:a4:
+                    68:f6:15:d2:7a:48:83:7c:84:cf:61:d1:88:38:10:
+                    3e:3c:eb:61:91:c9:d9:87:59:8f:67:68:f5:1e:e3:
+                    b7:af:2f:f0:55:1a:e1:9d:c5:9e:91:f1:9f:6f:16:
+                    24:44:86:af:f9:dd:4f:ee:09:29:8a:c7:4f:db:5d:
+                    39:02:45:d0:cc:57:ea:4f:19:15:00:c9:29:d8:77:
+                    c6:26:a2:e8:a6:d0:55:2a:e6:c3:3a:59:e4:ff:99:
+                    bf:e7:68:32:86:80:2e:dd:c3:5f:1a:9c:31:a2:3f:
+                    2d:84:4a:45:8c:a3:e5:e0:eb:b3:0d:a0:ac:a2:ce:
+                    0b:f8:90:59:fb:95:34:f8:6c:c6:e2:1b:76:ee:5b:
+                    0a:6f:d4:5e:1b:1a:c6:df:0f:72:40:fc:c8:31:b2:
+                    1a:2d:a2:6a:10:34:62:f3:9a:6a:29:19:4a:be:49:
+                    24:27:63:4c:23:85:cd:3e:c5:d9:ca:c6:6e:c4:e4:
+                    5a:8b:10:b9:ce:ca:7b:76:ab:0c:09:b1:63:cd:2a:
+                    10:55:3c:3c:ce:84:5c:44:30:12:cb:0f:20:2d:0a:
+                    0c:e5:54:10:f3:a8:64:79:ea:8f:4a:b2:1c:b8:3a:
+                    a5:e6:c6:45:b4:a7:26:63:99:e6:21:d0:4a:d5:db:
+                    d4:84:ee:e1:53:f4:f4:e6:cf:93:f4:66:b3:a7:44:
+                    90:a8:ad:9c:20:0e:56:4d:48:6d:41:44:19:cd:0c:
+                    b7:55:bf:30:3a:b8:a6:1f:77:89:17:82:a2:5b:20:
+                    fb:74:69
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            Netscape Cert Type: 
+                SSL Server
+            Netscape Comment: 
+                Easy-RSA Generated Server Certificate
+            X509v3 Subject Key Identifier: 
+                01:66:6A:01:72:5E:8F:8E:23:12:94:06:31:3F:A7:40:CD:F6:B3:20
+            X509v3 Authority Key Identifier: 
+                keyid:E7:38:CC:34:F5:84:23:DE:48:3A:80:11:10:CF:77:CE:EB:2E:BC:AB
+                DirName:/C=ES/ST=CA/L=Barcelona/O=I2CAT/OU=I2CAT/CN=I2CAT/name=I2CAT/emailAddress=daniel.camps@i2cat.net
+                serial:70:0E:02:1C:51:74:25:5D:1D:B6:AB:48:F0:F5:AF:38:38:4F:65:19
+
+            X509v3 Extended Key Usage: 
+                TLS Web Server Authentication
+            X509v3 Key Usage: 
+                Digital Signature, Key Encipherment
+    Signature Algorithm: sha1WithRSAEncryption
+         b8:c4:e6:ca:25:83:a0:60:cc:25:e9:b2:f0:1a:2a:de:19:7d:
+         33:09:fc:a4:2a:c4:45:09:05:25:e3:39:bf:6e:19:dd:a2:b1:
+         dd:6d:5c:d7:34:90:c2:ef:a0:23:e3:ee:f8:f8:68:73:9e:62:
+         9a:c9:8f:92:bd:59:66:51:28:91:ac:9e:2a:04:e4:c9:e3:d5:
+         46:20:fc:69:da:ed:b2:20:7e:c2:20:3d:9d:b5:15:51:75:2b:
+         1b:23:63:8c:0c:e0:67:06:a7:a6:33:49:32:ba:33:e2:3f:16:
+         50:fe:7f:39:e3:d0:68:a2:b4:56:44:77:2a:0e:a7:10:e8:48:
+         ac:dd:70:e7:fc:b5:36:14:9c:08:cd:07:41:8f:e8:c3:28:f3:
+         e0:ca:4f:09:f6:02:3a:13:75:79:25:d6:41:f3:8e:59:65:4f:
+         7e:8b:9d:d3:4d:ed:43:6f:2b:21:ad:3f:7c:45:c2:00:ee:1d:
+         43:08:08:4e:e0:c8:4a:1f:36:94:17:0a:8b:44:60:89:77:b1:
+         76:2d:89:39:21:f7:d0:42:8c:bc:cc:d8:ab:da:6d:00:ba:7e:
+         e1:d5:57:c9:a7:7f:0a:fc:84:03:25:ab:59:25:10:29:8a:b3:
+         a7:e6:e6:14:53:fb:e7:41:e7:0c:71:a0:5d:7d:5f:f2:03:71:
+         8a:88:8d:cf:79:fa:2b:fa:c0:b2:a5:49:10:ec:74:e6:df:0e:
+         1d:1e:ed:8b:d9:7c:aa:19:f1:8a:95:14:ee:63:33:5f:dc:74:
+         4c:c6:bc:38:41:ec:af:2c:57:0d:0a:12:ff:fb:84:30:6f:f5:
+         b6:24:63:e3:95:ce:c6:7b:fe:78:12:77:91:ee:ca:10:f8:6e:
+         c7:0a:5c:79:18:8f:b8:8e:cd:5c:fe:21:af:2b:38:9f:75:45:
+         ee:34:83:3d:0c:c0:29:3b:6d:16:48:4d:8e:4a:60:0b:05:45:
+         c8:b5:75:bd:f6:e9:54:47:04:84:9d:c3:df:c8:2d:e9:2c:c6:
+         a4:a3:b3:96:87:66:13:0c:b4:6e:1a:24:cc:40:80:10:38:e4:
+         f2:d2:35:26:ba:fb:5a:c7:b1:44:86:2d:4b:57:fd:46:ee:52:
+         fb:13:b6:25:fa:f6:88:18:4f:11:6e:7e:55:0c:4e:ac:34:c9:
+         68:18:5a:f7:58:cb:e4:01:73:de:14:d7:95:e5:41:26:8b:50:
+         bd:d6:6b:5a:6f:0c:c6:74:5f:7a:a7:5c:0c:b9:19:b1:f0:41:
+         29:6a:7e:e3:ca:5e:24:72:90:0f:4e:d5:64:71:45:f7:bf:03:
+         ac:4b:6d:22:6f:42:22:7d:3d:7c:3e:9a:79:fc:d4:b9:d5:7b:
+         6d:a0:0e:3a:10:9c:65:b2
+-----BEGIN CERTIFICATE-----
+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
+-----END CERTIFICATE-----

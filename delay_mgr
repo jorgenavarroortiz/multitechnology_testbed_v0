@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# Script used to add or remove delay from an interface
+
+usage() { echo "Usage: $0 [-m <add/remove>] [-i <interface>] [-d <200ms>]" 1>&2; exit 1; }
+
+while getopts ":m:i:d:" o; do
+    case "${o}" in
+        m)
+            MODE=${OPTARG}
+            echo "Mode: "$MODE
+            ;;
+        i)
+            IFC=${OPTARG}
+            echo "Interface: "$IFC
+            ;;
+        d)
+            DELAY=${OPTARG}
+            echo "Delay: "$DELAY
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+if [ -z "${MODE}" ]; then
+    usage
+fi
+
+# Add delay to interface
+if [ "$MODE" == "add" ]
+then
+	sudo tc qdisc add dev $IFC root netem delay $DELAY
+	sudo tc -s qdisc | grep $IFC
+fi
+
+# Reomve delay from interface
+if [ "$MODE" == "remove" ]
+then
+	sudo tc qdisc del dev $IFC root netem
+	sudo tc -s qdisc | grep $IFC
+fi
+
+
+

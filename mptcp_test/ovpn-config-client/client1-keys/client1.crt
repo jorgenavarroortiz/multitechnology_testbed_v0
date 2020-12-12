@@ -1,0 +1,136 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 2 (0x2)
+        Signature Algorithm: sha1WithRSAEncryption
+        Issuer: C=ES, ST=CA, L=Barcelona, O=I2CAT, OU=I2CAT, CN=I2CAT/name=I2CAT/emailAddress=daniel.camps@i2cat.net
+        Validity
+            Not Before: Jun 28 16:35:40 2020 GMT
+            Not After : Jun 26 16:35:40 2030 GMT
+        Subject: C=ES, ST=CA, L=Barcelona, O=I2CAT, OU=I2CAT, CN=client1/name=I2CAT/emailAddress=daniel.camps@i2cat.net
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                RSA Public-Key: (4096 bit)
+                Modulus:
+                    00:ad:ef:25:cb:32:b2:b4:86:a0:8d:49:9f:d4:0c:
+                    a5:65:98:3d:8e:4e:35:64:ca:ff:c9:db:ea:9b:c7:
+                    70:89:7f:3c:0b:d9:a8:a0:90:fc:40:74:7f:8b:2d:
+                    3f:5c:44:5d:cc:4e:44:69:db:1a:d3:82:a0:5e:0a:
+                    7b:74:06:bf:62:26:c9:06:7a:44:2c:b1:7b:15:af:
+                    fc:35:fb:90:82:5f:27:8c:d2:99:86:0d:2a:67:6c:
+                    ae:4b:c7:11:b3:f3:29:af:fb:4c:e6:18:5d:35:af:
+                    39:5b:47:fc:e3:b4:1f:e2:b3:eb:6e:e6:47:08:07:
+                    5a:75:fb:3a:5a:9c:5d:b0:59:65:67:eb:47:0b:88:
+                    0a:ef:97:3a:67:53:e1:66:6d:bd:11:0e:e1:1c:6e:
+                    fb:9f:8f:8d:af:27:7d:8d:07:dd:ea:16:02:2d:41:
+                    66:5e:46:78:de:ae:4d:f8:b0:c4:66:de:6c:be:3f:
+                    00:91:5b:70:74:6b:ee:56:dc:0b:81:4b:a7:8d:bf:
+                    d9:c1:34:a4:39:af:45:73:22:29:ac:99:4a:1d:df:
+                    e0:ae:a8:25:1c:d3:f8:2a:c1:bc:6e:9f:05:c7:df:
+                    08:90:21:e7:16:4b:1e:e2:83:a0:77:0e:92:f7:c6:
+                    dd:7e:40:92:7a:a8:e6:b5:5e:aa:e9:3d:fa:f5:95:
+                    37:8b:cc:fb:28:75:22:04:3e:42:cd:76:62:d6:30:
+                    41:b2:c8:af:d2:18:64:01:50:ba:5f:50:0f:68:3a:
+                    50:d9:b9:0a:ef:a0:f2:fc:0d:28:03:53:1e:a4:05:
+                    42:5f:4a:bf:04:12:f1:30:94:32:39:2e:a7:b5:f2:
+                    7c:7c:dd:bb:ee:f1:a2:be:94:cd:50:d8:70:09:20:
+                    f5:a4:fa:bf:d4:6f:dd:19:d7:ea:b0:a1:a9:15:c2:
+                    78:ad:57:cc:88:55:6d:9f:fc:37:58:ec:87:eb:20:
+                    cb:4f:fd:39:05:d3:ad:e9:a3:1b:9a:86:1f:0a:85:
+                    be:54:a9:12:26:b4:e1:57:08:ae:69:f7:6b:07:54:
+                    10:f2:ef:f3:1b:71:9b:59:de:58:dd:44:38:4d:71:
+                    1b:e3:50:f2:dc:da:47:c9:dd:04:ef:4b:02:48:d7:
+                    d3:d3:02:a6:98:26:75:82:9b:92:bc:41:05:9b:63:
+                    b3:b4:69:23:f5:65:d9:63:e3:ec:0b:40:eb:4a:94:
+                    8c:a0:e8:4a:a9:93:db:b2:ca:d6:67:d9:9e:93:6c:
+                    ba:1f:14:50:ac:f9:0e:99:ca:5f:c8:d3:e4:73:d1:
+                    4a:d5:df:3c:cc:d6:ab:e5:8c:3f:b7:6b:1b:08:70:
+                    46:04:d4:dd:b6:03:dc:14:77:25:f2:59:a0:43:50:
+                    78:84:9b
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            Netscape Comment: 
+                Easy-RSA Generated Certificate
+            X509v3 Subject Key Identifier: 
+                2C:2C:97:CB:9A:04:7F:38:20:11:BF:08:E6:D1:5D:86:DC:FC:01:F3
+            X509v3 Authority Key Identifier: 
+                keyid:E7:38:CC:34:F5:84:23:DE:48:3A:80:11:10:CF:77:CE:EB:2E:BC:AB
+                DirName:/C=ES/ST=CA/L=Barcelona/O=I2CAT/OU=I2CAT/CN=I2CAT/name=I2CAT/emailAddress=daniel.camps@i2cat.net
+                serial:70:0E:02:1C:51:74:25:5D:1D:B6:AB:48:F0:F5:AF:38:38:4F:65:19
+
+            X509v3 Extended Key Usage: 
+                TLS Web Client Authentication
+            X509v3 Key Usage: 
+                Digital Signature
+    Signature Algorithm: sha1WithRSAEncryption
+         11:13:b1:0d:33:aa:01:1c:32:2c:a4:1f:89:d7:4d:1a:80:37:
+         33:ac:20:f7:2b:ce:ac:de:fb:51:d6:3e:1c:c1:f4:c9:e6:62:
+         5b:c1:74:04:26:5c:d7:b4:5d:5a:3b:7e:c3:10:45:dc:40:3d:
+         6f:d4:4d:c6:1e:b3:5a:fb:ac:53:2f:59:88:43:88:21:bd:31:
+         b2:c5:7e:4e:5d:85:50:b4:06:7e:ff:c6:cd:47:2c:a4:0d:7f:
+         10:d7:9e:81:a4:13:e9:91:13:21:ba:12:d5:06:85:21:bb:d9:
+         f0:bc:6d:b9:63:c2:0c:0e:1b:67:45:31:51:3b:4a:e3:c8:ee:
+         91:7c:4a:40:e8:d3:05:d9:92:d9:eb:4f:9d:12:30:4a:c6:02:
+         51:a4:19:fd:6a:73:03:df:27:f4:16:43:cd:69:53:88:20:5c:
+         9f:02:c1:fd:5d:b5:98:ce:8a:ed:c8:99:a3:42:d2:7c:1d:bb:
+         8b:e7:a6:a7:7f:c4:1d:f7:2b:6e:8b:43:c1:d0:43:31:70:85:
+         27:77:63:82:6a:e2:8b:5f:84:ef:76:4a:e1:53:8a:d3:05:db:
+         d6:ac:28:99:62:08:9e:84:f6:da:85:a7:f7:0c:0f:a9:fd:45:
+         a2:f4:8a:49:9f:f3:30:9a:44:c8:e4:1d:5a:0e:b5:32:7d:93:
+         45:23:5d:22:1e:3f:ed:c1:c3:40:46:dc:7e:4a:58:66:9e:ac:
+         99:6a:28:3c:d9:63:7b:c4:88:9f:ea:de:9d:50:06:cd:b8:ca:
+         8d:eb:fa:94:bd:7f:92:13:dc:69:0c:5b:7d:56:3c:38:55:50:
+         c5:f6:1f:8d:db:96:72:1e:ff:51:89:51:c3:c6:71:82:f1:95:
+         e2:ee:ac:f3:98:2b:e0:43:81:2d:38:3a:03:1d:f1:c8:f1:ac:
+         e7:51:58:11:38:0d:6d:fd:0f:6c:f2:aa:02:a6:5b:34:19:2f:
+         d3:6a:cc:d6:be:39:3a:b7:1a:20:10:40:64:ec:53:9d:cb:1e:
+         a0:30:e8:5f:a4:88:82:f7:01:42:b6:46:bc:6c:b4:62:7b:72:
+         05:25:37:ae:3a:85:19:6a:10:fd:31:35:28:46:ea:83:d4:ad:
+         35:e5:ed:9a:f8:3d:42:be:be:51:24:9e:f9:e3:1a:c0:a2:b3:
+         01:86:d4:37:33:7e:c8:8c:fe:ac:a4:a1:33:0f:bb:13:47:98:
+         35:82:0e:6d:fc:41:df:a5:5f:0c:4d:ff:63:95:09:6e:48:1d:
+         a5:eb:27:5b:d9:83:45:63:ec:59:94:ef:ef:15:b9:45:5a:a0:
+         e8:c8:d3:a1:a5:fc:3d:18:f0:1b:16:28:d8:20:61:29:d4:c9:
+         e8:f2:c9:da:d7:42:ef:29
+-----BEGIN CERTIFICATE-----
+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
+pfw9GPAbFijYIGEp1Mno8sna10LvKQ==
+-----END CERTIFICATE-----
