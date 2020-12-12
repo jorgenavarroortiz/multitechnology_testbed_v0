@@ -12,8 +12,8 @@ make
 sudo make install
 
 # SSH credentials for bitbucket repository
-cp /home/vagrant/vagrant/ssh_credentials/id_rsa /home/vagrant/.ssh/id_rsa
-cp /home/vagrant/vagrant/ssh_credentials/id_rsa.pub /home/vagrant/.ssh/id_rsa.pub
+cp $HOME/vagrant/ssh_credentials/id_rsa $HOME/.ssh/id_rsa
+cp $HOME/vagrant/ssh_credentials/id_rsa.pub $HOME/.ssh/id_rsa.pub
 chmod 400 .ssh/id_rsa
 
 # 5G-CLARITY repository for free5gc

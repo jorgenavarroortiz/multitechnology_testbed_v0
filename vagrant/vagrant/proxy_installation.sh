@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # SSH credentials for bitbucket repository
-cp ~/vagrant/ssh_credentials/id_rsa ~/.ssh/id_rsa
-cp ~/vagrant/ssh_credentials/id_rsa.pub ~/.ssh/id_rsa.pub
+cp $HOME/vagrant/ssh_credentials/id_rsa ~/.ssh/id_rsa
+cp $HOME/vagrant/ssh_credentials/id_rsa.pub ~/.ssh/id_rsa.pub
 chmod 400 .ssh/id_rsa
 
 # 5G-CLARITY repository for free5gc
