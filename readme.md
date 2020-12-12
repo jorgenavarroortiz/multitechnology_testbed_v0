@@ -39,7 +39,7 @@ To setup this scenario the following scripts have to be run in this order:
 
 This will setup MPTCP properly in both VMs.
 
-<img src="https://bitbucket.i2cat.net/projects/SDWN/repos/free5gc/browse/img/mptcp_scenario1_set_MPTCP_parameters.png?at=refs%2Fheads%2Fugr_v01&raw=" width="800">
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1_set_MPTCP_parameters.png" width="800">
 
 In order to test the correct behaviour of MPTCP, you can run `iperf` and check the throughput in each interface using `ifstat`. For this, you can use:
 
@@ -49,13 +49,13 @@ In order to test the correct behaviour of MPTCP, you can run `iperf` and check t
 
 You can see that there are data sent on both interfaces (`eth1` and `eth2`).
 
-<img src="https://bitbucket.i2cat.net/projects/SDWN/repos/free5gc/browse/img/mptcp_scenario1_test_throughput.png?at=refs%2Fheads%2Fugr_v01&raw=" width="800">
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1_test_throughput.png" width="800">
 
 Additionally, you can check that each interface can be active (on), inactive (off) or used as backup (backup) on MPTCP. For that purpose, you can use the `change_interface_state.sh` script. In the following example, the test started with both interfaces as active, then 1) changing `eth2` to `backup` (so it would transfer data only if the other interface is inactive), next 2) changing `eth1` to `off` (so data was transferred using `eth2`), and finally 3) `eth1` becoming active again (so data was transferred only using `eth1`). Similarly, you can perform any other similar tests.
 
 **IMPORTANT**: The `backup` state is only used with the `default` scheduler. In the case of the `roundrobin` scheduler, `backup` is treated as `on` (i.e. the interface remains active).
 
-<img src="https://bitbucket.i2cat.net/projects/SDWN/repos/free5gc/browse/img/mptcp_scenario1_change_interfaces_state.png?at=refs%2Fheads%2Fugr_v01&raw=" width="800">
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1_change_interfaces_state.png" width="800">
 
 **Launching scenario 1 with namespace MPTCPns and OpenVPN**
 
@@ -67,7 +67,7 @@ To use a namespace (`MTPCPns`) and OpenVPN in both VMs, you have to run:
 
 In order to perform some experiment, remember to use the namespace `MPTCPns` and its network interfaces. For simplicity, you can run `sudo ip netns exec MPTCPns bash`. In the namespace, you can check the network interfaces by executing `ifconfig` (you should have interfaces `v_mp_1` and `v_mp_2` for both MPTCP paths, with IP addresses 10.1.1.X/24, with X=1..4, and `tun0`, with IP address 10.8.0.1/24 on the server and 10.8.0.2/24 on the client).
 
-<img src="https://bitbucket.i2cat.net/projects/SDWN/repos/free5gc/browse/img/mptcp_scenario1_test_namespace_ovpn.png?at=refs%2Fheads%2Fugr_v01&raw=" width="512">
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1_test_namespace_ovpn.png" width="512">
 
 
 ### SCENARIO 2: UE <-> free5GC <-> proxy
