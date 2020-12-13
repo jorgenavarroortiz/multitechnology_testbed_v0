@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Required packages for user plane
-sudo apt -y install git gcc cmake autoconf libtool pkg-config libmnl-dev libyaml-dev
+sudo apt -y install git gcc cmake autoconf libtool pkg-config libmnl-dev libyaml-dev bridge-utils
 go get -u github.com/sirupsen/logrus
 
 # Linux keernel module 5G GTP-U
