@@ -196,6 +196,7 @@ This will modify again the file `/etc/netplan/50-nuc.yaml`, so you have to confi
 - In order to copy this repository on the NUC, execute (first please make sure that you have network connectivity):
 ```
 cd $HOME/vagrant
+bash ./mptcp_installation.sh
 bash ./go_installation.sh
 source $HOME/.bashrc
 bash ./free5gc_control_plane_installation.sh
