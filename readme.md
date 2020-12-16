@@ -172,7 +172,7 @@ Later, you can process (`tcp_probe_process.sh`) and plot (`tcp_probe_plot.sh`) t
 
 The installation scripts for testbed v0 can be used to setup MPTCP in an Intel's NUC computer (tested on [Intel NUC 10 NUC10i7FNH](https://www.intel.com/content/www/us/en/products/boards-kits/nuc/kits/nuc10i7fnh.html)). Please execute the following steps:
 
-- Install Ubuntu Server 18.04 (64-bit).
+- Fresh install Ubuntu Server 18.04 (64-bit) on the NUC.
 - Copy the `5g-clarity_testbed_v0/vagrant/vagrant` directory from this repository to `$HOME`, so it becomes `$HOME/vagrant`.
 - Check that you have network connectivity. For that purpose, you may configure a YAML file at `/etc/netplan`. Please check `$HOME/vagrant/NUC/50-nuc.yaml.1` as an example.
 - Install kernel 5.4 with MPTCP support and reboot:
