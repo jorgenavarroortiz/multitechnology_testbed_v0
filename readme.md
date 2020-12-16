@@ -2,6 +2,8 @@
 
 Testbed v0 (virtualized environment) for the 5G-CLARITY European Project. Initially started by Daniel Camps (from i2CAT). i2CAT's repository readme can be found below, after UGR's repository readme. Please contact Jorge Navarro-Ortiz (jorgenavarro@ugr.es) or Juan J. Ramos-Munoz (jjramos@ugr.es) for further details.
 
+We have also included instructions to install MPTCP in NUC (Intel NUC 10 NUC10i7FNH) using kernel 5.4, which allows to use the Intel Wi-Fi 6 AX201 module.
+
 ## Setting up the virtual environment
 
 In order to simplify testing with MPTCP, we have developed two Vagrant configurations for the following **scenarios**:
@@ -161,6 +163,45 @@ First, you have to start TCP cwnd tracing using `tcp_probe_start.sh`. After the 
 Later, you can process (`tcp_probe_process.sh`) and plot (`tcp_probe_plot.sh`) the information that you have saved. The last script includes 3 types of plots: 1) congestion window and slow start threshold, 2) smooth RTT, and 3) sender and receiver advertised windows. For plotting, remember first to redirect the DISPLAY to your IP address using `export DISPLAY='<IP address>:0.0'`.
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/tcp_probe_process_plot.png" width="800">
+
+## NUC installation
+
+**[TO BE TESTED AND FINISHED]**
+
+The installation scripts for testbed v0 can be used to setup MPTCP in an Intel's NUC computer (tested on Intel NUC 10 NUC10i7FNH). Please execute the following steps:
+
+- Install Ubuntu Server 18.04 (64-bit).
+- Copy the `5g-clarity_testbed_v0/vagrant/vagrant` directory from this repository to `$HOME`, so it becomes `$HOME/vagrant`.
+- Check that you have network connectivity. For that purpose, you may configure a YAML file at `/etc/netplan`. Please check `$HOME/vagrant/NUC/50-nuc.yaml.1` as an example.
+- Install kernel 5.4 with MPTCP support and reboot:
+```
+cd $HOME/vagrant
+bash ./mptcp_kernel54_installation.sh
+sudo reboot
+```
+- After rebooting, the NUC will have kernel 5.4 (you should check it by executing `uname -r`) but you will loose the driver for the Intel Gigabit Ethernet Controller I219-V. In order to install the driver (e1000e version 3.8.7) execute:
+```
+cd $HOME/vagrant
+bash ./nuc_network1.sh
+```
+Modify your network settings in the file `/etc/netplan/50-nuc.yaml` and reboot. Please check that you have network connectivity again.
+- In order to have Wi-Fi connectivity, execute:
+```
+cd $HOME/vagrant
+bash ./nuc_network2.sh
+```
+This will modify again the file `/etc/netplan/50-nuc.yaml`, so you have to configure again network settings. The sample settings are for UGR's eduroam. Please check https://netplan.io/reference/ for reference.
+- In order to copy this repository on the NUC, execute (first please make sure that you have network connectivity):
+```
+cd $HOME/vagrant
+bash ./go_installation.sh
+source $HOME/.bashrc
+bash ./free5gc_control_plane_installation.sh
+```
+
+Congratulations! With these steps, you should have the kernel and the packages available at the `mptcpUe` VM from testbed v0.
+
+**NOTE**: The scripts from testbed v0 assumed `eth0` and `eth1` as the names of the network interfaces. The names in the NUC are `eno1` for Ethernet and `wlp0s20f3` for Wi-Fi. We have to modify the name of these interfaces or the content of the scripts. **[TO BE DONE]**
 
 ---
 
