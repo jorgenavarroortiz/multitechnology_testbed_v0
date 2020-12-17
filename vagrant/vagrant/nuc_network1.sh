@@ -8,4 +8,4 @@ tar zxf e1000e-3.8.7.tar.gz
 cd e1000e-3.8.7/src
 sudo make install
 
-sudo cp NUC/50-nuc.yaml.1 /etc/netplan/50-nuc.yaml
+sudo cp $HOME/vagrant/NUC/50-nuc.yaml.1 /etc/netplan/50-nuc.yaml
