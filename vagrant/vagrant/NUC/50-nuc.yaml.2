@@ -1,0 +1,24 @@
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eno1:
+      dhcp4: no
+      addresses:
+        - 192.168.1.66/24
+      gateway4: 192.168.1.1
+      nameservers:
+        addresses: [150.214.204.10, 8.8.8.8]
+  wifis:
+    wlp0s20f3:
+      dhcp4: yes
+      access-points:
+        "eduroam":
+          auth:
+            key-management: eap
+            method: peap
+            phase2-auth: MSCHAPV2
+            anonymous-identity: "anonymous@ugr.es"
+            identity: "PUT_YOUR_MAIL_HERE"
+            password: "PUT_YOUR_PASSWORD_HERE"
+            ca-certificate: /etc/ssl/certs/ca.pem
