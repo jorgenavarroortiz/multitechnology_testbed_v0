@@ -193,7 +193,7 @@ cd $HOME/vagrant
 bash ./nuc_network2.sh
 ```
 This will modify again the file `/etc/netplan/50-nuc.yaml`, so you have to configure again network settings (for both Ethernet and Wi-Fi). The sample settings are for UGR's eduroam. Please check https://netplan.io/reference/ for reference.
-- In order to copy this repository on the NUC, execute (first please make sure that you have network connectivity):
+- In order to copy this repository on the NUC, remember first to copy your SSH credentials to `$HOME/.ssh` and change their permissions (`sudo chmod 600 $HOME/.ssh/id_rsa`). Then, execute (first please make sure that you have network connectivity):
 ```
 cd $HOME/vagrant
 bash ./mptcp_installation.sh
