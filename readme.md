@@ -12,11 +12,11 @@ In order to simplify testing with MPTCP, we have developed two Vagrant configura
 
 2. Three VMs for the scenario explained in the master branch (**UE <-> free5GC <-> proxy**). Within this scenario, we also include the two testbeds considered in the main branch: simple testbed and free5GC testbed.
 
-In both scenarios, a Vagrantfile has been developed to install the required kernel version, packages and the developed scripts, including i2CAT's free5gc repository (UGR's branch). So the deployed VMs should work out of the box. For details, please check the explanations in the master branch. **The developed installation scripts** (see the `vagrant` directory) **should work on real PCs** (as long as they have Intel architecture, e.g. Intel's NUC computers, with Ubuntu 18.04). This has been successfully tested on an Intel NUC 10 NUC10i7FNH, please check below the section `NUC installation`.
+In both scenarios, a Vagrantfile has been developed to install the required kernel version, packages and the developed scripts, including i2CAT's free5gc repository (UGR's branch). So the deployed VMs should work out of the box. For details, please check the explanations in the master branch. **The developed installation scripts** (see the `vagrant` directory) **should work on real PCs** (as long as they have Intel architecture and Ubuntu 18.04 Server 64-bit installed). This has been successfully tested on an Intel NUC 10 NUC10i7FNH, please check below the section `NUC installation`.
 
 **Few differences with testbeds from the master branch**
 
-- All functions related to MPTCP are included in the kernel, i.e. there is no need to load modules. In addition to kernel 4.19, all MPTCP features (from http://multipath-tcp.org/) have also been patched in **kernel 5.4**. The advantage is twofold. On the one hand, kernel 5.4 *should work properly in Intel's NUC* (i.e. *AX201 Wi-Fi6 network card* should work properly). On the other hand, *GTP5G* (https://github.com/PrinzOwO/gtp5g) *should also work* on this kernel [**TO BE CONFIRMED**]. This means that the `free5gc` VM could also implement MPTCP, *thus not requiring* another VM (*`mptcpProxy`*). This could simplify the deployment in both real and virtualized environments. [**TO BE TESTED**].
+- All functions related to MPTCP are included in the kernel, i.e. there is no need to load modules. In addition to kernel 4.19, all MPTCP features (from http://multipath-tcp.org/) have also been patched in **kernel 5.4**. The advantage is twofold. On the one hand, kernel 5.4 *should work properly in Intel's NUC* (i.e. *AX201 Wi-Fi6 network card* should work properly). On the other hand, *GTP5G* (https://github.com/PrinzOwO/gtp5g) *should also work* on this kernel [**TO BE CONFIRMED**]. This means that the `free5gc` VM could also implement MPTCP, *thus not requiring* another VM (*`mptcpProxy`*). This could simplify the deployment in both real and virtualized environments.
 - **mptcpUe VM**: `eth1` and `eth2` are configured for using an internal network (ue_5gc) instead of using a bridged adapter. *The IP addresses of `eth1` and `eth2` are 10.1.1.1/24 and 10.1.1.2/24 instead of 10.0.1.1/24 and 10.0.1.2/24*. The reason is to avoid conflicts with `eth0` (NAT interface, with IP 10.0.2.15/24) if we decide later to have `eth1` and `eth2` in different networks (which will become 10.0.1.0/24 and 10.0.2.0/24 in the original scenario). Additionally, *we added `eth3` (with IP 192.168.33.1/24) to manage the VM through SSH*.
 - **free5gc VM**: Similarly, `eth1` has IP address 10.1.1.*222*/24, instead of 10.0.1.$(( NUM_UES + 1)). This is done to avoid confusion when using a different number of UEs in the mptcpUe VM, which will produce a different IP address at the free5gc VM. Additionally, *we added `eth3` (with IP 192.168.33.2/24) to manage the VM through SSH*.
 - **mptcpProxy VM**: *We only added `eth2` (with IP 192.168.33.3/24) to manage the VM through SSH*.
@@ -166,8 +166,6 @@ Later, you can process (`tcp_probe_process.sh`) and plot (`tcp_probe_plot.sh`) t
 
 ## NUC installation
 
-**[TO BE TESTED AND FINISHED]**
-
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/nuc.png" width="512">
 
 The installation scripts for testbed v0 can be used to setup MPTCP on an Intel's NUC computer (tested on [Intel NUC 10 NUC10i7FNH](https://www.intel.com/content/www/us/en/products/boards-kits/nuc/kits/nuc10i7fnh.html)). Please execute the following steps:
@@ -204,7 +202,7 @@ bash ./free5gc_control_plane_installation.sh
 
 Congratulations! With these steps, you should have the kernel and the packages available at the `mptcpUe` VM from testbed v0.
 
-**NOTE**: The scripts from testbed v0 assumed `eth0` and `eth1` as the names of the network interfaces. The names in the NUC are `eno1` for Ethernet and `wlp0s20f3` for Wi-Fi. We have to modify the name of these interfaces or the content of the scripts. **[TO BE DONE]**
+**NOTE**: The scripts from testbed v0 assumed `eth0` and `eth1` as the names of the network interfaces. The names in the NUC are `eno1` for Ethernet and `wlp0s20f3` for Wi-Fi. We have to modify the scripts to use any interface names. **[TO BE DONE]**
 
 ---
 
