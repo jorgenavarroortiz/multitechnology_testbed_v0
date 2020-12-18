@@ -24,11 +24,15 @@ In both scenarios, a Vagrantfile has been developed to install the required kern
 
 ### VMs installation using Vagrant for scenario 1
 
-Copy the content of the directory `free5gc/vagrant` to your computer. Rename the file `Vagrantfile.2machines.kernel4.19` or the file `Vagrantfile.2machines.kernel5.4` to `Vagrantfile`. **Copy your SSH credentials** for this repository (`id_rsa` and `id_rsa.pub` files) **to the `vagrant/ssh_credentials` directory**. Change to the directory with the `Vagrantfile` file and execute `vagrant up`. The execution will take around 15 minutes (depending on PC).
+**IMPORTANT: Please make sure that you copy the SSH credentials that you use to access this repository (`id_rsa` and `id_rsa.pub` files) to the `vagrant/ssh_credentials` directory as commented below. If not, the installation will fail!**
+
+Copy the content of the directory `free5gc/vagrant` to your computer. Rename the file `Vagrantfile.2machines.kernel4.19` or the file `Vagrantfile.2machines.kernel5.4_kernel5.0` to `Vagrantfile`. **Copy your SSH credentials** for this repository (`id_rsa` and `id_rsa.pub` files) **to the `vagrant/ssh_credentials` directory**. Change to the directory with the `Vagrantfile` file and execute `vagrant up`. The execution will take around 15 minutes (depending on PC).
 
 ### VMs installation using Vagrant for scenario 2
 
-Copy the content of the directory `free5gc/vagrant` to your computer. Rename the file `Vagrantfile.free5gc.kernel4.19_kernel5.0` or the file `Vagrantfile.free5gc.kernel5.4` to `Vagrantfile`. **Copy your SSH credentials** for this repository (`id_rsa` and `id_rsa.pub` files) **to the `vagrant/ssh_credentials` directory**. Change to the directory with the `Vagrantfile` file and execute `vagrant up`. The execution will take around 25 minutes (depending on PC).
+**IMPORTANT: Please make sure that you copy the SSH credentials that you use to access this repository (`id_rsa` and `id_rsa.pub` files) to the `vagrant/ssh_credentials` directory as commented below. If not, the installation will fail!**
+
+Copy the content of the directory `free5gc/vagrant` to your computer. Rename the file `Vagrantfile.free5gc.kernel4.19_kernel5.0` or the file `Vagrantfile.free5gc.kernel5.4_kernel5.0` to `Vagrantfile`. **Copy your SSH credentials** for this repository (`id_rsa` and `id_rsa.pub` files) **to the `vagrant/ssh_credentials` directory**. Change to the directory with the `Vagrantfile` file and execute `vagrant up`. The execution will take around 25 minutes (depending on PC).
 
 **NOTE**: If you need to reconfigure your keyboard for your specific language, you can run `sudo dpkg-reconfigure keyboard-configuration` in the deployed VMs.
 
