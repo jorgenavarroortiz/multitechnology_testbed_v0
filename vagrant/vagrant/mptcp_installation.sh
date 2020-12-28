@@ -12,7 +12,7 @@ sudo make install
 sudo apt-get -y install check libssl-dev libpcap-dev autoconf pkg-config
 cd $HOME
 git clone https://github.com/multipath-tcp/mptcptrace
-cd mptcprace
+cd mptcptrace
 ./autogen.sh
 ./configure
 make
