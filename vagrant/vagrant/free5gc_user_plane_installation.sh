@@ -5,20 +5,21 @@ sudo apt -y install git gcc cmake autoconf libtool pkg-config libmnl-dev libyaml
 go get -u github.com/sirupsen/logrus
 
 # Linux keernel module 5G GTP-U
-if [[ `uname -r` == "5.4.0-mptcp" ]]; then
-  sudo modprobe udp_tunnel
-  sudo cp gtp5g_kernel5.4/gtp5g.ko /lib/modules/`uname -r`/kernel/drivers/net
-  sudo depmod -a
-  sudo modprobe gtp5g
-  sudo echo "gtp5g" >> /etc/modules
-else
-  # For kernel 5.0.2 (or others)
+# The latest version corrects some compilation problems with the latest kernels, so now it is not required to have separate versions.
+#if [[ `uname -r` == "5.4.0-mptcp" ]]; then
+#  sudo modprobe udp_tunnel
+#  sudo cp gtp5g_kernel5.4/gtp5g.ko /lib/modules/`uname -r`/kernel/drivers/net
+#  sudo depmod -a
+#  sudo modprobe gtp5g
+#  sudo echo "gtp5g" >> /etc/modules
+#else
+#  # For kernel 5.0.2 (or others)
   cd $HOME
   git clone https://github.com/PrinzOwO/gtp5g.git
   cd gtp5g
   make
   sudo make install
-fi
+#fi
 
 # SSH credentials for bitbucket repository
 #cp $HOME/vagrant/ssh_credentials/id_rsa $HOME/.ssh/id_rsa
