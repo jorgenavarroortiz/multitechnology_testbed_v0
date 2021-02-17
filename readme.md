@@ -2,7 +2,7 @@
 
 Testbed v0 (virtualized environment) for the 5G-CLARITY European Project. Initially started by Daniel Camps (from i2CAT), see https://bitbucket.i2cat.net/projects/SDWN/repos/free5gc/browse for further details. Please contact Jorge Navarro-Ortiz (jorgenavarro@ugr.es) or Juan J. Ramos-Munoz (jjramos@ugr.es) for further details.
 
-We have also included instructions to install MPTCP in NUC (Intel NUC 10 NUC10i7FNH) using kernel 5.4, which allows to use the Intel Wi-Fi 6 AX201 module.
+We have also included instructions to install MPTCP in NUC (Intel NUC 10 NUC10i7FNH) using kernel ~~5.4~~5.5, which allows to use the Intel Wi-Fi 6 AX201 module.
 
 ## Setting up the virtual environment
 
@@ -16,7 +16,7 @@ In both scenarios, a Vagrantfile has been developed to install the required kern
 
 **Few differences with testbeds from the master branch**
 
-- All functions related to MPTCP are included in the kernel, i.e. there is no need to load modules. In addition to kernel 4.19, all MPTCP features (from http://multipath-tcp.org/) have also been patched in **kernel 5.4**. The advantage is twofold. On the one hand, kernel 5.4 *should work properly in Intel's NUC* (i.e. *AX201 Wi-Fi6 network card* should work properly). On the other hand, *GTP5G* (https://github.com/PrinzOwO/gtp5g) *should also work* on this kernel [**TO BE CONFIRMED**]. This means that the `free5gc` VM could also implement MPTCP, *thus not requiring* another VM (*`mptcpProxy`*). This could simplify the deployment in both real and virtualized environments.
+- All functions related to MPTCP are included in the kernel, i.e. there is no need to load modules. In addition to kernel 4.19, all MPTCP features (from http://multipath-tcp.org/) have also been patched in **kernel 5.5**. The advantage is twofold. On the one hand, kernel 5.5 *works properly in Intel's NUC* (i.e. *AX201 Wi-Fi6 network card* has been tested and works properly with this kernel, whereas it has some stability problems with kernel 5.4). On the other hand, *GTP5G* (https://github.com/PrinzOwO/gtp5g) *also works* on this kernel (**verified**). This means that the `free5gc` VM could also implement MPTCP, *thus not requiring* another VM (*`mptcpProxy`*). This could simplify the deployment in both real and virtualized environments (although this VM is currently used for simplicity).
 - **mptcpUe VM**: `eth1` and `eth2` are configured for using an internal network (ue_5gc) instead of using a bridged adapter. *The IP addresses of `eth1` and `eth2` are 10.1.1.1/24 and 10.1.1.2/24 instead of 10.0.1.1/24 and 10.0.1.2/24*. The reason is to avoid conflicts with `eth0` (NAT interface, with IP 10.0.2.15/24) if we decide later to have `eth1` and `eth2` in different networks (which will become 10.0.1.0/24 and 10.0.2.0/24 in the original scenario). Additionally, *we added `eth3` (with IP 192.168.33.1/24) to manage the VM through SSH*.
 - **free5gc VM**: Similarly, `eth1` has IP address 10.1.1.*222*/24, instead of 10.0.1.$(( NUM_UES + 1)). This is done to avoid confusion when using a different number of UEs in the mptcpUe VM, which will produce a different IP address at the free5gc VM. Additionally, *we added `eth3` (with IP 192.168.33.2/24) to manage the VM through SSH*.
 - **mptcpProxy VM**: *We only added `eth2` (with IP 192.168.33.3/24) to manage the VM through SSH*.
@@ -32,7 +32,7 @@ Copy the content of the directory `free5gc/vagrant` to your computer. Rename the
 
 **IMPORTANT: Please make sure that you copy the SSH credentials that you use to access this repository (`id_rsa` and `id_rsa.pub` files) to the `vagrant/ssh_credentials` directory as commented below. If not, the installation will fail!**
 
-Copy the content of the directory `free5gc/vagrant` to your computer. Rename the file `Vagrantfile.free5gc.kernel4.19_kernel5.0` or the file `Vagrantfile.free5gc.kernel5.4_kernel5.0` to `Vagrantfile`. **Copy your SSH credentials** for this repository (`id_rsa` and `id_rsa.pub` files) **to the `vagrant/ssh_credentials` directory**. Change to the directory with the `Vagrantfile` file and execute `vagrant up`. The execution will take around 25 minutes (depending on PC).
+Copy the content of the directory `free5gc/vagrant` to your computer. Rename the file `Vagrantfile.free5gc.kernel4.19_kernel5.0` or the file `Vagrantfile.free5gc.kernel5.5` to `Vagrantfile`. **Copy your SSH credentials** for this repository (`id_rsa` and `id_rsa.pub` files) **to the `vagrant/ssh_credentials` directory**. Change to the directory with the `Vagrantfile` file and execute `vagrant up`. The execution will take around 25 minutes (depending on PC).
 
 **NOTE**: If you need to reconfigure your keyboard for your specific language, you can run `sudo dpkg-reconfigure keyboard-configuration` in the deployed VMs.
 
@@ -177,17 +177,15 @@ The installation scripts for testbed v0 can be used to setup MPTCP on an Intel's
 - Fresh install Ubuntu Server 18.04 (64-bit) on the NUC.
 - Copy the `5g-clarity_testbed_v0/vagrant/vagrant` directory from this repository to `$HOME`, so it becomes `$HOME/vagrant`.
 - Check that you have network connectivity. For that purpose, you may configure a YAML file at `/etc/netplan`. Please check `$HOME/vagrant/NUC/50-nuc.yaml.1` as an example.
-- Install kernel 5.4 with MPTCP support and reboot:
+- Install kernel 5.5 with MPTCP support and reboot:
 ```
 cd $HOME/vagrant
-bash ./mptcp_kernel54_installation.sh
+bash ./mptcp_kernel55_installation.sh
 sudo reboot
 ```
-- After rebooting, the NUC will have kernel 5.4 (you should check it by executing `uname -r`) but you will loose the driver for the Intel Gigabit Ethernet Controller I219-V. In order to install the driver (e1000e version 3.8.7) execute:
-```
-cd $HOME/vagrant
-bash ./nuc_network1.sh
-```
+- After rebooting, the NUC will have kernel 5.5 (you should check it by executing `uname -r`)~~but you will loose the driver for the Intel Gigabit Ethernet Controller I219-V. In order to install the driver (e1000e version 3.8.7) execute:~~ (this was for kernel 5.4, which has some stabiltiy problems for the Wi-Fi card; it is not required with kernel 5.5).
+~~`cd $HOME/vagrant`~~
+~~`bash ./nuc_network1.sh`~~
 Modify your network settings in the file `/etc/netplan/50-nuc.yaml` and reboot. Please check that you have network connectivity again.
 - In order to have Wi-Fi connectivity, execute:
 ```
