@@ -1,8 +1,8 @@
 # 5G-CLARITY testbed v0 setup
 
-Testbed v0 (virtualized environment) for the 5G-CLARITY European Project. Initially started by Daniel Camps (from i2CAT), see https://bitbucket.i2cat.net/projects/SDWN/repos/free5gc/browse for further details. Please contact Jorge Navarro-Ortiz (jorgenavarro@ugr.es) or Juan J. Ramos-Munoz (jjramos@ugr.es) for further details.
+Testbed v0 (virtualized environment) for the 5G-CLARITY European Project. Based on Daniel Camps' work (from i2CAT), see https://bitbucket.i2cat.net/projects/SDWN/repos/free5gc/browse. Please contact Jorge Navarro-Ortiz (jorgenavarro@ugr.es) or Juan J. Ramos-Munoz (jjramos@ugr.es) for further details.
 
-We have also included instructions to install MPTCP in NUC (Intel NUC 10 NUC10i7FNH) using kernel ~~5.4~~5.5, which allows to use the Intel Wi-Fi 6 AX201 module.
+We have also included instructions to install MPTCP in NUC (Intel NUC 10 NUC10i7FNH) using kernel ~~5.4~~5.5, which supports the usage of the Intel Wi-Fi 6 AX201 module.
 
 ## Setting up the virtual environment
 
@@ -12,27 +12,25 @@ In order to simplify testing with MPTCP, we have developed two Vagrant configura
 
 2. Three VMs for the scenario explained in the master branch (**UE <-> free5GC <-> proxy**). Within this scenario, we also include the two testbeds considered in the main branch: simple testbed and free5GC testbed.
 
-In both scenarios, a Vagrantfile has been developed to install the required kernel version, packages and the developed scripts, including i2CAT's free5gc repository (UGR's branch). So the deployed VMs should work out of the box. For details, please check the explanations in the master branch. **The developed installation scripts** (see the `vagrant` directory) **should work on real PCs** (as long as they have Intel architecture and Ubuntu 18.04 Server 64-bit installed). This has been successfully tested on an Intel NUC 10 NUC10i7FNH, please check below the section `NUC installation`.
+In both scenarios, a Vagrantfile has been developed to install the required kernel version, packages and the developed scripts (including i2CAT's free5gc repository). So the deployed VMs should work out of the box. For details, please check the explanations in the master branch. **The developed installation scripts** (see the `vagrant` directory) **should work on real PCs** (as long as they have Intel architecture and Ubuntu 18.04 Server 64-bit installed). This has been successfully tested on an Intel NUC 10 NUC10i7FNH, please check below the section `NUC installation`.
 
 **Few differences with testbeds from the master branch**
 
 - All functions related to MPTCP are included in the kernel, i.e. there is no need to load modules. In addition to kernel 4.19, all MPTCP features (from http://multipath-tcp.org/) have also been patched in **kernel 5.5**. The advantage is twofold. On the one hand, kernel 5.5 *works properly in Intel's NUC* (i.e. *AX201 Wi-Fi6 network card* has been tested and works properly with this kernel, whereas it has some stability problems with kernel 5.4). On the other hand, *GTP5G* (https://github.com/PrinzOwO/gtp5g) *also works* on this kernel (**verified**). This means that the `free5gc` VM could also implement MPTCP, *thus not requiring* another VM (*`mptcpProxy`*). This could simplify the deployment in both real and virtualized environments (although this VM is currently used for simplicity).
 - **mptcpUe VM**: `eth1` and `eth2` are configured for using an internal network (ue_5gc) instead of using a bridged adapter. *The IP addresses of `eth1` and `eth2` are 10.1.1.1/24 and 10.1.1.2/24 instead of 10.0.1.1/24 and 10.0.1.2/24*. The reason is to avoid conflicts with `eth0` (NAT interface, with IP 10.0.2.15/24) if we decide later to have `eth1` and `eth2` in different networks (which will become 10.0.1.0/24 and 10.0.2.0/24 in the original scenario). Additionally, *we added `eth3` (with IP 192.168.33.1/24) to manage the VM through SSH*.
-- **free5gc VM**: Similarly, `eth1` has IP address 10.1.1.*222*/24, instead of 10.0.1.$(( NUM_UES + 1)). This is done to avoid confusion when using a different number of UEs in the mptcpUe VM, which will produce a different IP address at the free5gc VM. Additionally, *we added `eth3` (with IP 192.168.33.2/24) to manage the VM through SSH*.
-- **mptcpProxy VM**: *We only added `eth2` (with IP 192.168.33.3/24) to manage the VM through SSH*.
-- As usual, all VMs employ `eth0` for Internet connection (through VirtualBox's NAT).
+- **free5gc VM**: Similarly, `eth1` has IP address 10.1.1.*222*/24, instead of 10.0.1.$(( NUM_UES + 1)). This is done to avoid confusion when using a different number of UEs in the mptcpUe VM, which will produce a different IP address at the free5gc VM.
 
 ### VMs installation using Vagrant for scenario 1
 
 **IMPORTANT: Please make sure that you copy the SSH credentials that you use to access this repository (`id_rsa` and `id_rsa.pub` files) to the `vagrant/ssh_credentials` directory as commented below. If not, the installation will fail!**
 
-Copy the content of the directory `free5gc/vagrant` to your computer. Rename the file `Vagrantfile.2machines.kernel4.19` or the file `Vagrantfile.2machines.kernel5.4_kernel5.0` to `Vagrantfile`. **Copy your SSH credentials** for this repository (`id_rsa` and `id_rsa.pub` files) **to the `vagrant/ssh_credentials` directory**. Change to the directory with the `Vagrantfile` file and execute `vagrant up`. The execution will take around 15 minutes (depending on PC).
+Copy the content of the directory `free5gc/vagrant` to your computer. Rename the file `Vagrantfile.2machines.kernel5.5_kernel5.0` to `Vagrantfile`. **Copy your SSH credentials** for this repository (`id_rsa` and `id_rsa.pub` files) **to the `vagrant/ssh_credentials` directory**. Change to the directory with the `Vagrantfile` file and execute `vagrant up`. The execution will take around 15 minutes (depending on PC).
 
 ### VMs installation using Vagrant for scenario 2
 
 **IMPORTANT: Please make sure that you copy the SSH credentials that you use to access this repository (`id_rsa` and `id_rsa.pub` files) to the `vagrant/ssh_credentials` directory as commented below. If not, the installation will fail!**
 
-Copy the content of the directory `free5gc/vagrant` to your computer. Rename the file `Vagrantfile.free5gc.kernel4.19_kernel5.0` or the file `Vagrantfile.free5gc.kernel5.5` to `Vagrantfile`. **Copy your SSH credentials** for this repository (`id_rsa` and `id_rsa.pub` files) **to the `vagrant/ssh_credentials` directory**. Change to the directory with the `Vagrantfile` file and execute `vagrant up`. The execution will take around 25 minutes (depending on PC).
+Copy the content of the directory `free5gc/vagrant` to your computer. Rename the file `Vagrantfile.free5gc.kernel5.5` to `Vagrantfile`. **Copy your SSH credentials** for this repository (`id_rsa` and `id_rsa.pub` files) **to the `vagrant/ssh_credentials` directory**. Change to the directory with the `Vagrantfile` file and execute `vagrant up`. The execution will take around 25 minutes (depending on PC).
 
 **NOTE**: If you need to reconfigure your keyboard for your specific language, you can run `sudo dpkg-reconfigure keyboard-configuration` in the deployed VMs.
 
