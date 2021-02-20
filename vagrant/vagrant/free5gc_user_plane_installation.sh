@@ -14,11 +14,11 @@ go get -u github.com/sirupsen/logrus
 #  sudo echo "gtp5g" >> /etc/modules
 #else
 #  # For kernel 5.0.2 (or others)
-  cd $HOME
-  git clone https://github.com/PrinzOwO/gtp5g.git
-  cd gtp5g
-  make
-  sudo make install
+#  cd $HOME
+#  git clone https://github.com/PrinzOwO/gtp5g.git
+#  cd gtp5g
+#  make
+#  sudo make install
 #fi
 
 # SSH credentials for bitbucket repository
