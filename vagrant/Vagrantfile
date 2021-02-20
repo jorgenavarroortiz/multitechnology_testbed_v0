@@ -1,0 +1,129 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# vagrant plugin install vagrant-reload
+
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+#Vagrant::DEFAULT_SERVER_URL.replace('https://vagrantcloud.com')
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+  # Every Vagrant virtual environment requires a box to build off of.
+  config.vm.box = "bento/ubuntu-18.04"
+
+  config.ssh.username = 'vagrant'
+  config.ssh.password = 'vagrant'
+  config.ssh.insert_key = false
+
+  # Custom: SSH graphical, X11
+  config.ssh.forward_agent = true
+  config.ssh.forward_x11 = true
+
+  # avoid mounting shared folder
+  config.vm.synced_folder '.', '/vagrant', disabled: true
+
+  ####################
+  # Defining the MPTCP UE VM
+  ####################
+
+  config.vm.define "mptcpUe" do |mptcpUe|
+    mptcpUe.vm.network "forwarded_port", guest: 22, host: 12222, protocol: "tcp"                              # Port forwarding through the NAT interface
+    mptcpUe.vm.network "private_network", ip: "192.168.13.3", auto_config: true, virtualbox__intnet: "ue_5gc" # Interface 1 connecting to second machine
+    mptcpUe.vm.network "private_network", ip: "192.168.13.4", auto_config: true, virtualbox__intnet: "ue_5gc" # Interface 2 connecting to second machine
+    mptcpUe.vm.network "private_network", ip: "192.168.13.5", auto_config: true, virtualbox__intnet: "ue_5gc" # Interface 3 connecting to second machine
+    #mptcpUe.vm.network "private_network", ip: "192.168.33.1", auto_config: true                              # Interface 4 connecting to host (for management)
+    mptcpUe.vm.hostname = "mptcpUe"
+    mptcpUe.vm.provider :virtualbox do |vm|
+      # Linked clones
+      #vm.linked_clone = true
+      # Configure networking interfaces
+      vm.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
+      vm.customize ["modifyvm", :id, "--nicpromisc3", "allow-all"]
+      vm.customize ["modifyvm", :id, "--nicpromisc4", "allow-all"]
+      # Config name that appears in virtual box
+      vm.name = "mptcpUe"
+      # DNS queries to the host, which becomes a DNS Proxy
+      vm.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      # Lease more RAM to the guest
+      vm.customize ["modifyvm", :id, "--memory", "4096"]
+      # Set number of CPUs
+      vm.customize ["modifyvm", :id, "--cpus", 2]
+    end
+    # Provisioning
+    mptcpUe.vm.provision "file", source: "./vagrant", destination: "$HOME/vagrant"
+    mptcpUe.vm.provision "shell", path: "vagrant/mptcp_kernel55_installation.sh", privileged: false
+    mptcpUe.vm.provision :reload
+    mptcpUe.vm.provision "shell", path: "vagrant/mptcp_installation.sh", privileged: false
+    mptcpUe.vm.provision "shell", path: "vagrant/go_installation.sh", privileged: false
+    mptcpUe.vm.provision "shell", path: "vagrant/free5gc_control_plane_installation.sh", privileged: false, env: {"GOPATH" => "/home/vagrant/go", "GOROOT" => "/usr/local/go", "PATH" => "$PATH:/usr/local/go/bin:/home/vagrant/go/bin:/home/vagrant/go/bin", "GO111MODULE" => "off"}
+    #mptcpUe.vm.provision "shell", path: "vagrant/initial_testing_free5gc.sh", privileged: false
+  end
+
+  ####################
+  # Defining the FREE5GC VM
+  ####################
+
+  config.vm.define "free5gc" do |free5gc|
+    free5gc.vm.network "forwarded_port", guest: 22, host: 22222, protocol: "tcp" # Port forwarding through the NAT interface
+    free5gc.vm.network "private_network", ip: "192.168.13.2", auto_config: true, virtualbox__intnet: "ue_5gc"   # Interface 1 connecting to second machine
+    free5gc.vm.network "private_network", ip: "60.60.0.102", auto_config: true, virtualbox__intnet: "5gc_proxy" # Interface 2 connecting to second machine
+    free5gc.vm.hostname = "free5gc"
+    free5gc.vm.provider :virtualbox do |vm|
+      # Linked clones
+      #vm.linked_clone = true
+      # Configure networking interfaces
+      vm.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
+      vm.customize ["modifyvm", :id, "--nicpromisc3", "allow-all"]
+      # Config name that appears in virtual box
+      vm.name = "free5gc"
+      # DNS queries to the host, which becomes a DNS Proxy
+      vm.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      # Lease more RAM to the guest
+      vm.customize ["modifyvm", :id, "--memory", "4096"]
+      # Set number of CPUs
+      vm.customize ["modifyvm", :id, "--cpus", 2]
+    end
+    # Provisioning
+    free5gc.vm.provision "file", source: "./vagrant", destination: "$HOME/vagrant"
+    free5gc.vm.provision "shell", path: "vagrant/free5gc_kernel_installation.sh", privileged: false
+    free5gc.vm.provision :reload
+    free5gc.vm.provision "shell", path: "vagrant/go_installation.sh", privileged: false
+    free5gc.vm.provision "shell", path: "vagrant/free5gc_control_plane_installation.sh", privileged: false, env: {"GOPATH" => "/home/vagrant/go", "GOROOT" => "/usr/local/go", "PATH" => "$PATH:/usr/local/go/bin:/home/vagrant/go/bin:/home/vagrant/go/bin", "GO111MODULE" => "off"}
+    free5gc.vm.provision "shell", path: "vagrant/free5gc_user_plane_installation.sh", privileged: false, env: {"GOPATH" => "/home/vagrant/go", "GOROOT" => "/usr/local/go", "PATH" => "$PATH:/usr/local/go/bin:/home/vagrant/go/bin:/home/vagrant/go/bin", "GO111MODULE" => "off"}
+    #free5gc.vm.provision "shell", path: "vagrant/initial_testing_free5gc.sh", privileged: false
+
+  end
+
+  ####################
+  # Defining the MPTCP PROXY VM
+  ####################
+
+  config.vm.define "mptcpProxy" do |mptcpProxy|
+    mptcpProxy.vm.network "forwarded_port", guest: 22, host: 12222, protocol: "tcp" # Port forwarding through the NAT interface
+	  mptcpProxy.vm.network "private_network", ip: "60.60.0.101", auto_config: true, virtualbox__intnet: "5gc_proxy" # Interface 1 connecting to second machine
+	  mptcpProxy.vm.hostname = "mptcpProxy"
+    mptcpProxy.vm.provider :virtualbox do |vm|
+      # Linked clones
+      #vm.linked_clone = true
+      # Configure networking interfaces
+      vm.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
+      # Config name that appears in virtual box
+      vm.name = "mptcpProxy"
+      # DNS queries to the host, which becomes a DNS Proxy
+      vm.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      # Lease more RAM to the guest
+      vm.customize ["modifyvm", :id, "--memory", "4096"]
+      # Set number of CPUs
+      vm.customize ["modifyvm", :id, "--cpus", 2]
+    end
+    # Provisioning
+    mptcpProxy.vm.provision "file", source: "./vagrant", destination: "$HOME/vagrant"
+    mptcpProxy.vm.provision "shell", path: "vagrant/mptcp_kernel55_installation.sh", privileged: false
+    mptcpProxy.vm.provision :reload
+    mptcpProxy.vm.provision "shell", path: "vagrant/mptcp_installation.sh", privileged: false
+    mptcpProxy.vm.provision "shell", path: "vagrant/proxy_installation.sh", privileged: false
+#    mptcpProxy.vm.provision "shell", path: "vagrant/initial_testing_free5gc.sh", privileged: false
+  end
+
+end
