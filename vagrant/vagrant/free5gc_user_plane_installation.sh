@@ -52,3 +52,4 @@ cp $HOME/vagrant/dump_mongodb_free5gc.tar.gz $HOME
 cd $HOME
 tar xvfz dump_mongodb_free5gc.tar.gz
 mongorestore --port=27017 dump
+rm -f -r $HOME/dump
