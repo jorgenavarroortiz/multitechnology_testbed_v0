@@ -19,6 +19,8 @@ cd $HOME/go/src
 #git clone -b ugr_v01 ssh://git@bitbucket.i2cat.net:7999/sdwn/free5gc.git
 git clone git@github.com:jorgenavarroortiz/5g-clarity_testbed_v0.git
 mv 5g-clarity_testbed_v0 free5gc
+cd $HOME/go/src/free5gc
+chmod +x *.sh
 
   # install dependent packages
 cd $HOME/go/src/free5gc
