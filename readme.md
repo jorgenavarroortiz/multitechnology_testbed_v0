@@ -10,13 +10,13 @@ In order to simplify testing with MPTCP, we have developed two Vagrant configura
 
 1. **Two virtual machines** (VMs) which are **directly connected** by two network interfaces.
 
-2. Three VMs for the scenario explained in the master branch (**UE <-> free5GC <-> proxy**). Within this scenario, we also include the two testbeds considered in the main branch: simple testbed and free5GC testbed.
+2. **Three VMs** for the scenario explained in the master branch (**UE <-> free5GC <-> proxy**). Within this scenario, we also include the two testbeds considered in the main branch: simple testbed and free5GC testbed.
 
 In both scenarios, a Vagrantfile has been developed to install the required kernel version, packages and the developed scripts (including i2CAT's free5gc repository). So the deployed VMs should work out of the box. For details, please check the explanations in the master branch. **The developed installation scripts** (see the `vagrant` directory) **should work on real PCs** (as long as they have Intel architecture and Ubuntu 18.04 Server 64-bit installed). This has been successfully tested on an Intel NUC 10 NUC10i7FNH, please check below the section `NUC installation`.
 
 **Few differences with testbeds from the master branch**
 
-- All functions related to MPTCP are included in the kernel, i.e. there is no need to load modules. Instead of using kernel 4.19 (which it is supported by the MPTCP version in https://www.multipath-tcp.org/), we have updated patch for kernel 5.4 to work with **kernel 5.5**. The main advantage is that kernel 5.5 *works properly in Intel's NUC* (i.e. *AX201 Wi-Fi6 network card* has been tested and works properly with this kernel, whereas it has some stability problems with kernel 5.4). Access to this VM is available at port 12222 through SSH.
+- All functions related to MPTCP are included in the kernel, i.e. there is no need to load modules. Instead of using kernel 4.19 (which it is supported by the MPTCP version in https://www.multipath-tcp.org/), we have updated the patch for kernel 5.4 to work with **kernel 5.5**. The main advantage is that kernel 5.5 *works properly in Intel's NUC* (i.e. *AX201 Wi-Fi6 network card* has been tested and works properly with this kernel, whereas it has some serious stability problems with kernel 5.4). Access to this VM is available at port 12222 through SSH.
 - **mptcpUe VM**: `eth1` and `eth2` are configured for using an internal network (ue_5gc) instead of using a bridged adapter. Access to this VM is available at port 12222 through SSH.
 - **free5gc VM**: Similarly, this machine utilizes two internal networks (ue_5gc and 5gc_proxy) instead of using a bridged adapter. Access to this VM is available at port 22222 through SSH.
 - **mptcpProxy VM**: Similarly, this machine utilizes an internal network (5gc_proxy) instead of using a bridged adapter. Access to this VM is available at port 32222 through SSH.
