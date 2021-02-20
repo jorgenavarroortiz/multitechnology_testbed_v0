@@ -100,7 +100,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   ####################
 
   config.vm.define "mptcpProxy" do |mptcpProxy|
-    mptcpProxy.vm.network "forwarded_port", guest: 22, host: 12222, protocol: "tcp" # Port forwarding through the NAT interface
+    mptcpProxy.vm.network "forwarded_port", guest: 22, host: 32222, protocol: "tcp" # Port forwarding through the NAT interface
 	  mptcpProxy.vm.network "private_network", ip: "60.60.0.101", auto_config: true, virtualbox__intnet: "5gc_proxy" # Interface 1 connecting to second machine
 	  mptcpProxy.vm.hostname = "mptcpProxy"
     mptcpProxy.vm.provider :virtualbox do |vm|
