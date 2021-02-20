@@ -21,7 +21,7 @@ In both scenarios, a Vagrantfile has been developed to install the required kern
 - **free5gc VM**: Similarly, this machine utilizes two internal networks (ue_5gc and 5gc_proxy) instead of using a bridged adapter. Access to this VM is available at port 22222 through SSH.
 - **mptcpProxy VM**: Similarly, this machine utilizes an internal network (5gc_proxy) instead of using a bridged adapter. Access to this VM is available at port 32222 through SSH.
 
-### Vagrant requirements
+### Vagrant and Virtualbox requirements
 
 These vagrant files requires the installation of the Vagrant Reload Provisioner (https://github.com/aidanns/vagrant-reload). If you are using Ubuntu, you could follow these steps:
 
@@ -30,6 +30,21 @@ wget https://releases.hashicorp.com/vagrant/2.2.14/vagrant_2.2.14_x86_64.deb
 sudo dpkg -i vagrant_2.2.14_x86_64.deb
 sudo vagrant plugin install vagrant-reload
 ```
+
+You can check the version with ```vagrant --version```.
+
+We have tested the following installations using Virtualbox 6.1 (more precisely, 6.1.18r142142). If you are using Ubuntu, you could follow these steps:
+
+```
+wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
+wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | sudo apt-key add -
+sudo add-apt-repository "deb http://download.virtualbox.org/virtualbox/debian bionic contrib"
+
+sudo apt update
+sudo apt install virtualbox-6.1
+```
+
+You can check the version with ```vboxmanage --version```.
 
 ### VMs installation using Vagrant for scenario 1
 
