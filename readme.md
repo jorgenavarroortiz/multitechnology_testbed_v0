@@ -44,7 +44,7 @@ sudo apt update
 sudo apt install virtualbox-6.1
 ```
 
-You can check the version with ```vboxmanage --version```.
+You can check the version with ```vboxmanage --version```. Please remember to uninstall completely any previous Virtualbox 5.x installation, using ```dpkg -l | grep virtualbox``` and ```dpkg --purge <package_name>```.
 
 ### VMs installation using Vagrant for scenario 1
 
