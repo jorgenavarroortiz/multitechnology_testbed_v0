@@ -86,10 +86,11 @@ PATH=$PATH:$GOPATH/bin:$GOROOT/bin
 ####################
 sudo sysctl -w net.mptcp.mptcp_path_manager=fullmesh
 # Loading roundrobin as kernel module otherwise it is not available for selection through sysctl
-LOADED=$(lsmod | grep mptcp_rr)
-if [ "$LOADED" == "" ]; then
-	sudo insmod /lib/modules/4.19.126/kernel/net/mptcp/mptcp_rr.ko
-fi
+# JNa: not required since MPTCP is included in the kernel, not as a module
+#LOADED=$(lsmod | grep mptcp_rr)
+#if [ "$LOADED" == "" ]; then
+#	sudo insmod /lib/modules/4.19.126/kernel/net/mptcp/mptcp_rr.ko
+#fi
 
 
 ##################
