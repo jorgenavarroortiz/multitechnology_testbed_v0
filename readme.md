@@ -297,8 +297,8 @@ The goal is to set up the environment described in the following figure:
 
 ![Alt text](./img/testbed_setup_simple.png?raw=true "simple testbed")
 
-- 1. In the machine `free5gc` launch the 5GCore
-    - From this repo folder: `sudo ./clarity5gC_simple.sh`
+- 1. In the machine `free5gc` launch the 5GCore (modified by UGR, so now it takes the number of UEs and the IP address is correctly calculated)
+    - From this repo folder: `sudo ./clarity5gC_simple.sh -n 3 -s 10.0.1`
 
 - 2. In the machine `mptcpProxy` launch the openvpn server:
     - From this repo launch script `sudo ./clarityMptcpProxy.sh`
