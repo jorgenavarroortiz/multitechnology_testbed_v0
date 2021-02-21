@@ -15,3 +15,9 @@ echo "github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6Tb
 #git clone -b ugr_v01 ssh://git@bitbucket.i2cat.net:7999/sdwn/free5gc.git
 git clone git@github.com:jorgenavarroortiz/5g-clarity_testbed_v0.git
 mv 5g-clarity_testbed_v0 free5gc
+cd free5gc
+chmod +x *.sh
+chmod +x delay_mgr
+chmod +x openvpn_mgr
+cd mptcp_test
+chmod +x *.sh
