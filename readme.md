@@ -108,9 +108,9 @@ In order to perform some experiment, remember to use the namespace `MPTCPns` and
 
 ## Launching SCENARIO 2: UE <-> free5GC <-> proxy
 
-In this scenario, a VM (mptcpUe) employs two network interfaces (`eth1` and `eth2`) emulating a computer with two wireless access technologies (WATs), e.g. Wi-Fi, Li-Fi or 5G NR. We assume that they are in bridge mode, i.e. connected to the same IP network. This VM is directly connected to a VM (free5gc) implementing the 5G core network. The connection is done through the N3IWF (Non-3GPP InterWorking Function) entity. Since we are employing MPTCP to simultaneously transfer data from both interfaces of mptcpUe VM, it is required that the other end also implements MPTCP. Due to the different kernel versions on both VMs (4.19.142 for MPTCP and 5.0.0-23 for free5GC), another VM (mptcpProxy) is also required. mptcpProxy implements MPTCP for this purpose.
+In this scenario, a VM (mptcpUe) employs two network interfaces (`eth1` and `eth2`) emulating a computer with two wireless access technologies (WATs), e.g. Wi-Fi, Li-Fi or 5G NR. We assume that they are in bridge mode, i.e. connected to the same IP network. This VM is directly connected to a VM (free5gc) implementing the 5G core network. The connection is done through the N3IWF (Non-3GPP InterWorking Function) entity. Since we are employing MPTCP to simultaneously transfer data from both interfaces of mptcpUe VM, it is required that the other end also implements MPTCP. Due to the different kernel versions on both VMs (~~4.19.142~~5.5 for MPTCP and 5.0.0-23 for free5GC), another VM (mptcpProxy) is also required. mptcpProxy implements MPTCP for this purpose.
 
-**NOTE**: If required, you can add more network interfaces to the mptcpUe VM to emulate more WATs, as long as the last one is configured for management (i.e. using 192.168.33.1/24). The scripts will utilize consecutive network interfaces starting from eth1, eth2, eth3, etcetera.
+**NOTE**: If required, you can add more network interfaces to the mptcpUe VM to emulate more WATs (currently three interfaces are added). The scripts will utilize consecutive network interfaces starting from eth1, eth2, eth3, etcetera.
 
 **Launch scenario 2 without 5G core network**
 
