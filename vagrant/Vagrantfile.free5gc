@@ -65,7 +65,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   ####################
 
   config.vm.define "free5gc" do |free5gc|
-    free5gc.vm.network "forwarded_port", guest: 22, host: 22222, protocol: "tcp" # Port forwarding through the NAT interface
+    free5gc.vm.network "forwarded_port", guest: 22, host: 22222, protocol: "tcp"                                # Port forwarding through the NAT interface
     free5gc.vm.network "private_network", ip: "192.168.13.2", auto_config: true, virtualbox__intnet: "ue_5gc"   # Interface 1 connecting to second machine
     free5gc.vm.network "private_network", ip: "60.60.0.102", auto_config: true, virtualbox__intnet: "5gc_proxy" # Interface 2 connecting to second machine
     free5gc.vm.hostname = "free5gc"
@@ -100,7 +100,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   ####################
 
   config.vm.define "mptcpProxy" do |mptcpProxy|
-    mptcpProxy.vm.network "forwarded_port", guest: 22, host: 32222, protocol: "tcp" # Port forwarding through the NAT interface
+    mptcpProxy.vm.network "forwarded_port", guest: 22, host: 32222, protocol: "tcp"                                # Port forwarding through the NAT interface
 	  mptcpProxy.vm.network "private_network", ip: "60.60.0.101", auto_config: true, virtualbox__intnet: "5gc_proxy" # Interface 1 connecting to second machine
 	  mptcpProxy.vm.hostname = "mptcpProxy"
     mptcpProxy.vm.provider :virtualbox do |vm|
