@@ -84,9 +84,9 @@ In this scenario, two machines are directly connected using network interfaces e
 
 To setup this scenario the following scripts have to be run in this order:
 
-- In the machine `mptcpUe1` change to the directory `$HOME/free5gc/mptcp_test` and launch `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -g 10.1.1.3 -n 10.1.1 -u 2 -f 1`. You can add option `-d` if you want to read debug messages.
+- In the machine `mptcpUe1` change to the directory `$HOME/free5gc/mptcp_test` and launch `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -g 10.1.1.4 -n 10.1.1 -u 3 -f 1`. You can add option `-d` if you want to read debug messages.
 
-- In the machine `mptcpUe2` change to the directory `$HOME/free5gc/mptcp_test` and launch `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -g 10.1.1.1 -n 10.1.1 -u 2 -f 1`. You can add option `-d` if you want to read debug messages.
+- In the machine `mptcpUe2` change to the directory `$HOME/free5gc/mptcp_test` and launch `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -g 10.1.1.1 -n 10.1.1 -u 3 -f 1`. You can add option `-d` if you want to read debug messages.
 
 This will setup MPTCP properly in both VMs.
 
@@ -96,9 +96,9 @@ In order to test the correct behaviour of MPTCP, you can run `iperf` and check t
 
 - In the machine `mptcpUe2` (which will act as server) run `./test_throughput_tcp_server.sh & ifstat`.
 
-- In the machine `mptcpUe1` (which will act as client) run `./test_throughput_tcp_client.sh -s 10.1.1.3 & ifstat`.
+- In the machine `mptcpUe1` (which will act as client) run `./test_throughput_tcp_client.sh -s 10.1.1.4 & ifstat`.
 
-You can see that there are data sent on both interfaces (`eth1` and `eth2`).
+You can see that there are data sent on both interfaces (`eth1` and `eth2`).**[To be updated with the example with three network interfaces]**
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1_test_throughput.png" width="1200">
 
@@ -106,17 +106,21 @@ Additionally, you can check that each interface can be active (on), inactive (of
 
 **IMPORTANT**: The `backup` state is only used with the `default` scheduler. In the case of the `roundrobin` scheduler, `backup` is treated as `on` (i.e. the interface remains active).
 
+**[To be updated with the example with three network interfaces]**
+
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1_change_interfaces_state.png" width="1200">
 
 **Launching scenario 1 with namespace MPTCPns and OpenVPN**
 
 To use a namespace (`MTPCPns`) and OpenVPN in both VMs, you have to run:
 
-- In mptcpUe1: `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -g 10.1.1.3 -n 10.1.1 -u 2 -f 1 -m -o client`
+- In mptcpUe1: `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -g 10.1.1.4 -n 10.1.1 -u 3 -f 1 -m -o client`
 
-- In mptcpUe2: `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -g 10.1.1.3 -n 10.1.1 -u 2 -f 3 -m -o server`
+- In mptcpUe2: `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -g 10.1.1.1 -n 10.1.1 -u 3 -f 3 -m -o server`
 
-In order to perform some experiment, remember to use the namespace `MPTCPns` and its network interfaces. For simplicity, you can run `sudo ip netns exec MPTCPns bash`. In the namespace, you can check the network interfaces by executing `ifconfig` (you should have interfaces `v_mp_1` and `v_mp_2` for both MPTCP paths, with IP addresses 10.1.1.X/24, with X=1..4, and `tun0`, with IP address 10.8.0.1/24 on the server and 10.8.0.2/24 on the client).
+In order to perform some experiment, remember to use the namespace `MPTCPns` and its network interfaces. For simplicity, you can run `sudo ip netns exec MPTCPns bash`. In the namespace, you can check the network interfaces by executing `ifconfig` (you should have interfaces `v_mp_1`, `v_mp_2` and `v_mp_3` for the three MPTCP paths, with IP addresses 10.1.1.X/24, with X=1..3 on the first machine and X=4..6 on the second machine, and `tun0`, with IP address 10.8.0.1/24 on the server and 10.8.0.2/24 on the client).
+
+**[To be updated with the example with three network interfaces]**
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1_test_namespace_ovpn.png" width="800">
 
