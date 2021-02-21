@@ -31,7 +31,7 @@ The scenario with free5gc is quite demanding. We have tested in two different co
 
 - Laptop PC with an **Intel(R) Core(TM) i7-8550U CPU @ 1.80GHz and 16 GBs of RAM**: Tested with two network interfaces. Most of the times, AMF is deployed after N3IWF in the first execution, so you need to cancel it (ctrl+C) and execute it again. It works ok most of the times during the second execution. Most of the times it works ok with two network interfaces.
 
-The performance (in terms of throughput) is low in both cases. **[TO BE TESTED WITHOUT VIRTUALIZATION]**
+The performance (in terms of throughput) is low in both cases (few hundreds of kbps).
 
 **Vagrant requirements**
 
