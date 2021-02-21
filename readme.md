@@ -234,37 +234,11 @@ Congratulations! With these steps, you should have the kernel and the packages a
 
 ---
 
-# 5GCLARITY testbed setup (from i2CAT's original repository, **TO BE REMOVED**)
+# i2CAT's scripts 5GCLARITY testbed setup
 
 ## Setting up the virtual environment
 
-After cloning this repository, you need to install vagrant and Virtualbox in your system. In `Vagrantfile` there is a configuration for an environment with three virtual machines named `mptcpUe`, implementing the logic of the 5GCLARITY CPE, `free5gc`, implementing the core network, and `mptcpProxy` implementing the logic of the mptcp proxy.
-Run `vagrant up` inside this repository to bring up the machines.
-
-The three machines will have a clean Ubuntu 18.04 installation. Vagrant will prepare an SSH server inside each VM, so you can ssh into them probably at porst `2222`, `2200` and `2201`.
-
-You need to do the following additional configurations for the testbed:
-
-- Machines `mptcpUe` and `mptpcProxy`
-    - Compile the MPTCP kernel following the isntructions here: https://multipath-tcp.org/pmwiki.php/Users/DoItYourself.
-    - Note: When compiling the kernel you need to do `make menuconfig` navigate to the Networking menu, and select all available mptcp path managers and mptcp schedulers. They are compiled as separate modules that can be loaded at runtime
-    - Once the kernel is installed, reboot and check that you are running kernel `4.19.126`. This is the lates MPTCP kernel available at the time this testbed was setup.
-    - Once the MPTCP kernel is available you need to clone again this repository in the VMs: `git clone ssh://git@bitbucket.i2cat.net:7999/sdwn/free5gc.git`
-    - Install openvpn. There is no need to generate keys, as they are already provided in this repository
-
-- Machine `mptcpUe`
-    - In addition to the steps above, in this machine you need to install free5GC, but only the control plane functions (i.e. no need to compile UPF). To do this follow the instruction below in this Readme here: Install Control Plane Entities
-
-- Machine `free5gc`
-    - You need to do a full installation of free5GC. This requires installation of kernel `5.0.0-23-generic`, including the headers. This is required to compile the UPF, which requires a specific kernel module
-    - You need to clone this repository again inside the VM: `git clone ssh://git@bitbucket.i2cat.net:7999/sdwn/free5gc.git`
-    - After booting with the kernel `5.0.0-23-generic` follow the installation instructions for free5gc at the end of this readme
-
-You can use the scripts in this repository to launch two testbeds:
-- free5GC testbed, including a free5gC core, the MPTCP client and the proxy. This is detailed later
-- Simple testbed, used to test MPTCP in a simpler setup without the free5GC core. Also detailed later
-
-In a separate section we discuss some helper scripts to operate this testbed
+You can follow the steps at i2CAT's repository (https://bitbucket.i2cat.net/projects/SDWN/repos/free5gc/browse) or use the Vagrantfiles in this repository (recommended for simplicity).
 
 ## Launching the free5GC testbed
 
@@ -337,7 +311,7 @@ The following helper tools are included:
 - In machine `mptcpUe` you can use `sudo ./openvpn_mgr -m start -M` or `sudo ./openvpn_mgr -m stop -M` to start or stop the openvpn tunnel inside the MPTCP namespace in the UE. Note that you need to restart the tunnel every time you change the scheduler for it to have effect. The reason is that scheduler is considered when the TCP socket opens
 - In the machine `mptcpUe` you can use `./delay_mgr -m add -i v_mph_1 -d 200ms` or `./delay_mgr -m remove -i v_mph_1 -d 200ms` to add or remove delay to a given interface
 
-# APPENDIX: free5GC v3.0.0 Installation Guide
+**TO BE REMOVED FROM HERE**
 
 ## Minimum Requirement
 - Software
