@@ -221,7 +221,7 @@ cd $HOME/vagrant
 bash ./mptcp_kernel55_installation.sh
 sudo reboot
 ```
-- After rebooting, the NUC will have kernel 5.5 (you should check it by executing `uname -r`)~~but you will loose the driver for the Intel Gigabit Ethernet Controller I219-V. In order to install the driver (e1000e version 3.8.7) execute:~~ (this was for kernel 5.4, which has some stabiltiy problems for the Wi-Fi card; it is not required with kernel 5.5).
+- After rebooting, the NUC will have kernel 5.5 (you should check it by executing `uname -r`) ~~but you will loose the driver for the Intel Gigabit Ethernet Controller I219-V. In order to install the driver (e1000e version 3.8.7) execute:~~ (this was for kernel 5.4, which has some stabiltiy problems for the Wi-Fi card; it is not required with kernel 5.5).
 ~~`cd $HOME/vagrant`~~
 ~~`bash ./nuc_network1.sh`~~
 Modify your network settings in the file `/etc/netplan/50-nuc.yaml` and reboot. Please check that you have network connectivity again.
