@@ -16,12 +16,24 @@ In both scenarios, a Vagrantfile has been developed to install the required kern
 
 **Few differences with testbeds from the master branch**
 
-- All functions related to MPTCP are included in the kernel, i.e. there is no need to load modules. Instead of using kernel 4.19 (which it is supported by the MPTCP version in https://www.multipath-tcp.org/), we have updated the patch for kernel 5.4 to work with **kernel 5.5**. The main advantage is that kernel 5.5 *works properly in Intel's NUC* (i.e. *AX201 Wi-Fi6 network card* has been tested and works properly with this kernel, whereas it has some serious stability problems with kernel 5.4). Access to this VM is available at port 12222 through SSH.
-- **mptcpUe VM**: `eth1` and `eth2` are configured for using an internal network (ue_5gc) instead of using a bridged adapter. Access to this VM is available at port 12222 through SSH.
-- **free5gc VM**: Similarly, this machine utilizes two internal networks (ue_5gc and 5gc_proxy) instead of using a bridged adapter. Access to this VM is available at port 22222 through SSH.
-- **mptcpProxy VM**: Similarly, this machine utilizes an internal network (5gc_proxy) instead of using a bridged adapter. Access to this VM is available at port 32222 through SSH.
+- All functions related to MPTCP are included in the kernel, i.e. there is no need to load modules. Instead of using kernel 4.19 (which it is supported by the MPTCP version in https://www.multipath-tcp.org/), we have updated the patch for kernel 5.4 to work with **kernel 5.5**. The main advantage is that kernel 5.5 *works properly in Intel's NUC* (i.e. *AX201 Wi-Fi6 network card* has been tested and works properly with this kernel, whereas it has some serious stability problems with kernel 5.4).
+- **mptcpUe VM**: `eth1` and `eth2` are configured for using an internal network (ue_5gc) instead of using a bridged adapter. Access to this VM is available through **SSH on port 12222**.
+- **free5gc VM**: Similarly, this machine utilizes two internal networks (ue_5gc and 5gc_proxy) instead of using a bridged adapter. Access to this VM is available through **SSH on port 22222**.
+- **mptcpProxy VM**: Similarly, this machine utilizes an internal network (5gc_proxy) instead of using a bridged adapter. Access to this VM is available through **SSH on port 32222**.
 
-### Vagrant and Virtualbox requirements
+### Hardware and software requirements
+
+**Hardware requirements**
+
+The scenario with free5gc is quite demanding. We have tested in two different computers:
+
+- Desktop PC with an **Intel(R) Core(TM) i7-7820X CPU @ 3.60GHz and 32 GBs of RAM**: In general, the scenario works ok with two network interfaces (although sometimes AMF is deployed after N3IWF, which requires to restart the process). It also works ok with three network interfaces, although sometimes one of the network interfaces works intermitently.
+
+- Laptop PC with an **Intel(R) Core(TM) i7-8550U CPU @ 1.80GHz and 16 GBs of RAM**: Tested with two network interfaces. Most of the times, AMF is deployed after N3IWF in the first execution, so you need to cancel it (ctrl+C) and execute it again. It works ok most of the times during the second execution. Most of the times it works ok with two network interfaces.
+
+The performance (in terms of throughput) is low in both cases. **[TO BE TESTED WITHOUT VIRTUALIZATION]**
+
+**Vagrant requirements**
 
 These vagrant files requires the installation of the Vagrant Reload Provisioner (https://github.com/aidanns/vagrant-reload). If you are using Ubuntu, you could follow these steps:
 
@@ -32,6 +44,8 @@ sudo vagrant plugin install vagrant-reload
 ```
 
 You can check the version with ```vagrant --version```.
+
+**Virtualbox**
 
 We have tested the following installations using Virtualbox 6.1 (more precisely, 6.1.18r142142). If you are using Ubuntu, you could follow these steps:
 
@@ -108,9 +122,9 @@ In order to perform some experiment, remember to use the namespace `MPTCPns` and
 
 ## Launching SCENARIO 2: UE <-> free5GC <-> proxy
 
-In this scenario, a VM (mptcpUe) employs two network interfaces (`eth1` and `eth2`) emulating a computer with two wireless access technologies (WATs), e.g. Wi-Fi, Li-Fi or 5G NR. We assume that they are in bridge mode, i.e. connected to the same IP network. This VM is directly connected to a VM (free5gc) implementing the 5G core network. The connection is done through the N3IWF (Non-3GPP InterWorking Function) entity. Since we are employing MPTCP to simultaneously transfer data from both interfaces of mptcpUe VM, it is required that the other end also implements MPTCP. Due to the different kernel versions on both VMs (4.19.142 for MPTCP and 5.0.0-23 for free5GC), another VM (mptcpProxy) is also required. mptcpProxy implements MPTCP for this purpose.
+In this scenario, a VM (mptcpUe) employs two network interfaces (`eth1` and `eth2`) emulating a computer with two wireless access technologies (WATs), e.g. Wi-Fi, Li-Fi or 5G NR. We assume that they are in bridge mode, i.e. connected to the same IP network. This VM is directly connected to a VM (free5gc) implementing the 5G core network. The connection is done through the N3IWF (Non-3GPP InterWorking Function) entity. Since we are employing MPTCP to simultaneously transfer data from both interfaces of mptcpUe VM, it is required that the other end also implements MPTCP. Due to the different kernel versions on both VMs (~~4.19.142~~5.5 for MPTCP and 5.0.0-23 for free5GC), another VM (mptcpProxy) is also required. mptcpProxy implements MPTCP for this purpose.
 
-**NOTE**: If required, you can add more network interfaces to the mptcpUe VM to emulate more WATs, as long as the last one is configured for management (i.e. using 192.168.33.1/24). The scripts will utilize consecutive network interfaces starting from eth1, eth2, eth3, etcetera.
+**NOTE**: If required, you can add more network interfaces to the mptcpUe VM to emulate more WATs (currently three interfaces are added). The scripts will utilize consecutive network interfaces starting from eth1, eth2, eth3, etcetera.
 
 **Launch scenario 2 without 5G core network**
 
@@ -234,37 +248,11 @@ Congratulations! With these steps, you should have the kernel and the packages a
 
 ---
 
-# 5GCLARITY testbed setup (from i2CAT's original repository, **TO BE REMOVED**)
+# i2CAT's scripts 5GCLARITY testbed setup
 
 ## Setting up the virtual environment
 
-After cloning this repository, you need to install vagrant and Virtualbox in your system. In `Vagrantfile` there is a configuration for an environment with three virtual machines named `mptcpUe`, implementing the logic of the 5GCLARITY CPE, `free5gc`, implementing the core network, and `mptcpProxy` implementing the logic of the mptcp proxy.
-Run `vagrant up` inside this repository to bring up the machines.
-
-The three machines will have a clean Ubuntu 18.04 installation. Vagrant will prepare an SSH server inside each VM, so you can ssh into them probably at porst `2222`, `2200` and `2201`.
-
-You need to do the following additional configurations for the testbed:
-
-- Machines `mptcpUe` and `mptpcProxy`
-    - Compile the MPTCP kernel following the isntructions here: https://multipath-tcp.org/pmwiki.php/Users/DoItYourself.
-    - Note: When compiling the kernel you need to do `make menuconfig` navigate to the Networking menu, and select all available mptcp path managers and mptcp schedulers. They are compiled as separate modules that can be loaded at runtime
-    - Once the kernel is installed, reboot and check that you are running kernel `4.19.126`. This is the lates MPTCP kernel available at the time this testbed was setup.
-    - Once the MPTCP kernel is available you need to clone again this repository in the VMs: `git clone ssh://git@bitbucket.i2cat.net:7999/sdwn/free5gc.git`
-    - Install openvpn. There is no need to generate keys, as they are already provided in this repository
-
-- Machine `mptcpUe`
-    - In addition to the steps above, in this machine you need to install free5GC, but only the control plane functions (i.e. no need to compile UPF). To do this follow the instruction below in this Readme here: Install Control Plane Entities
-
-- Machine `free5gc`
-    - You need to do a full installation of free5GC. This requires installation of kernel `5.0.0-23-generic`, including the headers. This is required to compile the UPF, which requires a specific kernel module
-    - You need to clone this repository again inside the VM: `git clone ssh://git@bitbucket.i2cat.net:7999/sdwn/free5gc.git`
-    - After booting with the kernel `5.0.0-23-generic` follow the installation instructions for free5gc at the end of this readme
-
-You can use the scripts in this repository to launch two testbeds:
-- free5GC testbed, including a free5gC core, the MPTCP client and the proxy. This is detailed later
-- Simple testbed, used to test MPTCP in a simpler setup without the free5GC core. Also detailed later
-
-In a separate section we discuss some helper scripts to operate this testbed
+You can follow the steps at i2CAT's repository (https://bitbucket.i2cat.net/projects/SDWN/repos/free5gc/browse) or use the Vagrantfiles in this repository (recommended for simplicity).
 
 ## Launching the free5GC testbed
 
@@ -337,7 +325,7 @@ The following helper tools are included:
 - In machine `mptcpUe` you can use `sudo ./openvpn_mgr -m start -M` or `sudo ./openvpn_mgr -m stop -M` to start or stop the openvpn tunnel inside the MPTCP namespace in the UE. Note that you need to restart the tunnel every time you change the scheduler for it to have effect. The reason is that scheduler is considered when the TCP socket opens
 - In the machine `mptcpUe` you can use `./delay_mgr -m add -i v_mph_1 -d 200ms` or `./delay_mgr -m remove -i v_mph_1 -d 200ms` to add or remove delay to a given interface
 
-# APPENDIX: free5GC v3.0.0 Installation Guide
+**TO BE REMOVED FROM HERE**
 
 ## Minimum Requirement
 - Software
