@@ -86,7 +86,7 @@ To setup this scenario the following scripts have to be run in this order:
 
 - In the machine `mptcpUe1` change to the directory `$HOME/free5gc/mptcp_test` and launch `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -g 10.1.1.4 -n 10.1.1 -u 3 -f 1`. You can add option `-d` if you want to read debug messages.
 
-- In the machine `mptcpUe2` change to the directory `$HOME/free5gc/mptcp_test` and launch `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -g 10.1.1.1 -n 10.1.1 -u 3 -f 1`. You can add option `-d` if you want to read debug messages.
+- In the machine `mptcpUe2` change to the directory `$HOME/free5gc/mptcp_test` and launch `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -g 10.1.1.1 -n 10.1.1 -u 3 -f 4`. You can add option `-d` if you want to read debug messages.
 
 This will setup MPTCP properly in both VMs.
 
