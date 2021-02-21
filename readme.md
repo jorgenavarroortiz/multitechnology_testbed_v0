@@ -90,6 +90,8 @@ To setup this scenario the following scripts have to be run in this order:
 
 This will setup MPTCP properly in both VMs.
 
+**[To be updated with the example with three network interfaces]**
+
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1_set_MPTCP_parameters.png" width="1200">
 
 In order to test the correct behaviour of MPTCP, you can run `iperf` and check the throughput in each interface using `ifstat`. For this, you can use:
@@ -98,7 +100,9 @@ In order to test the correct behaviour of MPTCP, you can run `iperf` and check t
 
 - In the machine `mptcpUe1` (which will act as client) run `./test_throughput_tcp_client.sh -s 10.1.1.4 & ifstat`.
 
-You can see that there are data sent on both interfaces (`eth1` and `eth2`).**[To be updated with the example with three network interfaces]**
+You can see that there are data sent on both interfaces (`eth1` and `eth2`).
+
+**[To be updated with the example with three network interfaces]**
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1_test_throughput.png" width="1200">
 
