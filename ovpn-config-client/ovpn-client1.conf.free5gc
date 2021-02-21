@@ -33,8 +33,8 @@ dev tap
 # Are we connecting to a TCP or
 # UDP server?  Use the same setting as
 # on the server.
-proto tcp
-;proto udp
+proto tcp4
+;proto udp4
 
 # The hostname/IP and port of the server.
 # You can have multiple remote entries
