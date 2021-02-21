@@ -21,7 +21,19 @@ In both scenarios, a Vagrantfile has been developed to install the required kern
 - **free5gc VM**: Similarly, this machine utilizes two internal networks (ue_5gc and 5gc_proxy) instead of using a bridged adapter. Access to this VM is available through **SSH on port 22222**.
 - **mptcpProxy VM**: Similarly, this machine utilizes an internal network (5gc_proxy) instead of using a bridged adapter. Access to this VM is available through **SSH on port 32222**.
 
-### Vagrant and Virtualbox requirements
+### Hardware and softwarerequirements
+
+**Hardware requirements**
+
+The scenario with free5gc is quite demanding. We have tested in two different computers:
+
+- Desktop PC with an **Intel(R) Core(TM) i7-7820X CPU @ 3.60GHz and 32 GBs of RAM**: In general, the scenario works ok with two network interfaces (although sometimes AMF is deployed after N3IWF, which requires to restart the process). It also works ok with three network interfaces, although sometimes one of the network interfaces works intermitently.
+
+- Laptop PC with an **Intel(R) Core(TM) i7-8550U CPU @ 1.80GHz and 16 GBs of RAM**: Tested with two network interfaces. Most of the times, AMF is deployed after N3IWF in the first execution, so you need to cancel it (ctrl+C) and execute it again. It works ok most of the times during the second execution. Most of the times it works ok with two network interfaces.
+
+The performance (in terms of throughput) is low in both cases. **[TO BE TESTED WITHOUT VIRTUALIZATION]**
+
+**Vagrant requirements**
 
 These vagrant files requires the installation of the Vagrant Reload Provisioner (https://github.com/aidanns/vagrant-reload). If you are using Ubuntu, you could follow these steps:
 
@@ -32,6 +44,8 @@ sudo vagrant plugin install vagrant-reload
 ```
 
 You can check the version with ```vagrant --version```.
+
+**Virtualbox**
 
 We have tested the following installations using Virtualbox 6.1 (more precisely, 6.1.18r142142). If you are using Ubuntu, you could follow these steps:
 
