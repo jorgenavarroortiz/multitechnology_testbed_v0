@@ -39,7 +39,7 @@ proto tcp
 # The hostname/IP and port of the server.
 # You can have multiple remote entries
 # to load balance between the servers.
-remote 10.1.1.3 1194
+remote 10.1.1.4 1194
 ;remote my-server-2 1194
 
 # Choose a random host from the remote
