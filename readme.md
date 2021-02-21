@@ -31,7 +31,7 @@ The scenario with free5gc is quite demanding. We have tested in two different co
 
 - Laptop PC with an **Intel(R) Core(TM) i7-8550U CPU @ 1.80GHz and 16 GBs of RAM**: Tested with two network interfaces. Most of the times, AMF is deployed after N3IWF in the first execution, so you need to cancel it (ctrl+C) and execute it again. It works ok most of the times during the second execution. Most of the times it works ok with two network interfaces.
 
-The performance (in terms of throughput) is low in both cases. **[TO BE TESTED WITHOUT VIRTUALIZATION]**
+The performance (in terms of throughput) is low in both cases (few hundreds of kbps).
 
 **Vagrant requirements**
 
@@ -221,7 +221,7 @@ cd $HOME/vagrant
 bash ./mptcp_kernel55_installation.sh
 sudo reboot
 ```
-- After rebooting, the NUC will have kernel 5.5 (you should check it by executing `uname -r`)~~but you will loose the driver for the Intel Gigabit Ethernet Controller I219-V. In order to install the driver (e1000e version 3.8.7) execute:~~ (this was for kernel 5.4, which has some stabiltiy problems for the Wi-Fi card; it is not required with kernel 5.5).
+- After rebooting, the NUC will have kernel 5.5 (you should check it by executing `uname -r`) ~~but you will loose the driver for the Intel Gigabit Ethernet Controller I219-V. In order to install the driver (e1000e version 3.8.7) execute:~~ (this was for kernel 5.4, which has some stabiltiy problems for the Wi-Fi card; it is not required with kernel 5.5).
 ~~`cd $HOME/vagrant`~~
 ~~`bash ./nuc_network1.sh`~~
 Modify your network settings in the file `/etc/netplan/50-nuc.yaml` and reboot. Please check that you have network connectivity again.
@@ -248,7 +248,7 @@ Congratulations! With these steps, you should have the kernel and the packages a
 
 ---
 
-# i2CAT's scripts 5GCLARITY testbed setup
+# i2CAT's scripts 5G-CLARITY testbed
 
 ## Setting up the virtual environment
 
@@ -297,8 +297,8 @@ The goal is to set up the environment described in the following figure:
 
 ![Alt text](./img/testbed_setup_simple.png?raw=true "simple testbed")
 
-- 1. In the machine `free5gc` launch the 5GCore
-    - From this repo folder: `sudo ./clarity5gC_simple.sh`
+- 1. In the machine `free5gc` launch the 5GCore (modified by UGR, so now it takes the number of UEs and the IP address is correctly calculated)
+    - From this repo folder: `sudo ./clarity5gC_simple.sh -n 3 -s 10.0.1`
 
 - 2. In the machine `mptcpProxy` launch the openvpn server:
     - From this repo launch script `sudo ./clarityMptcpProxy.sh`
@@ -325,7 +325,9 @@ The following helper tools are included:
 - In machine `mptcpUe` you can use `sudo ./openvpn_mgr -m start -M` or `sudo ./openvpn_mgr -m stop -M` to start or stop the openvpn tunnel inside the MPTCP namespace in the UE. Note that you need to restart the tunnel every time you change the scheduler for it to have effect. The reason is that scheduler is considered when the TCP socket opens
 - In the machine `mptcpUe` you can use `./delay_mgr -m add -i v_mph_1 -d 200ms` or `./delay_mgr -m remove -i v_mph_1 -d 200ms` to add or remove delay to a given interface
 
-**TO BE REMOVED FROM HERE**
+---
+
+#free5GC Stage 3 Installation Guide (from https://github.com/free5gc/free5gc-stage-3, use it as reference)
 
 ## Minimum Requirement
 - Software
