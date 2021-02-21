@@ -325,7 +325,9 @@ The following helper tools are included:
 - In machine `mptcpUe` you can use `sudo ./openvpn_mgr -m start -M` or `sudo ./openvpn_mgr -m stop -M` to start or stop the openvpn tunnel inside the MPTCP namespace in the UE. Note that you need to restart the tunnel every time you change the scheduler for it to have effect. The reason is that scheduler is considered when the TCP socket opens
 - In the machine `mptcpUe` you can use `./delay_mgr -m add -i v_mph_1 -d 200ms` or `./delay_mgr -m remove -i v_mph_1 -d 200ms` to add or remove delay to a given interface
 
-**TO BE REMOVED FROM HERE**
+---
+
+#free5GC Stage 3 Installation Guide (from https://github.com/free5gc/free5gc-stage-3, use it as reference)
 
 ## Minimum Requirement
 - Software
