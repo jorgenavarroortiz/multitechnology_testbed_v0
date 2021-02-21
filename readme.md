@@ -76,7 +76,7 @@ Copy the content of the directory `free5gc/vagrant` to your computer. Rename the
 
 ## Launching SCENARIO 1: Two virtual machines directly connected
 
-In this scenario, two machines are directly connected using network interfaces eth1 and eth2. eth0 is configured with NAT in VirtualBox to connect to Internet. eth3 is configured with IP addresses 192.168.33.1/24 and 192.168.33.2/24 for management (for connecting through SSH). The image shows both VMs employing a network namespace (MPTCPns) and OpenVPN. You can configure whether namespaces or OpenVPN are used or not.
+In this scenario, two machines are directly connected using network interfaces eth1, eth2 and eth3. eth0 is configured with NAT in VirtualBox to connect to Internet. They are accessible through SSH on ports 12222 and 22222, respectively. The image shows both VMs employing a network namespace (MPTCPns) and OpenVPN. You can configure whether namespaces and OpenVPN are used or not.
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1.png" width="800">
 
