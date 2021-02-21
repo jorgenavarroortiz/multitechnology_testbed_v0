@@ -21,7 +21,7 @@ In both scenarios, a Vagrantfile has been developed to install the required kern
 - **free5gc VM**: Similarly, this machine utilizes two internal networks (ue_5gc and 5gc_proxy) instead of using a bridged adapter. Access to this VM is available through **SSH on port 22222**.
 - **mptcpProxy VM**: Similarly, this machine utilizes an internal network (5gc_proxy) instead of using a bridged adapter. Access to this VM is available through **SSH on port 32222**.
 
-### Hardware and softwarerequirements
+### Hardware and software requirements
 
 **Hardware requirements**
 
