@@ -248,7 +248,7 @@ Congratulations! With these steps, you should have the kernel and the packages a
 
 ---
 
-# i2CAT's scripts 5GCLARITY testbed setup
+# i2CAT's scripts 5G-CLARITY testbed
 
 ## Setting up the virtual environment
 
