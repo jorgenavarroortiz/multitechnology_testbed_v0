@@ -88,15 +88,15 @@ To setup this scenario the following scripts have to be run in this order:
 
 - In the machine `mptcpUe2` change to the directory `$HOME/free5gc/mptcp_test` and launch `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -g 10.1.1.1 -n 10.1.1 -u 3 -f 4`. You can add option `-d` if you want to read debug messages.
 
-This will setup MPTCP properly in both VMs.
+This will setup MPTCP properly in both VMs. **NOTE:** please check the ``remote`` directive in the `$HOME/free5gc/mptcp_test/ovpn-config-client/ovpn-client1.conf`. Currently it is set to `10.1.1.1`, i.e. **`mptcpUe1` acts as the OpenVPN server**. Please change this according to your needs.
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1_set_MPTCP_parameters.png" width="1200">
 
 In order to test the correct behaviour of MPTCP, you can run `iperf` and check the throughput in each interface using `ifstat`. For this, you can use:
 
-- In the machine `mptcpUe2` (which will act as server) run `./test_throughput_tcp_server.sh & ifstat`.
+- In the machine `mptcpUe1` (which will act as server) run `./test_throughput_tcp_server.sh & ifstat`.
 
-- In the machine `mptcpUe1` (which will act as client) run `./test_throughput_tcp_client.sh -s 10.1.1.4 & ifstat`.
+- In the machine `mptcpUe2` (which will act as client) run `./test_throughput_tcp_client.sh -s 10.1.1.1 & ifstat`.
 
 You can see that there are data sent on both interfaces (`eth1` and `eth2`).
 
