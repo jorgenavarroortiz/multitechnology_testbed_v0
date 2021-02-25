@@ -148,7 +148,9 @@ To test that MPTCP is working properly, run the following scripts:
 
 **Launch scenario 2 with 5G core network**
 
-[**SCENARIO RUNNING FREE5GC: TO BE DONE AND WRITTEN**]
+[**SCENARIO RUNNING FREE5GC: TO BE FINISHED**]
+
+Please use [i2CAT's scenario 2](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-the-free5gc-testbed) in the meantime.
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario2_free5gc.png" width="1200">
 
