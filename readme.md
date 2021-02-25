@@ -150,7 +150,7 @@ To test that MPTCP is working properly, run the following scripts:
 
 [**SCENARIO RUNNING FREE5GC: TO BE FINISHED**]
 
-Please use [i2CAT's scenario 2](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-the-free5gc-testbed) in the meantime.
+Please use [i2CAT's scenario 2](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-the-free5gc-testbed) in the meantime. You can watch a [video showing how it should work](https://www.youtube.com/watch?v=S5ocC49i4Uk).
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario2_free5gc.png" width="1200">
 
