@@ -4,6 +4,9 @@ Testbed v0 (virtualized environment) for the 5G-CLARITY European Project. Based 
 
 We have also included instructions to install MPTCP in NUC (Intel NUC 10 NUC10i7FNH) using kernel ~~5.4~~5.5, which supports the usage of the Intel Wi-Fi 6 AX201 module.
 
+You can watch a [video showing how scenario 1 works](https://youtu.be/EAh_p1I007o).
+You can watch a [video showing how scenario 2 works](https://youtu.be/AYZm-uw-ZXU) (using i2CAT's scripts, to be updated with UGR's ones).
+
 ## Setting up the virtual environment
 
 In order to simplify testing with MPTCP, we have developed two Vagrant configurations for the following **scenarios**:
@@ -109,6 +112,8 @@ Additionally, you can check that each interface can be active (on), inactive (of
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1_change_interfaces_state.png" width="1200">
 
 **Launching scenario 1 with namespace MPTCPns and OpenVPN**
+
+You can watch a [video showing how it works](https://youtu.be/EAh_p1I007o).
 
 To use a namespace (`MTPCPns`) and OpenVPN in both VMs, you have to run:
 
