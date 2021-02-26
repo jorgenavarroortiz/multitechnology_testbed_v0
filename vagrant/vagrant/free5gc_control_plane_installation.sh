@@ -20,9 +20,6 @@ cd $HOME/go/src
 git clone git@github.com:jorgenavarroortiz/5g-clarity_testbed_v0.git
 mv 5g-clarity_testbed_v0 free5gc
 cd $HOME/go/src/free5gc
-chmod +x *.sh
-chmod +x delay_mgr
-chmod +x openvpn_mgr
 
   # install dependent packages
 cd $HOME/go/src/free5gc
