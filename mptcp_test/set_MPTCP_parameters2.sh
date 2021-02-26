@@ -35,6 +35,8 @@ usage() {
 REAL_MACHINE=0
 ns=0
 LAST_BYTE_FIRST_UE=1
+CURRENTDIR=`pwd`
+echo "current directory: $CURRENTDIR"
 
 while getopts ":p:s:c:g:n:u:f:mo:S:ad" o; do
   case "${o}" in
@@ -149,13 +151,18 @@ if [[ $ns == 0 ]]; then
   for i in $(seq 1 $NUM_UES)
   do
 #    card="eth"$i
+    echo "CURRENTDIRPWD: $CURRENTDIR"
+    cd $CURRENTDIR
     card=`sed ${i}'q;d' if_names.txt`
+    echo "card(1): $card"
     IPcard=$SMF_UE_SUBNET"."$(( LAST_BYTE_FIRST_UE+i-1 ))"/24"
     sudo ifconfig $card $IPcard
   done
 fi
 
 #GlobalEth="eth1"
+echo "CURRENTDIR: $CURRENTDIR"
+cd $CURRENTDIR
 GlobalEth=`sed '1q;d' if_names.txt`
 GlobalGW=$GW
 
@@ -184,7 +191,10 @@ if [[ $ns == 0 ]]; then
   for i in $(seq 1 $NUM_UES)
   do
 #    card="eth"$i
+    echo "CURRENTDIR: $CURRENTDIR"
+    cd $CURRENTDIR
     card=`sed ${i}'q;d' if_names.txt`
+    echo "card(2): $card"
     IPcard=$SMF_UE_SUBNET"."$(( LAST_BYTE_FIRST_UE+i-1 ))
     NETcard=$SMF_UE_SUBNET".0"
     netmaskcardbits=24
@@ -208,8 +218,10 @@ else
 
       sudo ip netns add ${UENS}
 
+      echo "CURRENTDIR: $CURRENTDIR"
+      cd $CURRENTDIR
       card=`sed ${i}'q;d' if_names.txt`
-      echo "Interface: $card"
+      echo "card(3): $card"
 
       # Create bridge simulating L2 network
       BRNAME="br"$i
@@ -269,7 +281,7 @@ else
       echo ""
       echo "Connecting MPTCP namespace to UE "$i
     fi
-    if [ ${ATTACH} ]
+    if [ ${ATTACH} ]; then
       UENS="UEns_"$i
       EXEC_UENS="sudo ip netns exec ${UENS}"
       VETH_UE="v_ue_"$i
@@ -277,7 +289,10 @@ else
       sudo ip link add $VETH_UE type veth peer name $VETH_UE_H
     fi
 
+    echo "CURRENTDIR: $CURRENTDIR"
+    cd $CURRENTDIR
     card=`sed ${i}'q;d' if_names.txt`
+    echo "card(4): $card"
 
     VETH_MPTCP="v_mp_"$i
     VETH_MPTCP_H="v_mph_"$i
@@ -285,7 +300,7 @@ else
     sudo ip link add $VETH_MPTCP type veth peer name $VETH_MPTCP_H
     sudo ifconfig $card 0.0.0.0 up
     sudo brctl addbr "brmptcp_"$i
-    if [ ${ATTACH} ]
+    if [ ${ATTACH} ]; then
       sudo brctl addif "brmptcp_"$i $VETH_UE_H
     else
       sudo brctl addif "brmptcp_"$i $card
@@ -293,17 +308,17 @@ else
     sudo brctl addif "brmptcp_"$i $VETH_MPTCP_H
     sudo ip link set $VETH_MPTCP_H up
     sudo ip link set "brmptcp_"$i up
-    if [ ${ATTACH} ]
+    if [ ${ATTACH} ]; then
       sudo ip link set $VETH_UE netns ${UENS} # Send one end of the veth pair to the UE namespace
       $EXEC_UENS ip link set $VETH_UE up
     fi
     sudo ip link set $VETH_MPTCP netns ${MPTCPNS} # Send other end of the veth pair to the MPTCP namespace
     $EXEC_MPTCPNS ip link set $VETH_MPTCP up
-    if [ ${ATTACH} ]
+    if [ ${ATTACH} ]; then
       IP_UE=$SMF_UE_SUBNET"."$(($i + 2))"/24"
       IP_UE_SIMPLE=$SMF_UE_SUBNET"."$(($i + 2))
       $EXEC_UENS ip addr add $IP_UE dev $VETH_UE
-    	$EXEC_UENS echo 1 > /proc/sys/net/ipv4/ip_forward # enable IP forwarding in the UE namespace
+      $EXEC_UENS sysctl -w net.ipv4.ip_forward=1
     fi
     #IP_MPTCP=$SMF_UE_SUBNET"."$i"/24"
     #IP_MPTCP_SIMPLE=$SMF_UE_SUBNET"."$i
@@ -330,7 +345,10 @@ if [[ $ns == 0 ]]; then
   # Configure each interface (no namespaces)
   for i in $(seq 1 $NUM_UES)
   do
+    echo "CURRENTDIR: $CURRENTDIR"
+    cd $CURRENTDIR
     card=`sed ${i}'q;d' if_names.txt`
+    echo "card(5): $card"
     IPcard=$SMF_UE_SUBNET"."$(( LAST_BYTE_FIRST_UE+i-1 ))
     NETcard=$SMF_UE_SUBNET".0"
     GWcard=$GW
@@ -391,7 +409,10 @@ else
     $EXEC_MPTCPNS ip route add default via $GW_MPTCP dev $VETH_MPTCP table $i #2> /dev/null
 
     # Probably not needed...
+    echo "CURRENTDIR: $CURRENTDIR"
+    cd $CURRENTDIR
     card=`sed ${i}'q;d' if_names.txt`
+    echo "card(6): $card"
     sudo ip link set dev $card multipath on
     sudo ip link set dev $VETH_MPTCP_H multipath on
     $EXEC_MPTCPNS ip link set dev $VETH_MPTCP multipath on
@@ -428,6 +449,8 @@ if [[ $OVPN == 1 ]]; then
       EXEC_OVPN="sudo"
     fi
 
+    echo "CURRENTDIR: $CURRENTDIR"
+    cd $CURRENTDIR
     cd ovpn-config-client
 
     # Automatically modify the configuration file according to the OVPN server IP address
@@ -449,6 +472,8 @@ if [[ $OVPN == 1 ]]; then
     else
       EXEC_OVPN="sudo"
     fi
+    echo "CURRENTDIR: $CURRENTDIR"
+    cd $CURRENTDIR
     cd ovpn-config-proxy
     $EXEC_OVPN openvpn ovpn-server.conf &
 
