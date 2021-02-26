@@ -14,7 +14,7 @@ usage() {
   echo "Usage: $0 -p <path manager> -s <scheduler> -c <congestion control> -g <gateway> -n <network> [-u <num_UEs>] [-f <last_byte_first_UE>] [-m] [-o <server/client>] [-d]" 1>&2;
   echo ""
   echo "E.g. for mptcpProxy: $0 -p fullmesh -s default -c olia -g 60.60.0.102 -n 60.60.0      -f 101    -o server"
-  echo "E.g. for mptcpUe:    $0 -p fullmesh -s default -c olia -g 10.1.1.222  -n 10.1.1  -u 2 -f 1   -m -o client -os 60.60.0.101";
+  echo "E.g. for mptcpUe:    $0 -p fullmesh -s default -c olia -g 10.1.1.222  -n 10.1.1  -u 2 -f 1   -m -o client -S 60.60.0.101";
   echo ""
   echo "       <path manager> ........... default, fullmesh, ndiffports, binder"
   echo "       <scheduler> .............. default, roundrobin, redundant"
@@ -25,7 +25,7 @@ usage() {
   echo "       <last_byte_ip_address> ... last byte of the first IP address (following IP addresses will be consecutive)"
   echo "       -m ....................... create namespace MPTCPns with virtual interfaces"
   echo "       -o ....................... create an OpenVPN connection, indicating if this entity is server or client"
-  echo "       -os ...................... OVPN server IP address"
+  echo "       -S ....................... OVPN server IP address"
   echo "       -d ....................... print debug messages"
   exit 1;
 }
@@ -83,7 +83,7 @@ while getopts ":p:s:c:g:n:u:f:mo:d" o; do
         OVPN_ENTITY=${OPTARG}
         echo "Create an OpenVPN connection"
         ;;
-    os)
+    S)
         OVPN_SERVER_IP=${OPTARG}
         echo "OVPN server IP address"
         ;;
@@ -196,8 +196,6 @@ else
   # Using MPTCPns namespace
   sudo ip netns add ${MPTCPNS}
 
-  card=`sed ${i}'q;d' if_names.txt`
-
   # Create veth_pair between the MPTCP namespace, and the UE namespace (UEs represent interfaces in this case)
   for i in $(seq 1 $NUM_UES)
   do
@@ -205,6 +203,8 @@ else
       echo ""
       echo "Connecting MPTCP namespace to UE "$i
     fi
+
+    card=`sed ${i}'q;d' if_names.txt`
 
     VETH_MPTCP="v_mp_"$i
     VETH_MPTCP_H="v_mph_"$i
