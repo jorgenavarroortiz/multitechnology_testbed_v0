@@ -5,6 +5,7 @@ Testbed v0 (virtualized environment) for the 5G-CLARITY European Project. Based 
 We have also included instructions to install MPTCP in NUC (Intel NUC 10 NUC10i7FNH) using kernel ~~5.4~~5.5, which supports the usage of the Intel Wi-Fi 6 AX201 module.
 
 You can watch a [video showing how scenario 1 works](https://youtu.be/EAh_p1I007o).
+
 You can watch a [video showing how scenario 2 works](https://youtu.be/AYZm-uw-ZXU) (using i2CAT's scripts, to be updated with UGR's ones).
 
 ## Setting up the virtual environment
