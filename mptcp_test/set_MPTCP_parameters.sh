@@ -31,6 +31,7 @@ usage() {
 }
 
 # Default values
+REAL_MACHINE=0
 ns=0
 LAST_BYTE_FIRST_UE=1
 
@@ -139,16 +140,18 @@ PATH=$PATH:$GOPATH/bin:$GOROOT/bin
 ##############################
 #./configure.sh
 if [[ $ns == 0 ]]; then
-  sudo ifconfig eth0 down
+#  sudo ifconfig eth0 down
   for i in $(seq 1 $NUM_UES)
   do
-    card="eth"$i
+#    card="eth"$i
+    card=`sed '${i}q;d' if_names.txt`
     IPcard=$SMF_UE_SUBNET"."$(( LAST_BYTE_FIRST_UE+i-1 ))"/24"
     sudo ifconfig $card $IPcard
   done
 fi
 
-GlobalEth="eth1"
+#GlobalEth="eth1"
+GlobalEth=`sed '1q;d' if_names.txt`
 GlobalGW=$GW
 
 ##############################
@@ -175,7 +178,8 @@ if [[ $ns == 0 ]]; then
   # Configure each interface (no namespaces)
   for i in $(seq 1 $NUM_UES)
   do
-    card="eth"$i
+#    card="eth"$i
+    card=`sed '${i}q;d' if_names.txt`
     IPcard=$SMF_UE_SUBNET"."$(( LAST_BYTE_FIRST_UE+i-1 ))
     NETcard=$SMF_UE_SUBNET".0"
     netmaskcardbits=24
@@ -192,6 +196,8 @@ else
   # Using MPTCPns namespace
   sudo ip netns add ${MPTCPNS}
 
+  card=`sed '${i}q;d' if_names.txt`
+
   # Create veth_pair between the MPTCP namespace, and the UE namespace (UEs represent interfaces in this case)
   for i in $(seq 1 $NUM_UES)
   do
@@ -204,9 +210,9 @@ else
     VETH_MPTCP_H="v_mph_"$i
 
     sudo ip link add $VETH_MPTCP type veth peer name $VETH_MPTCP_H
-    sudo ifconfig "eth"$i 0.0.0.0 up
+    sudo ifconfig $card 0.0.0.0 up
     sudo brctl addbr "brmptcp_"$i
-    sudo brctl addif "brmptcp_"$i "eth"$i
+    sudo brctl addif "brmptcp_"$i $card
     sudo brctl addif "brmptcp_"$i $VETH_MPTCP_H
     sudo ip link set $VETH_MPTCP_H up
     sudo ip link set "brmptcp_"$i up
@@ -226,9 +232,10 @@ else
   done
 fi
 
-# Disable interfaces for MPTCP (eth0 = NAT connection, eth$(( NUM_UES+1 )) = connection with host OS)
-sudo ip link set dev eth0 multipath off
-sudo ip link set dev eth$(( NUM_UES+1 )) multipath off
+# Disable interfaces for MPTCP (eth0 = NAT connection in VMs, to be modified for real machines)
+if [[ $REAL_MACHINE == 0 ]]; then
+  sudo ip link set dev eth0 multipath off
+fi
 
 # Remove previous rules
 for i in {32700..32765}; do sudo ip rule del pref $i 2>/dev/null ; done
@@ -237,7 +244,7 @@ if [[ $ns == 0 ]]; then
   # Configure each interface (no namespaces)
   for i in $(seq 1 $NUM_UES)
   do
-    card="eth"$i
+    card=`sed '${i}q;d' if_names.txt`
     IPcard=$SMF_UE_SUBNET"."$(( LAST_BYTE_FIRST_UE+i-1 ))
     NETcard=$SMF_UE_SUBNET".0"
     GWcard=$GW
@@ -294,7 +301,8 @@ else
     $EXEC_MPTCPNS ip route add default via $GW_MPTCP dev $VETH_MPTCP table $i #2> /dev/null
 
     # Probably not needed...
-    sudo ip link set dev eth$i multipath on
+    card=`sed '${i}q;d' if_names.txt`
+    sudo ip link set dev $card multipath on
     sudo ip link set dev $VETH_MPTCP_H multipath on
     $EXEC_MPTCPNS ip link set dev $VETH_MPTCP multipath on
   done
