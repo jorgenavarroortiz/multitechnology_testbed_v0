@@ -235,7 +235,7 @@ then
 
         # JNa: automatically modify the configuration file according to the OVPN server IP address
         cp ovpn-client1.conf.GENERIC ovpn-client1.conf
-        sed -i 's/SERVER_IP_ADDRESS/60.60.0.101/' ovpn-client1.conf
+        sed -i 's/SERVER_IP_ADDRESS/${OVPN_SERVER_IP}/' ovpn-client1.conf
 
         $EXEC_MPTCPNS openvpn ovpn-client1.conf &
 
