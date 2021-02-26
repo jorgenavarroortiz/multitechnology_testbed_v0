@@ -104,11 +104,15 @@ do
 
       sudo ip netns add ${UENS}
 
+      # JNa: Generalize the name of the network interface using if_names.txt
+      card=`sed ${i}'q;d' if_names.txt`
+      echo "Interface: $card"
+
       # Create bridge simulating L2 network
       BRNAME="br"$i
       sudo brctl addbr $BRNAME
-      sudo ifconfig "eth"$i 0.0.0.0 up
-      sudo brctl addif $BRNAME "eth"$i # adding host eth interface to the bridge
+      sudo ifconfig $card 0.0.0.0 up
+      sudo brctl addif $BRNAME $card # adding host eth interface to the bridge
 
 
       VETH_UE="veth_ue_"$i

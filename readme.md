@@ -4,6 +4,10 @@ Testbed v0 (virtualized environment) for the 5G-CLARITY European Project. Based 
 
 We have also included instructions to install MPTCP in NUC (Intel NUC 10 NUC10i7FNH) using kernel ~~5.4~~5.5, which supports the usage of the Intel Wi-Fi 6 AX201 module.
 
+You can watch a [video](https://youtu.be/EAh_p1I007o) showing how [scenario 1](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-scenario-1-two-virtual-machines-directly-connected) works.
+
+You can watch a [video](https://youtu.be/AYZm-uw-ZXU) showing how [scenario 2](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-scenario-2-ue---free5gc---proxy) works (using [i2CAT's scripts](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-the-free5gc-testbed), to be updated with UGR's ones).
+
 ## Setting up the virtual environment
 
 In order to simplify testing with MPTCP, we have developed two Vagrant configurations for the following **scenarios**:
@@ -110,11 +114,13 @@ Additionally, you can check that each interface can be active (on), inactive (of
 
 **Launching scenario 1 with namespace MPTCPns and OpenVPN**
 
+You can watch a [video](https://youtu.be/EAh_p1I007o) showing how it works.
+
 To use a namespace (`MTPCPns`) and OpenVPN in both VMs, you have to run:
 
 - In mptcpUe1: `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -g 10.1.1.4 -n 10.1.1 -u 3 -f 1 -m -o server`
 
-- In mptcpUe2: `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -g 10.1.1.1 -n 10.1.1 -u 3 -f 4 -m -o client`
+- In mptcpUe2: `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -g 10.1.1.1 -n 10.1.1 -u 3 -f 4 -m -o client -S 10.1.1.1`
 
 In order to perform some experiments, remember to use the namespace `MPTCPns` and its network interfaces. For simplicity, you can run `sudo ip netns exec MPTCPns bash`. In the namespace, you can check the network interfaces by executing `ifconfig` (you should have interfaces `v_mp_1`, `v_mp_2` and `v_mp_3` for the three MPTCP paths, with IP addresses 10.1.1.X/24, with X=1..3 on the first machine and X=4..6 on the second machine, and `tun0`, with IP address 10.8.0.1/24 on the server and 10.8.0.2/24 on the client).
 
@@ -150,7 +156,7 @@ To test that MPTCP is working properly, run the following scripts:
 
 [**SCENARIO RUNNING FREE5GC: TO BE FINISHED**]
 
-Please use [i2CAT's scenario 2](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-the-free5gc-testbed) in the meantime. You can watch a [video showing how it should work](https://www.youtube.com/watch?v=S5ocC49i4Uk).
+Please use [i2CAT's scenario 2](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-the-free5gc-testbed) in the meantime. You can watch a [video](https://youtu.be/AYZm-uw-ZXU) showing how it works (using i2CAT's scripts, to be updated).
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario2_free5gc.png" width="1200">
 

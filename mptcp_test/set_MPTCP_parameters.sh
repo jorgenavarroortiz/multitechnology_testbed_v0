@@ -14,7 +14,7 @@ usage() {
   echo "Usage: $0 -p <path manager> -s <scheduler> -c <congestion control> -g <gateway> -n <network> [-u <num_UEs>] [-f <last_byte_first_UE>] [-m] [-o <server/client>] [-d]" 1>&2;
   echo ""
   echo "E.g. for mptcpProxy: $0 -p fullmesh -s default -c olia -g 60.60.0.102 -n 60.60.0      -f 101    -o server"
-  echo "E.g. for mptcpUe:    $0 -p fullmesh -s default -c olia -g 10.1.1.222  -n 10.1.1  -u 2 -f 1   -m -o client -os 60.60.0.101";
+  echo "E.g. for mptcpUe:    $0 -p fullmesh -s default -c olia -g 10.1.1.222  -n 10.1.1  -u 2 -f 1   -m -o client -S 60.60.0.101";
   echo ""
   echo "       <path manager> ........... default, fullmesh, ndiffports, binder"
   echo "       <scheduler> .............. default, roundrobin, redundant"
@@ -25,12 +25,13 @@ usage() {
   echo "       <last_byte_ip_address> ... last byte of the first IP address (following IP addresses will be consecutive)"
   echo "       -m ....................... create namespace MPTCPns with virtual interfaces"
   echo "       -o ....................... create an OpenVPN connection, indicating if this entity is server or client"
-  echo "       -os ...................... OVPN server IP address"
+  echo "       -S ....................... OVPN server IP address"
   echo "       -d ....................... print debug messages"
   exit 1;
 }
 
 # Default values
+REAL_MACHINE=0
 ns=0
 LAST_BYTE_FIRST_UE=1
 
@@ -82,7 +83,7 @@ while getopts ":p:s:c:g:n:u:f:mo:d" o; do
         OVPN_ENTITY=${OPTARG}
         echo "Create an OpenVPN connection"
         ;;
-    os)
+    S)
         OVPN_SERVER_IP=${OPTARG}
         echo "OVPN server IP address"
         ;;
@@ -139,16 +140,18 @@ PATH=$PATH:$GOPATH/bin:$GOROOT/bin
 ##############################
 #./configure.sh
 if [[ $ns == 0 ]]; then
-  sudo ifconfig eth0 down
+#  sudo ifconfig eth0 down
   for i in $(seq 1 $NUM_UES)
   do
-    card="eth"$i
+#    card="eth"$i
+    card=`sed ${i}'q;d' if_names.txt`
     IPcard=$SMF_UE_SUBNET"."$(( LAST_BYTE_FIRST_UE+i-1 ))"/24"
     sudo ifconfig $card $IPcard
   done
 fi
 
-GlobalEth="eth1"
+#GlobalEth="eth1"
+GlobalEth=`sed '1q;d' if_names.txt`
 GlobalGW=$GW
 
 ##############################
@@ -175,7 +178,8 @@ if [[ $ns == 0 ]]; then
   # Configure each interface (no namespaces)
   for i in $(seq 1 $NUM_UES)
   do
-    card="eth"$i
+#    card="eth"$i
+    card=`sed ${i}'q;d' if_names.txt`
     IPcard=$SMF_UE_SUBNET"."$(( LAST_BYTE_FIRST_UE+i-1 ))
     NETcard=$SMF_UE_SUBNET".0"
     netmaskcardbits=24
@@ -200,13 +204,15 @@ else
       echo "Connecting MPTCP namespace to UE "$i
     fi
 
+    card=`sed ${i}'q;d' if_names.txt`
+
     VETH_MPTCP="v_mp_"$i
     VETH_MPTCP_H="v_mph_"$i
 
     sudo ip link add $VETH_MPTCP type veth peer name $VETH_MPTCP_H
-    sudo ifconfig "eth"$i 0.0.0.0 up
+    sudo ifconfig $card 0.0.0.0 up
     sudo brctl addbr "brmptcp_"$i
-    sudo brctl addif "brmptcp_"$i "eth"$i
+    sudo brctl addif "brmptcp_"$i $card
     sudo brctl addif "brmptcp_"$i $VETH_MPTCP_H
     sudo ip link set $VETH_MPTCP_H up
     sudo ip link set "brmptcp_"$i up
@@ -226,9 +232,10 @@ else
   done
 fi
 
-# Disable interfaces for MPTCP (eth0 = NAT connection, eth$(( NUM_UES+1 )) = connection with host OS)
-sudo ip link set dev eth0 multipath off
-sudo ip link set dev eth$(( NUM_UES+1 )) multipath off
+# Disable interfaces for MPTCP (eth0 = NAT connection in VMs, to be modified for real machines)
+if [[ $REAL_MACHINE == 0 ]]; then
+  sudo ip link set dev eth0 multipath off
+fi
 
 # Remove previous rules
 for i in {32700..32765}; do sudo ip rule del pref $i 2>/dev/null ; done
@@ -237,7 +244,7 @@ if [[ $ns == 0 ]]; then
   # Configure each interface (no namespaces)
   for i in $(seq 1 $NUM_UES)
   do
-    card="eth"$i
+    card=`sed ${i}'q;d' if_names.txt`
     IPcard=$SMF_UE_SUBNET"."$(( LAST_BYTE_FIRST_UE+i-1 ))
     NETcard=$SMF_UE_SUBNET".0"
     GWcard=$GW
@@ -294,7 +301,8 @@ else
     $EXEC_MPTCPNS ip route add default via $GW_MPTCP dev $VETH_MPTCP table $i #2> /dev/null
 
     # Probably not needed...
-    sudo ip link set dev eth$i multipath on
+    card=`sed ${i}'q;d' if_names.txt`
+    sudo ip link set dev $card multipath on
     sudo ip link set dev $VETH_MPTCP_H multipath on
     $EXEC_MPTCPNS ip link set dev $VETH_MPTCP multipath on
   done
