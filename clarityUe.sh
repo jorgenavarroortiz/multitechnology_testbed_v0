@@ -162,7 +162,7 @@ fi
 ##################
 # Prepare MPTCP namesapce
 ##################
- 
+
 if [ ${MPTCP} ]
 then
       sleep 3
@@ -232,11 +232,14 @@ then
         echo "Launching OVPN tunnel over MPTCP to transport L2 packets"
         echo ""
         cd $GOPATH/src/free5gc/ovpn-config-client  # openvpn needs to run from this folder
+
+        # JNa: automatically modify the configuration file according to the OVPN server IP address
+        cp ovpn-client1.conf.GENERIC ovpn-client1.conf
+        sed -i 's/SERVER_IP_ADDRESS/60.60.0.101/' ovpn-client1.conf
+
         $EXEC_MPTCPNS openvpn ovpn-client1.conf &
 
         #TODO: Add check to validate the tap0 interface is available
 
       fi
 fi
-
-
