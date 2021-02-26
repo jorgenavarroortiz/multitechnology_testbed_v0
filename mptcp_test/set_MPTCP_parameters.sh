@@ -144,7 +144,7 @@ if [[ $ns == 0 ]]; then
   for i in $(seq 1 $NUM_UES)
   do
 #    card="eth"$i
-    card=`sed '${i}q;d' if_names.txt`
+    card=`sed ${i}'q;d' if_names.txt`
     IPcard=$SMF_UE_SUBNET"."$(( LAST_BYTE_FIRST_UE+i-1 ))"/24"
     sudo ifconfig $card $IPcard
   done
@@ -179,7 +179,7 @@ if [[ $ns == 0 ]]; then
   for i in $(seq 1 $NUM_UES)
   do
 #    card="eth"$i
-    card=`sed '${i}q;d' if_names.txt`
+    card=`sed ${i}'q;d' if_names.txt`
     IPcard=$SMF_UE_SUBNET"."$(( LAST_BYTE_FIRST_UE+i-1 ))
     NETcard=$SMF_UE_SUBNET".0"
     netmaskcardbits=24
@@ -196,7 +196,7 @@ else
   # Using MPTCPns namespace
   sudo ip netns add ${MPTCPNS}
 
-  card=`sed '${i}q;d' if_names.txt`
+  card=`sed ${i}'q;d' if_names.txt`
 
   # Create veth_pair between the MPTCP namespace, and the UE namespace (UEs represent interfaces in this case)
   for i in $(seq 1 $NUM_UES)
@@ -244,7 +244,7 @@ if [[ $ns == 0 ]]; then
   # Configure each interface (no namespaces)
   for i in $(seq 1 $NUM_UES)
   do
-    card=`sed '${i}q;d' if_names.txt`
+    card=`sed ${i}'q;d' if_names.txt`
     IPcard=$SMF_UE_SUBNET"."$(( LAST_BYTE_FIRST_UE+i-1 ))
     NETcard=$SMF_UE_SUBNET".0"
     GWcard=$GW
@@ -301,7 +301,7 @@ else
     $EXEC_MPTCPNS ip route add default via $GW_MPTCP dev $VETH_MPTCP table $i #2> /dev/null
 
     # Probably not needed...
-    card=`sed '${i}q;d' if_names.txt`
+    card=`sed ${i}'q;d' if_names.txt`
     sudo ip link set dev $card multipath on
     sudo ip link set dev $VETH_MPTCP_H multipath on
     $EXEC_MPTCPNS ip link set dev $VETH_MPTCP multipath on
