@@ -114,7 +114,7 @@ To use a namespace (`MTPCPns`) and OpenVPN in both VMs, you have to run:
 
 - In mptcpUe1: `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -g 10.1.1.4 -n 10.1.1 -u 3 -f 1 -m -o server`
 
-- In mptcpUe2: `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -g 10.1.1.1 -n 10.1.1 -u 3 -f 4 -m -o client`
+- In mptcpUe2: `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -g 10.1.1.1 -n 10.1.1 -u 3 -f 4 -m -o client -os 10.1.1.1`
 
 In order to perform some experiments, remember to use the namespace `MPTCPns` and its network interfaces. For simplicity, you can run `sudo ip netns exec MPTCPns bash`. In the namespace, you can check the network interfaces by executing `ifconfig` (you should have interfaces `v_mp_1`, `v_mp_2` and `v_mp_3` for the three MPTCP paths, with IP addresses 10.1.1.X/24, with X=1..3 on the first machine and X=4..6 on the second machine, and `tun0`, with IP address 10.8.0.1/24 on the server and 10.8.0.2/24 on the client).
 
