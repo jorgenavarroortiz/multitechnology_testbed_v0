@@ -1,1 +1,0 @@
-if_names.txt.scenario1_different_networks_UE1
