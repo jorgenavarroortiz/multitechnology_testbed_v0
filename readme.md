@@ -4,7 +4,7 @@ Testbed v0 (virtualized environment) for the 5G-CLARITY European Project. Based 
 
 We have also included instructions to install MPTCP in NUC (Intel NUC 10 NUC10i7FNH) using kernel ~~5.4~~5.5, which supports the usage of the Intel Wi-Fi 6 AX201 module.
 
-You can watch a [video](https://youtu.be/EAh_p1I007o) showing how [scenario 1](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-scenario-1-two-virtual-machines-directly-connected) works (there is some changes in the parameters, since the scripts are now more general and the network interfaces may be in the same network or in different networks, using if_names.txt... files)..
+You can watch a [video](https://youtu.be/SbDKX6ndMeA) showing how [scenario 1](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-scenario-1-two-virtual-machines-directly-connected) works.
 
 You can watch a [video](https://youtu.be/AYZm-uw-ZXU) showing how [scenario 2](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-scenario-2-ue---free5gc---proxy) works (using [i2CAT's scripts](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-the-free5gc-testbed), to be updated with UGR's ones).
 
@@ -116,7 +116,7 @@ Additionally, you can check that each interface can be active (on), inactive (of
 
 **Launching scenario 1 with namespace MPTCPns and OpenVPN**
 
-You can watch a [video](https://youtu.be/EAh_p1I007o) showing how it works (there are some changes in the parameters, since the scripts are now more general and the network interfaces may be in the same network or in different networks, using if_names.txt... files).
+You can watch a [video](https://youtu.be/SbDKX6ndMeA) showing how it works.
 
 To use a namespace (`MTPCPns`) and OpenVPN in both VMs, you have to run:
 
