@@ -144,14 +144,14 @@ if [[ $ns == 0 ]]; then
   for i in $(seq 1 $NUM_UES)
   do
 #    card="eth"$i
-    card=`sed ${i}'q;d' if_names.txt`
+    card=`sed ${i}'q;d' if_names.txt | cut -f 1 -d ' '`
     IPcard=$SMF_UE_SUBNET"."$(( LAST_BYTE_FIRST_UE+i-1 ))"/24"
     sudo ifconfig $card $IPcard
   done
 fi
 
 #GlobalEth="eth1"
-GlobalEth=`sed '1q;d' if_names.txt`
+GlobalEth=`sed '1q;d' if_names.txt | cut -f 1 -d ' '`
 GlobalGW=$GW
 
 ##############################
@@ -179,7 +179,7 @@ if [[ $ns == 0 ]]; then
   for i in $(seq 1 $NUM_UES)
   do
 #    card="eth"$i
-    card=`sed ${i}'q;d' if_names.txt`
+    card=`sed ${i}'q;d' if_names.txt | cut -f 1 -d ' '`
     IPcard=$SMF_UE_SUBNET"."$(( LAST_BYTE_FIRST_UE+i-1 ))
     NETcard=$SMF_UE_SUBNET".0"
     netmaskcardbits=24
@@ -204,7 +204,7 @@ else
       echo "Connecting MPTCP namespace to UE "$i
     fi
 
-    card=`sed ${i}'q;d' if_names.txt`
+    card=`sed ${i}'q;d' if_names.txt | cut -f 1 -d ' '`
 
     VETH_MPTCP="v_mp_"$i
     VETH_MPTCP_H="v_mph_"$i
@@ -244,7 +244,7 @@ if [[ $ns == 0 ]]; then
   # Configure each interface (no namespaces)
   for i in $(seq 1 $NUM_UES)
   do
-    card=`sed ${i}'q;d' if_names.txt`
+    card=`sed ${i}'q;d' if_names.txt | cut -f 1 -d ' '`
     IPcard=$SMF_UE_SUBNET"."$(( LAST_BYTE_FIRST_UE+i-1 ))
     NETcard=$SMF_UE_SUBNET".0"
     GWcard=$GW
@@ -301,7 +301,7 @@ else
     $EXEC_MPTCPNS ip route add default via $GW_MPTCP dev $VETH_MPTCP table $i #2> /dev/null
 
     # Probably not needed...
-    card=`sed ${i}'q;d' if_names.txt`
+    card=`sed ${i}'q;d' if_names.txt | cut -f 1 -d ' '`
     sudo ip link set dev $card multipath on
     sudo ip link set dev $VETH_MPTCP_H multipath on
     $EXEC_MPTCPNS ip link set dev $VETH_MPTCP multipath on
@@ -342,7 +342,7 @@ if [[ $OVPN == 1 ]]; then
 
     # Automatically modify the configuration file according to the OVPN server IP address
     cp ovpn-client1.conf.GENERIC ovpn-client1.conf
-    sed -i 's/SERVER_IP_ADDRESS/${OVPN_SERVER_IP}/' ovpn-client1.conf
+    sed -i 's/SERVER_IP_ADDRESS/'${OVPN_SERVER_IP}'/' ovpn-client1.conf
 
     $EXEC_OVPN openvpn ovpn-client1.conf &
 
