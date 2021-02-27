@@ -48,6 +48,7 @@ while getopts ":p:s:c:g:n:u:f:mo:S:d" o; do
       f=1
       FILENAME=${OPTARG}
       echo "FILENAME="${OPTARG}
+      ;;
     u)
       u=1
       NUM_UES=${OPTARG}
@@ -79,7 +80,7 @@ while getopts ":p:s:c:g:n:u:f:mo:S:d" o; do
 done
 shift $((OPTIND-1))
 
-if [ -z "${p}" ] || [ -z "${s}" ] || [ -z "${c}" ] || [ -z "${u}" ] || [ -z "${OVPN}" ]; then
+if [ -z "${p}" ] || [ -z "${s}" ] || [ -z "${c}" ] || [ -z "${f}" ] || [ -z "${u}" ] || [ -z "${OVPN}" ]; then
   usage
 fi
 
