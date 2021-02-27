@@ -8,16 +8,16 @@
 usage() {
   echo "Usage: $0 -p <path manager> -s <scheduler> -c <congestion control> -g <gateway> -n <network> [-u <num_UEs>] [-f <last_byte_first_UE>] [-m] [-o <server/client>] [-d]" 1>&2;
   echo ""
-  echo "E.g. for mptcpProxy: $0 -p fullmesh -s default -c olia -g 60.60.0.102 -n 60.60.0      -f 101    -o server"
-  echo "E.g. for mptcpUe:    $0 -p fullmesh -s default -c olia -g 10.1.1.222  -n 10.1.1  -u 2 -f 1   -m -o client -S 60.60.0.101";
+  echo "NOTE: if_names.txt defines the interfaces to be used (one per line), as well as their IP addresses and gateways (routes)"
+  echo "      The format for each line is <interface name> <IP address/netmask> <gateway IP address>"
+  echo "      For example: eth1 10.1.1.1/24 10.1.1.2"
+  echo ""
+  echo "E.g. for mptcpProxy: $0 -p fullmesh -s default -c olia -u 3 -m -o server"
+  echo "E.g. for mptcpUe:    $0 -p fullmesh -s default -c olia -u 3 -m -o client -S 10.1.1.1";
   echo ""
   echo "       <path manager> ........... default, fullmesh, ndiffports, binder"
   echo "       <scheduler> .............. default, roundrobin, redundant"
   echo "       <congestion control> ..... reno, cubic, lia, olia, wvegas, balia, mctcpdesync"
-  echo "       <gateway> ................ IP address of gateway for default route"
-#  echo "       <network> ................ 3 first bytes of IP addresses (SMF UE subnet (UE) or proxy subnet (proxy)"
-#  echo "       <num_UEs> ................ number of UEs (last byte of IP addresses from 1 to <num_UEs>)"
-  echo "       <last_byte_ip_address> ... last byte of the first IP address (following IP addresses will be consecutive)"
   echo "       -m ....................... create namespace MPTCPns with virtual interfaces"
   echo "       -o ....................... create an OpenVPN connection, indicating if this entity is server or client"
   echo "       -S ....................... OVPN server IP address"
@@ -47,25 +47,10 @@ while getopts ":p:s:c:g:n:u:f:mo:S:d" o; do
       CONGESTIONCONTROL=${OPTARG}
       echo "CONGESTIONCONTROL="${OPTARG}
       ;;
-    g)
-      g=1
-      GW=${OPTARG}
-      echo "GW=${GW}"
-      ;;
-    n)
-      n=1
-      SMF_UE_SUBNET=${OPTARG}
-      echo "SMF_UE_SUBNET="${SMF_UE_SUBNET}
-      ;;
     u)
       u=1
       NUM_UES=${OPTARG}
       echo "NUM_UES="${NUM_UES}
-      ;;
-    f)
-      f=1
-      LAST_BYTE_FIRST_UE=${OPTARG}
-      echo "LAST_BYTE_FIRST_UE="${LAST_BYTE_FIRST_UE}
       ;;
     m)
       ns=1
@@ -93,9 +78,9 @@ while getopts ":p:s:c:g:n:u:f:mo:S:d" o; do
 done
 shift $((OPTIND-1))
 
-#if [ -z "${p}" ] || [ -z "${s}" ] || [ -z "${c}" ] || [ -z "${g}" ] || [ -z "${n}" ] || [ -z "${f}" ]; then
-#  usage
-#fi
+if [ -z "${p}" ] || [ -z "${s}" ] || [ -z "${c}" ] || [ -z "${u}" ] || [ -z "${OVPN}" ]; then
+  usage
+fi
 
 ##############################
 # Environment configuration
