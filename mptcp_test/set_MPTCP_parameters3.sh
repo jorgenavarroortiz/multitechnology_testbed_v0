@@ -8,16 +8,13 @@
 usage() {
   echo "Usage: $0 -p <path manager> -s <scheduler> -c <congestion control> -g <gateway> -n <network> [-u <num_UEs>] [-f <last_byte_first_UE>] [-m] [-o <server/client>] [-d]" 1>&2;
   echo ""
-  echo "NOTE: if_names.txt defines the interfaces to be used (one per line), as well as their IP addresses and gateways (routes)"
-  echo "      The format for each line is <interface name> <IP address/netmask> <gateway IP address>"
-  echo "      For example: eth1 10.1.1.1/24 10.1.1.2"
-  echo ""
   echo "E.g. for mptcpProxy: $0 -p fullmesh -s default -c olia -u 3 -m -o server"
   echo "E.g. for mptcpUe:    $0 -p fullmesh -s default -c olia -u 3 -m -o client -S 10.1.1.1";
   echo ""
   echo "       <path manager> ........... default, fullmesh, ndiffports, binder"
   echo "       <scheduler> .............. default, roundrobin, redundant"
   echo "       <congestion control> ..... reno, cubic, lia, olia, wvegas, balia, mctcpdesync"
+  echo "       <filename> ............... defines the interfaces to be used (one per line), with format <interface name> <IP address/netmask> <gateway IP address>"
   echo "       -m ....................... create namespace MPTCPns with virtual interfaces"
   echo "       -o ....................... create an OpenVPN connection, indicating if this entity is server or client"
   echo "       -S ....................... OVPN server IP address"
@@ -47,6 +44,10 @@ while getopts ":p:s:c:g:n:u:f:mo:S:d" o; do
       CONGESTIONCONTROL=${OPTARG}
       echo "CONGESTIONCONTROL="${OPTARG}
       ;;
+    f)
+      f=1
+      FILENAME=${OPTARG}
+      echo "FILENAME="${OPTARG}
     u)
       u=1
       NUM_UES=${OPTARG}
@@ -124,16 +125,16 @@ if [[ $ns == 0 ]]; then
   for i in $(seq 1 $NUM_UES)
   do
 #    card="eth"$i
-    card=`sed ${i}'q;d' if_names.txt | cut -f 1 -d ' '`
+    card=`sed ${i}'q;d' $FILENAME | cut -f 1 -d ' '`
 #    IPcard=$SMF_UE_SUBNET"."$(( LAST_BYTE_FIRST_UE+i-1 ))"/24"
-    IPcard=`sed ${i}'q;d' if_names.txt | cut -f 2 -d ' ' | cut -f 1 -d '/'`
-    MaskCard=`sed ${i}'q;d' if_names.txt | cut -f 2 -d ' ' | cut -f 2 -d '/'`
+    IPcard=`sed ${i}'q;d' $FILENAME | cut -f 2 -d ' ' | cut -f 1 -d '/'`
+    MaskCard=`sed ${i}'q;d' $FILENAME | cut -f 2 -d ' ' | cut -f 2 -d '/'`
     sudo ifconfig $card ${IPcard}/${MaskCard}
   done
 fi
 
 #GlobalEth="eth1"
-GlobalEth=`sed '1q;d' if_names.txt | cut -f 1 -d ' '`
+GlobalEth=`sed '1q;d' $FILENAME | cut -f 1 -d ' '`
 GlobalGW=$GW
 
 ##############################
@@ -161,7 +162,7 @@ if [[ $ns == 0 ]]; then
   for i in $(seq 1 $NUM_UES)
   do
 #    card="eth"$i
-    card=`sed ${i}'q;d' if_names.txt | cut -f 1 -d ' '`
+    card=`sed ${i}'q;d' $FILENAME | cut -f 1 -d ' '`
 
     sudo ip link set dev $card multipath on
   done
@@ -178,7 +179,7 @@ else
       echo "Connecting MPTCP namespace to UE "$i
     fi
 
-    card=`sed ${i}'q;d' if_names.txt | cut -f 1 -d ' '`
+    card=`sed ${i}'q;d' $FILENAME | cut -f 1 -d ' '`
 
     VETH_MPTCP="v_mp_"$i
     VETH_MPTCP_H="v_mph_"$i
@@ -193,10 +194,10 @@ else
     sudo ip link set $VETH_MPTCP netns ${MPTCPNS} # Send other end of the veth pair to the MPTCP namespace
     $EXEC_MPTCPNS ip link set $VETH_MPTCP up
 
-    IP_MPTCP_SIMPLE=`sed ${i}'q;d' if_names.txt | cut -f 2 -d ' ' | cut -f 1 -d '/'`
-    MaskCard=`sed ${i}'q;d' if_names.txt | cut -f 2 -d ' ' | cut -f 2 -d '/'`
+    IP_MPTCP_SIMPLE=`sed ${i}'q;d' $FILENAME | cut -f 2 -d ' ' | cut -f 1 -d '/'`
+    MaskCard=`sed ${i}'q;d' $FILENAME | cut -f 2 -d ' ' | cut -f 2 -d '/'`
     IP_MPTCP=${IP_MPTCP_SIMPLE}"/"${MaskCard}
-    GW_MPTCP=`sed ${i}'q;d' if_names.txt | cut -f 3 -d ' '`
+    GW_MPTCP=`sed ${i}'q;d' $FILENAME | cut -f 3 -d ' '`
     IFS=. read -r i1 i2 i3 i4 <<< $IP_MPTCP_SIMPLE
     IFS=. read -r xx m1 m2 m3 m4 <<< $(for a in $(seq 1 32); do if [ $(((a - 1) % 8)) -eq 0 ]; then echo -n .; fi; if [ $a -le $MaskCard ]; then echo -n 1; else echo -n 0; fi; done)
 #    IFS=. read -r m1 m2 m3 m4 <<< "255.255.255.0"
@@ -227,10 +228,10 @@ if [[ $ns == 0 ]]; then
   # Configure each interface (no namespaces)
   for i in $(seq 1 $NUM_UES)
   do
-    card=`sed ${i}'q;d' if_names.txt | cut -f 1 -d ' '`
-    IPcard=`sed ${i}'q;d' if_names.txt | cut -f 2 -d ' ' | cut -f 1 -d '/'`
-    MaskCard=`sed ${i}'q;d' if_names.txt | cut -f 2 -d ' ' | cut -f 2 -d '/'`
-    GWcard=`sed ${i}'q;d' if_names.txt | cut -f 3 -d ' '`
+    card=`sed ${i}'q;d' $FILENAME | cut -f 1 -d ' '`
+    IPcard=`sed ${i}'q;d' $FILENAME | cut -f 2 -d ' ' | cut -f 1 -d '/'`
+    MaskCard=`sed ${i}'q;d' $FILENAME | cut -f 2 -d ' ' | cut -f 2 -d '/'`
+    GWcard=`sed ${i}'q;d' $FILENAME | cut -f 3 -d ' '`
     IFS=. read -r i1 i2 i3 i4 <<< $IPcard
     IFS=. read -r xx m1 m2 m3 m4 <<< $(for a in $(seq 1 32); do if [ $(((a - 1) % 8)) -eq 0 ]; then echo -n .; fi; if [ $a -le $MaskCard ]; then echo -n 1; else echo -n 0; fi; done)
 #    IFS=. read -r m1 m2 m3 m4 <<< "255.255.255.0"
@@ -277,10 +278,10 @@ else
     VETH_MPTCP_H="v_mph_"$i
 
     #IP_MPTCP_SIMPLE=$SMF_UE_SUBNET"."$i
-    IP_MPTCP_SIMPLE=`sed ${i}'q;d' if_names.txt | cut -f 2 -d ' ' | cut -f 1 -d '/'`
-    MaskCard=`sed ${i}'q;d' if_names.txt | cut -f 2 -d ' ' | cut -f 2 -d '/'`
+    IP_MPTCP_SIMPLE=`sed ${i}'q;d' $FILENAME | cut -f 2 -d ' ' | cut -f 1 -d '/'`
+    MaskCard=`sed ${i}'q;d' $FILENAME | cut -f 2 -d ' ' | cut -f 2 -d '/'`
     IP_MPTCP=${IP_MPTCP_SIMPLE}"/"${MaskCard}
-    GW_MPTCP=`sed ${i}'q;d' if_names.txt | cut -f 3 -d ' '`
+    GW_MPTCP=`sed ${i}'q;d' $FILENAME | cut -f 3 -d ' '`
     IFS=. read -r i1 i2 i3 i4 <<< $IP_MPTCP_SIMPLE
     IFS=. read -r xx m1 m2 m3 m4 <<< $(for a in $(seq 1 32); do if [ $(((a - 1) % 8)) -eq 0 ]; then echo -n .; fi; if [ $a -le $MaskCard ]; then echo -n 1; else echo -n 0; fi; done)
 #    IFS=. read -r m1 m2 m3 m4 <<< "255.255.255.0"
@@ -303,7 +304,7 @@ else
     $EXEC_MPTCPNS ip route add default via $GW_MPTCP dev $VETH_MPTCP table $i #2> /dev/null
 
     # Probably not needed...
-    card=`sed ${i}'q;d' if_names.txt | cut -f 1 -d ' '`
+    card=`sed ${i}'q;d' $FILENAME | cut -f 1 -d ' '`
     sudo ip link set dev $card multipath on
     sudo ip link set dev $VETH_MPTCP_H multipath on
     $EXEC_MPTCPNS ip link set dev $VETH_MPTCP multipath on
