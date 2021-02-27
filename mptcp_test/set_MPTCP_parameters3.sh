@@ -15,8 +15,8 @@ usage() {
   echo "       <scheduler> .............. default, roundrobin, redundant"
   echo "       <congestion control> ..... reno, cubic, lia, olia, wvegas, balia, mctcpdesync"
   echo "       <gateway> ................ IP address of gateway for default route"
-  echo "       <network> ................ 3 first bytes of IP addresses (SMF UE subnet (UE) or proxy subnet (proxy)"
-  echo "       <num_UEs> ................ number of UEs (last byte of IP addresses from 1 to <num_UEs>)"
+#  echo "       <network> ................ 3 first bytes of IP addresses (SMF UE subnet (UE) or proxy subnet (proxy)"
+#  echo "       <num_UEs> ................ number of UEs (last byte of IP addresses from 1 to <num_UEs>)"
   echo "       <last_byte_ip_address> ... last byte of the first IP address (following IP addresses will be consecutive)"
   echo "       -m ....................... create namespace MPTCPns with virtual interfaces"
   echo "       -o ....................... create an OpenVPN connection, indicating if this entity is server or client"
@@ -30,7 +30,7 @@ REAL_MACHINE=0
 ns=0
 LAST_BYTE_FIRST_UE=1
 
-while getopts ":p:s:c:g:n:u:f:mo:d" o; do
+while getopts ":p:s:c:g:n:u:f:mo:S:d" o; do
   case "${o}" in
     p)
       p=1
@@ -93,9 +93,9 @@ while getopts ":p:s:c:g:n:u:f:mo:d" o; do
 done
 shift $((OPTIND-1))
 
-if [ -z "${p}" ] || [ -z "${s}" ] || [ -z "${c}" ] || [ -z "${g}" ] || [ -z "${n}" ] || [ -z "${f}" ]; then
-  usage
-fi
+#if [ -z "${p}" ] || [ -z "${s}" ] || [ -z "${c}" ] || [ -z "${g}" ] || [ -z "${n}" ] || [ -z "${f}" ]; then
+#  usage
+#fi
 
 ##############################
 # Environment configuration
@@ -140,8 +140,10 @@ if [[ $ns == 0 ]]; then
   do
 #    card="eth"$i
     card=`sed ${i}'q;d' if_names.txt | cut -f 1 -d ' '`
-    IPcard=$SMF_UE_SUBNET"."$(( LAST_BYTE_FIRST_UE+i-1 ))"/24"
-    sudo ifconfig $card $IPcard
+#    IPcard=$SMF_UE_SUBNET"."$(( LAST_BYTE_FIRST_UE+i-1 ))"/24"
+    IPcard=`sed ${i}'q;d' if_names.txt | cut -f 2 -d ' ' | cut -f 1 -d '/'`
+    MaskCard=`sed ${i}'q;d' if_names.txt | cut -f 2 -d ' ' | cut -f 2 -d '/'`
+    sudo ifconfig $card ${IPcard}/${MaskCard}
   done
 fi
 
@@ -175,14 +177,6 @@ if [[ $ns == 0 ]]; then
   do
 #    card="eth"$i
     card=`sed ${i}'q;d' if_names.txt | cut -f 1 -d ' '`
-    IPcard=$SMF_UE_SUBNET"."$(( LAST_BYTE_FIRST_UE+i-1 ))
-    NETcard=$SMF_UE_SUBNET".0"
-    netmaskcardbits=24
-    GWcard=$GW
-    NETcard=${NETcard}"/"${netmaskcardbits}
-    if [[ $DEBUG == 1 ]]; then echo "[DEBUG] IPcard:   ${IPcard}"; fi
-    if [[ $DEBUG == 1 ]]; then echo "[DEBUG] NETcard:  ${NETcard}"; fi
-    if [[ $DEBUG == 1 ]]; then echo "[DEBUG] GWcard:   ${GWcard}"; fi
 
     sudo ip link set dev $card multipath on
   done
@@ -214,13 +208,22 @@ else
     sudo ip link set $VETH_MPTCP netns ${MPTCPNS} # Send other end of the veth pair to the MPTCP namespace
     $EXEC_MPTCPNS ip link set $VETH_MPTCP up
 
+    IP_MPTCP_SIMPLE=`sed ${i}'q;d' if_names.txt | cut -f 2 -d ' ' | cut -f 1 -d '/'`
+    MaskCard=`sed ${i}'q;d' if_names.txt | cut -f 2 -d ' ' | cut -f 2 -d '/'`
+    IP_MPTCP=${IP_MPTCP_SIMPLE}"/"${MaskCard}
+    GW_MPTCP=`sed ${i}'q;d' if_names.txt | cut -f 3 -d ' '`
+    IFS=. read -r i1 i2 i3 i4 <<< $IP_MPTCP_SIMPLE
+    IFS=. read -r xx m1 m2 m3 m4 <<< $(for a in $(seq 1 32); do if [ $(((a - 1) % 8)) -eq 0 ]; then echo -n .; fi; if [ $a -le $MaskCard ]; then echo -n 1; else echo -n 0; fi; done)
+#    IFS=. read -r m1 m2 m3 m4 <<< "255.255.255.0"
+    NET_IP_MPTCP_SIMPLE=`printf "%d.%d.%d.%d\n" "$((i1 & m1))" "$((i2 & m2))" "$((i3 & m3))" "$((i4 & m4))"`
+    NET_IP_MPTCP=${NET_IP_MPTCP_SIMPLE}"/"${MaskCard}
     #IP_MPTCP=$SMF_UE_SUBNET"."$i"/24"
     #IP_MPTCP_SIMPLE=$SMF_UE_SUBNET"."$i
-    IP_MPTCP=$SMF_UE_SUBNET"."$(( LAST_BYTE_FIRST_UE+i-1 ))"/24"
-    IP_MPTCP_SIMPLE=$SMF_UE_SUBNET"."$(( LAST_BYTE_FIRST_UE+i-1 ))
-    NET_IP_MPTCP=$SMF_UE_SUBNET".0/24"
+#    IP_MPTCP=$SMF_UE_SUBNET"."$(( LAST_BYTE_FIRST_UE+i-1 ))"/24"
+#    IP_MPTCP_SIMPLE=$SMF_UE_SUBNET"."$(( LAST_BYTE_FIRST_UE+i-1 ))
+#    NET_IP_MPTCP=$SMF_UE_SUBNET".0/24"
     if [[ $DEBUG == 1 ]]; then echo "NET_IP_MPTCP${i}: ${NET_IP_MPTCP}"; fi
-    GW_MPTCP=$GW
+#    GW_MPTCP=$GW
     if [[ $DEBUG == 1 ]]; then echo "GW_MPTCP${i}: ${GW_MPTCP}"; fi
     $EXEC_MPTCPNS ip addr add $IP_MPTCP dev $VETH_MPTCP
     $EXEC_MPTCPNS ifconfig $VETH_MPTCP mtu 1400   # done to avoid fragmentation which breaks ovpn setup
@@ -240,9 +243,16 @@ if [[ $ns == 0 ]]; then
   for i in $(seq 1 $NUM_UES)
   do
     card=`sed ${i}'q;d' if_names.txt | cut -f 1 -d ' '`
-    IPcard=$SMF_UE_SUBNET"."$(( LAST_BYTE_FIRST_UE+i-1 ))
-    NETcard=$SMF_UE_SUBNET".0"
-    GWcard=$GW
+    IPcard=`sed ${i}'q;d' if_names.txt | cut -f 2 -d ' ' | cut -f 1 -d '/'`
+    MaskCard=`sed ${i}'q;d' if_names.txt | cut -f 2 -d ' ' | cut -f 2 -d '/'`
+    GWcard=`sed ${i}'q;d' if_names.txt | cut -f 3 -d ' '`
+    IFS=. read -r i1 i2 i3 i4 <<< $IPcard
+    IFS=. read -r xx m1 m2 m3 m4 <<< $(for a in $(seq 1 32); do if [ $(((a - 1) % 8)) -eq 0 ]; then echo -n .; fi; if [ $a -le $MaskCard ]; then echo -n 1; else echo -n 0; fi; done)
+#    IFS=. read -r m1 m2 m3 m4 <<< "255.255.255.0"
+    NETcard=`printf "%d.%d.%d.%d\n" "$((i1 & m1))" "$((i2 & m2))" "$((i3 & m3))" "$((i4 & m4))"`
+#    IPcard=$SMF_UE_SUBNET"."$(( LAST_BYTE_FIRST_UE+i-1 ))
+#    NETcard=$SMF_UE_SUBNET".0"
+#    GWcard=$GW
     # Create routing tables for each interface
     if [[ $DEBUG == 1 ]]; then
       sudo ip rule add from $IPcard table $i
@@ -280,10 +290,22 @@ else
   do
     VETH_MPTCP="v_mp_"$i
     VETH_MPTCP_H="v_mph_"$i
+
     #IP_MPTCP_SIMPLE=$SMF_UE_SUBNET"."$i
-    IP_MPTCP_SIMPLE=$SMF_UE_SUBNET"."$(( LAST_BYTE_FIRST_UE+i-1 ))
-    NET_IP_MPTCP=$SMF_UE_SUBNET".0/24"
-    GW_MPTCP=$GW
+    IP_MPTCP_SIMPLE=`sed ${i}'q;d' if_names.txt | cut -f 2 -d ' ' | cut -f 1 -d '/'`
+    MaskCard=`sed ${i}'q;d' if_names.txt | cut -f 2 -d ' ' | cut -f 2 -d '/'`
+    IP_MPTCP=${IP_MPTCP_SIMPLE}"/"${MaskCard}
+    GW_MPTCP=`sed ${i}'q;d' if_names.txt | cut -f 3 -d ' '`
+    IFS=. read -r i1 i2 i3 i4 <<< $IP_MPTCP_SIMPLE
+    IFS=. read -r xx m1 m2 m3 m4 <<< $(for a in $(seq 1 32); do if [ $(((a - 1) % 8)) -eq 0 ]; then echo -n .; fi; if [ $a -le $MaskCard ]; then echo -n 1; else echo -n 0; fi; done)
+#    IFS=. read -r m1 m2 m3 m4 <<< "255.255.255.0"
+    NET_IP_MPTCP_SIMPLE=`printf "%d.%d.%d.%d\n" "$((i1 & m1))" "$((i2 & m2))" "$((i3 & m3))" "$((i4 & m4))"`
+    NET_IP_MPTCP=${NET_IP_MPTCP_SIMPLE}"/"${MaskCard}
+
+#    IP_MPTCP_SIMPLE=$SMF_UE_SUBNET"."$(( LAST_BYTE_FIRST_UE+i-1 ))
+#    NET_IP_MPTCP=$SMF_UE_SUBNET".0/24"
+#    GW_MPTCP=$GW
+
     echo "Information for interface ${i}..."
     echo "VETH_MPTCP: ${VETH_MPTCP}"
     echo "VETH_MPTCP_H: ${VETH_MPTCP_H}"
