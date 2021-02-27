@@ -27,7 +27,7 @@ REAL_MACHINE=0
 ns=0
 LAST_BYTE_FIRST_UE=1
 
-while getopts ":p:s:c:g:u:mo:S:d" o; do
+while getopts ":p:s:c:f:u:mo:S:d" o; do
   case "${o}" in
     p)
       p=1
