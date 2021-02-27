@@ -4,7 +4,7 @@ Testbed v0 (virtualized environment) for the 5G-CLARITY European Project. Based 
 
 We have also included instructions to install MPTCP in NUC (Intel NUC 10 NUC10i7FNH) using kernel ~~5.4~~5.5, which supports the usage of the Intel Wi-Fi 6 AX201 module.
 
-You can watch a [video](https://youtu.be/EAh_p1I007o) showing how [scenario 1](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-scenario-1-two-virtual-machines-directly-connected) works.
+You can watch a [video](https://youtu.be/EAh_p1I007o) showing how [scenario 1](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-scenario-1-two-virtual-machines-directly-connected) works (there is some changes in the parameters, since the scripts are now more general and the network interfaces may be in the same network or in different networks, using if_names.txt... files)..
 
 You can watch a [video](https://youtu.be/AYZm-uw-ZXU) showing how [scenario 2](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-scenario-2-ue---free5gc---proxy) works (using [i2CAT's scripts](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-the-free5gc-testbed), to be updated with UGR's ones).
 
@@ -88,11 +88,13 @@ In this scenario, two machines are directly connected using network interfaces e
 
 To setup this scenario the following scripts have to be run in this order:
 
-- In the machine `mptcpUe1` change to the directory `$HOME/free5gc/mptcp_test` and launch `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -g 10.1.1.4 -n 10.1.1 -u 3 -f 1`. You can add option `-d` if you want to read debug messages.
+- In the machine `mptcpUe1` change to the directory `$HOME/free5gc/mptcp_test` and launch `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_same_network_UE1 -u 3`. You can add option `-d` if you want to read debug messages.
 
-- In the machine `mptcpUe2` change to the directory `$HOME/free5gc/mptcp_test` and launch `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -g 10.1.1.1 -n 10.1.1 -u 3 -f 4`. You can add option `-d` if you want to read debug messages.
+- In the machine `mptcpUe2` change to the directory `$HOME/free5gc/mptcp_test` and launch `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_same_network_UE2 -u 3 -m`. You can add option `-d` if you want to read debug messages.
 
-This will setup MPTCP properly in both VMs. **NOTE:** please check the ``remote`` directive in the `$HOME/free5gc/mptcp_test/ovpn-config-client/ovpn-client1.conf`. Currently it is set to `10.1.1.1`, i.e. **`mptcpUe1` acts as the OpenVPN server**. Please change this according to your needs.
+**NOTE**: if_names.txt.scenario1_same_network_UEX (X=1 or 2) utilizes IP addresses on the same network (1.1.1.{1,2,3}/24 for eth{1,2,3} on mptcpUE1, and 1.1.1.{4,5,6} for eth{1,2,3} on mptcpUE2), assuming that all network interfaces are connected to the same internal network (ue_ue). if_names.txt.scenario1_different_networks_UEX (X=1 or 2) utilizes IP addresses on different networks (1.1.{1,2,3}.1/24 for eth{1,2,3} on mptcpUE1, and 1.1.{1,2,3}.2/24 on eth{1,2,3} on mptcpUE2) assuming that network interfaces are connected to 3 different internal networks (ue_ue_X, X=1,2,3). This will simplify to use these scripts on real machines, which typically use different networks for each interface.
+
+~~This will setup MPTCP properly in both VMs. **NOTE:** please check the ``remote`` directive in the `$HOME/free5gc/mptcp_test/ovpn-config-client/ovpn-client1.conf`. Currently it is set to `10.1.1.1`, i.e. **`mptcpUe1` acts as the OpenVPN server**. Please change this according to your needs.~~The OVPN configuration is now automatically adjusted.
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1_set_MPTCP_parameters.png" width="1200">
 
@@ -114,13 +116,13 @@ Additionally, you can check that each interface can be active (on), inactive (of
 
 **Launching scenario 1 with namespace MPTCPns and OpenVPN**
 
-You can watch a [video](https://youtu.be/EAh_p1I007o) showing how it works.
+You can watch a [video](https://youtu.be/EAh_p1I007o) showing how it works (there are some changes in the parameters, since the scripts are now more general and the network interfaces may be in the same network or in different networks, using if_names.txt... files).
 
 To use a namespace (`MTPCPns`) and OpenVPN in both VMs, you have to run:
 
-- In mptcpUe1: `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -g 10.1.1.4 -n 10.1.1 -u 3 -f 1 -m -o server`
+- In mptcpUe1: `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_same_network_UE1 -u 3 -m -o server`
 
-- In mptcpUe2: `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -g 10.1.1.1 -n 10.1.1 -u 3 -f 4 -m -o client -S 10.1.1.1`
+- In mptcpUe2: `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_same_network_UE2 -u 3 -m -o client -S 10.1.1.1`
 
 In order to perform some experiments, remember to use the namespace `MPTCPns` and its network interfaces. For simplicity, you can run `sudo ip netns exec MPTCPns bash`. In the namespace, you can check the network interfaces by executing `ifconfig` (you should have interfaces `v_mp_1`, `v_mp_2` and `v_mp_3` for the three MPTCP paths, with IP addresses 10.1.1.X/24, with X=1..3 on the first machine and X=4..6 on the second machine, and `tun0`, with IP address 10.8.0.1/24 on the server and 10.8.0.2/24 on the client).
 
