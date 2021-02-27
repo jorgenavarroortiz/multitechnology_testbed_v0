@@ -94,7 +94,7 @@ To setup this scenario the following scripts have to be run in this order:
 
 **NOTE**: if_names.txt.scenario1_same_network_UEX (X=1 or 2) utilizes IP addresses on the same network (1.1.1.{1,2,3}/24 for eth{1,2,3} on mptcpUE1, and 1.1.1.{4,5,6} for eth{1,2,3} on mptcpUE2), assuming that all network interfaces are connected to the same internal network (ue_ue). if_names.txt.scenario1_different_networks_UEX (X=1 or 2) utilizes IP addresses on different networks (1.1.{1,2,3}.1/24 for eth{1,2,3} on mptcpUE1, and 1.1.{1,2,3}.2/24 on eth{1,2,3} on mptcpUE2) assuming that network interfaces are connected to 3 different internal networks (ue_ue_X, X=1,2,3). This will simplify the usage of these scripts on real machines, which typically use different networks for each interface.
 
-~~This will setup MPTCP properly in both VMs. **NOTE:** please check the ``remote`` directive in the `$HOME/free5gc/mptcp_test/ovpn-config-client/ovpn-client1.conf`. Currently it is set to `10.1.1.1`, i.e. **`mptcpUe1` acts as the OpenVPN server**. Please change this according to your needs.~~The OVPN configuration is now automatically adjusted.
+NOTE: The OVPN configuration files on both server and client are now automatically adjusted.
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1_set_MPTCP_parameters.png" width="1200">
 
