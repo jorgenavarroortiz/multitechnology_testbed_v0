@@ -80,9 +80,9 @@ while getopts ":p:s:c:f:u:mo:S:d" o; do
 done
 shift $((OPTIND-1))
 
-if [ -z "${p}" ] || [ -z "${s}" ] || [ -z "${c}" ] || [ -z "${f}" ] || [ -z "${u}" ] || [ -z "${OVPN}" ]; then
-  usage
-fi
+#if [ -z "${p}" ] || [ -z "${s}" ] || [ -z "${c}" ] || [ -z "${f}" ] || [ -z "${u}" ] || [ -z "${OVPN}" ]; then
+#  usage
+#fi
 
 ##############################
 # Environment configuration
@@ -285,19 +285,22 @@ else
     GW_MPTCP=`sed ${i}'q;d' $FILENAME | cut -f 3 -d ' '`
     IFS=. read -r i1 i2 i3 i4 <<< $IP_MPTCP_SIMPLE
     IFS=. read -r xx m1 m2 m3 m4 <<< $(for a in $(seq 1 32); do if [ $(((a - 1) % 8)) -eq 0 ]; then echo -n .; fi; if [ $a -le $MaskCard ]; then echo -n 1; else echo -n 0; fi; done)
-#    IFS=. read -r m1 m2 m3 m4 <<< "255.255.255.0"
-    NET_IP_MPTCP_SIMPLE=`printf "%d.%d.%d.%d\n" "$((i1 & m1))" "$((i2 & m2))" "$((i3 & m3))" "$((i4 & m4))"`
+    NET_IP_MPTCP_SIMPLE=`printf "%d.%d.%d.%d\n" "$((i1 & (2#$m1)))" "$((i2 & (2#$m2)))" "$((i3 & (2#$m3)))" "$((i4 & (2#$m4)))"`
     NET_IP_MPTCP=${NET_IP_MPTCP_SIMPLE}"/"${MaskCard}
 
 #    IP_MPTCP_SIMPLE=$SMF_UE_SUBNET"."$(( LAST_BYTE_FIRST_UE+i-1 ))
 #    NET_IP_MPTCP=$SMF_UE_SUBNET".0/24"
 #    GW_MPTCP=$GW
 
-    echo "Information for interface ${i}..."
-    echo "VETH_MPTCP: ${VETH_MPTCP}"
-    echo "VETH_MPTCP_H: ${VETH_MPTCP_H}"
-    echo "NET_IP_MPTCP: ${NET_IP_MPTCP}"
-    echo "GW_MPTCP: ${GW_MPTCP}"
+    if [[ $DEBUG == 1 ]]; then
+      echo "Information for interface ${i}..."
+      echo "VETH_MPTCP: ${VETH_MPTCP}"
+      echo "VETH_MPTCP_H: ${VETH_MPTCP_H}"
+      echo "IP_MPTCP_SIMPLE: ${i1}.${i2}.${i3}.${i4}"
+      echo "NETMASK: ${m1}.${m2}.${m3}.${m4}"
+      echo "NET_IP_MPTCP: ${NET_IP_MPTCP}"
+      echo "GW_MPTCP: ${GW_MPTCP}"
+    fi
 
     # Create routing tables for each interface
     $EXEC_MPTCPNS ip rule add from $IP_MPTCP_SIMPLE table $i #2> /dev/null
