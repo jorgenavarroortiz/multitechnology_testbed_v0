@@ -202,7 +202,7 @@ else
     IFS=. read -r i1 i2 i3 i4 <<< $IP_MPTCP_SIMPLE
     IFS=. read -r xx m1 m2 m3 m4 <<< $(for a in $(seq 1 32); do if [ $(((a - 1) % 8)) -eq 0 ]; then echo -n .; fi; if [ $a -le $MaskCard ]; then echo -n 1; else echo -n 0; fi; done)
 #    IFS=. read -r m1 m2 m3 m4 <<< "255.255.255.0"
-    NET_IP_MPTCP_SIMPLE=`printf "%d.%d.%d.%d\n" "$((i1 & m1))" "$((i2 & m2))" "$((i3 & m3))" "$((i4 & m4))"`
+    NET_IP_MPTCP_SIMPLE=`printf "%d.%d.%d.%d\n" "$((i1 & (2#$m1)))" "$((i2 & (2#$m2)))" "$((i3 & (2#$m3)))" "$((i4 & (2#$m4)))"`
     NET_IP_MPTCP=${NET_IP_MPTCP_SIMPLE}"/"${MaskCard}
     #IP_MPTCP=$SMF_UE_SUBNET"."$i"/24"
     #IP_MPTCP_SIMPLE=$SMF_UE_SUBNET"."$i
@@ -236,7 +236,7 @@ if [[ $ns == 0 ]]; then
     IFS=. read -r i1 i2 i3 i4 <<< $IPcard
     IFS=. read -r xx m1 m2 m3 m4 <<< $(for a in $(seq 1 32); do if [ $(((a - 1) % 8)) -eq 0 ]; then echo -n .; fi; if [ $a -le $MaskCard ]; then echo -n 1; else echo -n 0; fi; done)
 #    IFS=. read -r m1 m2 m3 m4 <<< "255.255.255.0"
-    NETcard=`printf "%d.%d.%d.%d\n" "$((i1 & m1))" "$((i2 & m2))" "$((i3 & m3))" "$((i4 & m4))"`
+    NETcard=`printf "%d.%d.%d.%d\n" "$((i1 & (2#$m1)))" "$((i2 & (2#$m2)))" "$((i3 & (2#$m3)))" "$((i4 & (2#$m4)))"`
 #    IPcard=$SMF_UE_SUBNET"."$(( LAST_BYTE_FIRST_UE+i-1 ))
 #    NETcard=$SMF_UE_SUBNET".0"
 #    GWcard=$GW
