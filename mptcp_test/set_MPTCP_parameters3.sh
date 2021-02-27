@@ -6,10 +6,10 @@
 #############################
 
 usage() {
-  echo "Usage: $0 -p <path manager> -s <scheduler> -c <congestion control> -g <gateway> -n <network> [-u <num_UEs>] [-f <last_byte_first_UE>] [-m] [-o <server/client>] [-d]" 1>&2;
+  echo "Usage: $0 -p <path manager> -s <scheduler> -c <congestion control> -f <filename> [-u <num_UEs>] [-m] [-o <server/client>] [-S <OVPN server IP address>] [-d]" 1>&2;
   echo ""
-  echo "E.g. for mptcpProxy: $0 -p fullmesh -s default -c olia -u 3 -m -o server"
-  echo "E.g. for mptcpUe:    $0 -p fullmesh -s default -c olia -u 3 -m -o client -S 10.1.1.1";
+  echo "E.g. for mptcpProxy: $0 -p fullmesh -s default -c olia -f if_names.txt.scenario1_different_networks_UE1 -u 3 -m -o server"
+  echo "E.g. for mptcpUe:    $0 -p fullmesh -s default -c olia -f if_names.txt.scenario1_different_networks_UE2 -u 3 -m -o client -S 10.1.1.1";
   echo ""
   echo "       <path manager> ........... default, fullmesh, ndiffports, binder"
   echo "       <scheduler> .............. default, roundrobin, redundant"
@@ -27,7 +27,7 @@ REAL_MACHINE=0
 ns=0
 LAST_BYTE_FIRST_UE=1
 
-while getopts ":p:s:c:g:n:u:f:mo:S:d" o; do
+while getopts ":p:s:c:g:u:mo:S:d" o; do
   case "${o}" in
     p)
       p=1
