@@ -4,7 +4,7 @@
 #
 # Author: Daniel Camps (daniel.camps@i2cat.net)
 # Copyright: i2CAT
-
+# Modified by Jorge Navarro-Ortiz (jorgenavarro@ugr.es)
 
 ############################
 # Parsing inputs parameters
@@ -192,9 +192,3 @@ echo ""
 echo "##############"
 echo "#### Loading the N3IWF ..."
 cd src/n3iwf && sudo -E $GOROOT/bin/go run n3iwf.go &
-
-
-
-
-
-
