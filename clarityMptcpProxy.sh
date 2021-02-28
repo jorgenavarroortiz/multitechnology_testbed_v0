@@ -4,28 +4,53 @@
 #
 # Author: Daniel Camps (daniel.camps@i2cat.net)
 # Copyright: i2CAT
+# Modified by Jorge Navarro-Ortiz (jorgenavarro@ugr.es)
+
+#############################
+# Parsing inputs parameters
+#############################
+
+usage() {
+  echo "Usage: $0 [-i <IP address>] [-g <gateway IP address>]" 1>&2;
+  echo "Example: $0 -i 60.60.0.101 -g 60.60.0.102"
+  exit 1;
+}
+
+while getopts ":i:g:" o; do
+  case "${o}" in
+    i)
+      MYIP=${OPTARG}
+      i=1
+      echo "MYIP="$MYIP
+	    ;;
+    g)
+      GATEWAY=${OPTARG}
+	    g=1
+	    echo "GATEWAY="$GATEWAY
+      ;;
+    *)
+      usage
+      ;;
+  esac
+done
+shift $((OPTIND-1))
+
+if [ -z "${i}" ] || [ -z "${g}" ]; then
+    usage
+fi
 
 ####################
 # Configure MPTCP path manager
 ####################
 sudo sysctl -w net.mptcp.mptcp_path_manager=fullmesh
-# Loading roundrobin as kernel module otherwise it is not available for selection through sysctl
-# JNa: not required since MPTCP is included in the kernel, not as a module
-#LOADED=$(lsmod | grep mptcp_rr)
-#if [ "$LOADED" == "" ]; then
-#        sudo insmod /lib/modules/4.19.126/kernel/net/mptcp/mptcp_rr.ko
-#fi
-
 
 # Add data network IP address to eth1
-DN_IP="60.60.0.101"
-sudo ifconfig eth1 $DN_IP"/24" up
+sudo ifconfig eth1 $MYIP"/24" up
 
 # Add static route to reach MPTCP UEs
-sudo ip route add "10.0.1/24" via 60.60.0.102 dev eth1
-#sudo ip route add "10.1.1/24" via 60.60.0.102 dev eth1
-#sudo ip route add "10.1.2/24" via 60.60.0.102 dev eth1
-#sudo ip route add "10.1.3/24" via 60.60.0.102 dev eth1
+while read p; do
+  sudo ip route add $p via $GATEWAY dev eth1
+done <if_routes.txt
 
 # Launch openvpn server
 echo ""
