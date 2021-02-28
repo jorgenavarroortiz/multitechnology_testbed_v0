@@ -6,7 +6,7 @@ We have also included instructions to install MPTCP in NUC (Intel NUC 10 NUC10i7
 
 You can watch a [video](https://youtu.be/_7CiYgILo1g) showing how [scenario 1](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-scenario-1-two-virtual-machines-directly-connected) works.
 
-You can watch a [video](https://youtu.be/AYZm-uw-ZXU) showing how [scenario 2](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-scenario-2-ue---free5gc---proxy) works (using [i2CAT's scripts](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-the-free5gc-testbed), to be updated with UGR's ones).
+You can watch a [video](https://youtu.be/AYZm-uw-ZXU) showing how [scenario 2](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-scenario-2-ue---free5gc---proxy) works.
 
 ## Setting up the virtual environment
 
@@ -158,7 +158,7 @@ To test that MPTCP is working properly, run the following scripts:
 
 [**SCENARIO RUNNING FREE5GC: TO BE FINISHED**]
 
-Please use [i2CAT's scenario 2](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-the-free5gc-testbed) in the meantime. You can watch a [video](https://youtu.be/AYZm-uw-ZXU) showing how it works (using i2CAT's scripts, to be updated).
+Please use [i2CAT's scenario 2](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-the-free5gc-testbed) in the meantime. You can watch a [video](https://youtu.be/AYZm-uw-ZXU) showing how it works.
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario2_free5gc.png" width="1200">
 
