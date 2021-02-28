@@ -166,7 +166,7 @@ To setup this testbed the following scripts need to be run in this order:
 
 - **mptcpProxy**: change to the `$HOME/free5gc` directory and run `sudo ./clarityMptcpProxy.sh`. Wait until openvpn says the server is initialized. You may check that there is a `tap0` interface with IP address `10.8.0.1`.
 
-- **mptcpUe**: to attach to N3IWF through 2 (or more) interfaces, and launch an MPTCP namespace over which it will connect to the openvpn server, change to the `$HOME/go/src/free5gc` directory and run `sudo ./clarityUe.sh -n 2 -m -a -s 10.0.1 -o 60.60.0.101`. Wait until verbose messages stop. Look inside `clarity5gC.sh` for an explanation on the parameters. 
+- **mptcpUe**: to attach to N3IWF through 2 (or more) interfaces, and launch an MPTCP namespace over which it will connect to the openvpn server, change to the `$HOME/go/src/free5gc` directory and run `sudo ./clarityUe.sh -n 2 -m -a -s 10.0.1 -o 60.60.0.101`. Wait until verbose messages stop. Look inside `clarityUe.sh` for an explanation on the parameters. 
  
 **Validation**:
 
