@@ -13,34 +13,34 @@
 usage() { echo "Usage: $0 [-n <NUM_UEs>] [-m] [-a] [-s <SmfUeSubnet>] [-o <OvpnServerAddress>]" 1>&2; exit 1; }
 
 while getopts ":n:mas:o:" o; do
-    case "${o}" in
-        n)
-            NUM_UES=${OPTARG}
+  case "${o}" in
+    n)
+      NUM_UES=${OPTARG}
 	    n=1
 	    echo "NUM_UEs="$NUM_UES
-            ;;
+      ;;
 	m)
-            MPTCP=True
-            echo "MPTCP mode is enabled"
+      MPTCP=True
+      echo "MPTCP mode is enabled"
 	    ;;
 	a)
 	    ATTACH=True
-            echo "5GCore Attach is enabled"
+      echo "5GCore Attach is enabled"
 	    ;;
-        s)
-            t=1
-            SMF_UE_SUBNET=${OPTARG}
-            echo "UE Subnet configured in SMF="$SMF_UE_SUBNET
-            ;;
-        o)
-            OVPN=True
+  s)
+      t=1
+      SMF_UE_SUBNET=${OPTARG}
+      echo "UE Subnet configured in SMF="$SMF_UE_SUBNET
+      ;;
+  o)
+      OVPN=True
 	    OVPN_SERVER_IP=${OPTARG}
-            echo "MPTCP namespace will launch OpenVPN tunnel"
-            ;;
-        *)
-            usage
-            ;;
-    esac
+      echo "MPTCP namespace will launch OpenVPN tunnel"
+      ;;
+  *)
+      usage
+      ;;
+  esac
 done
 shift $((OPTIND-1))
 
@@ -85,12 +85,6 @@ PATH=$PATH:$GOPATH/bin:$GOROOT/bin
 # Configure MPTCP path manager
 ####################
 sudo sysctl -w net.mptcp.mptcp_path_manager=fullmesh
-# Loading roundrobin as kernel module otherwise it is not available for selection through sysctl
-# JNa: not required since MPTCP is included in the kernel, not as a module
-#LOADED=$(lsmod | grep mptcp_rr)
-#if [ "$LOADED" == "" ]; then
-#        sudo insmod /lib/modules/4.19.126/kernel/net/mptcp/mptcp_rr.ko
-#fi
 
 
 #########################################
