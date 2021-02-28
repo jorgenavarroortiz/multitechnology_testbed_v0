@@ -282,7 +282,7 @@ To setup this testbed the following scripts need to be run in this order:
     - You may check that there is a `tap0` interface with IP address `10.8.0.1`
 
 - 3. In the machine `mptcpUe` launch the UE that will attach to N3IWF through 2 interfaces, and launch an MPTCP namespace over which it will connect to the openvpn server
-    - Form this repo launch script: `sudo ./clarityUe.sh -n 2 -m -a -s 10.0.1 -o 10.8.0.1`
+    - Form this repo launch script: `sudo ./clarityUe.sh -n 2 -m -a -s 10.0.1 -o 60.60.0.101`
     - Wait until verbose messages stop. Look inside `clarity5gC.sh` for an explanation on the parameters
     - You may see some `ERR` messages in the `free5gc` console while attaching the two UEs, you can ignore those
     - You may now ping over the openvpn connection from inside the MPTCP namespace: `sudo ip netns exec MPTCPns ping 10.8.0.1`
