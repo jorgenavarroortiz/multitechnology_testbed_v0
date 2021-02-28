@@ -6,7 +6,7 @@ We have also included instructions to install MPTCP in NUC (Intel NUC 10 NUC10i7
 
 You can watch a [video](https://youtu.be/_7CiYgILo1g) showing how [scenario 1](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-scenario-1-two-virtual-machines-directly-connected) works.
 
-You can watch a [video](https://youtu.be/AYZm-uw-ZXU) showing how [scenario 2](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-scenario-2-ue---free5gc---proxy) works (using [i2CAT's scripts](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-the-free5gc-testbed), to be updated with UGR's ones).
+You can watch a [video](https://youtu.be/AYZm-uw-ZXU) showing how [scenario 2](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-scenario-2-ue---free5gc---proxy) works.
 
 ## Setting up the virtual environment
 
@@ -94,7 +94,7 @@ To setup this scenario the following scripts have to be run in this order:
 
 **NOTE**: if_names.txt.scenario1_same_network_UEX (X=1 or 2) utilizes IP addresses on the same network (1.1.1.{1,2,3}/24 for eth{1,2,3} on mptcpUE1, and 1.1.1.{4,5,6} for eth{1,2,3} on mptcpUE2), assuming that all network interfaces are connected to the same internal network (ue_ue). if_names.txt.scenario1_different_networks_UEX (X=1 or 2) utilizes IP addresses on different networks (1.1.{1,2,3}.1/24 for eth{1,2,3} on mptcpUE1, and 1.1.{1,2,3}.2/24 on eth{1,2,3} on mptcpUE2) assuming that network interfaces are connected to 3 different internal networks (ue_ue_X, X=1,2,3). This will simplify the usage of these scripts on real machines, which typically use different networks for each interface.
 
-NOTE: The OVPN configuration files on both server and client are now automatically adjusted.
+NOTE: The OpenVPN configuration files on both server and client are now automatically adjusted.
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1_set_MPTCP_parameters.png" width="1200">
 
@@ -156,11 +156,27 @@ To test that MPTCP is working properly, run the following scripts:
 
 **Launch scenario 2 with 5G core network**
 
-[**SCENARIO RUNNING FREE5GC: TO BE FINISHED**]
-
-Please use [i2CAT's scenario 2](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-the-free5gc-testbed) in the meantime. You can watch a [video](https://youtu.be/AYZm-uw-ZXU) showing how it works (using i2CAT's scripts, to be updated).
+The following image shows the scenario. You can watch a [video](https://youtu.be/AYZm-uw-ZXU) showing how it works.
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario2_free5gc.png" width="1200">
+
+To setup this testbed the following scripts need to be run in this order:
+
+- **free5gc**: change to the `$HOME/go/src/free5gc` directory and run `sudo ./clarity5gC.sh -n 2 -u -s 10.0.1`. Wait until verbose messages stop. If it stops after "_### Creating UE context for UeImsi=..._" messages, stop it (ctrl-C) and launch it again. This might happen in low-power PCs, in which the N3IWF starts before AMF is fully deployed. It should stop after "_[N3IWF] Handle NG Setup Response_" message. Look inside `clarity5gC.sh` for an explanation on the parameters.
+
+- **mptcpProxy**: change to the `$HOME/free5gc` directory and run `sudo ./clarityMptcpProxy.sh`. Wait until openvpn says the server is initialized. You may check that there is a `tap0` interface with IP address `10.8.0.1`.
+
+- **mptcpUe**: to attach to N3IWF through 2 (or more) interfaces, and launch an MPTCP namespace over which it will connect to the openvpn server, change to the `$HOME/go/src/free5gc` directory and run `sudo ./clarityUe.sh -n 2 -m -a -s 10.0.1 -o 60.60.0.101`. Wait until verbose messages stop. Look inside `clarity5gC.sh` for an explanation on the parameters. 
+ 
+**Validation**:
+
+- You may now ping over the OpenVPN connection from inside the MPTCP namespace: `sudo ip netns exec MPTCPns ping 10.8.0.1`
+- You may validate if you can ping from inside the MPTCP namespace in `mptcpUe` the DataNetwork in `mptpcProxy`, by running `sudo ip netns exec MPTCP ping -I v_mp_X 60.60.0.101`, where X=1,2 (the two different paths)
+- You may validate if MPTCPns has a route towards `60.60.0/24`
+- In mptcpProxy, you may validate that there is a route to `10.0.1/24` via `60.60.0.102` (`route -n`)
+- In `free5gc`, you may validate that UPF has one route towards `10.0.1/24` through device `upfgtp0` and one route to `60.60.0/24` through `veth_dn_u` (`sudo ip netns exec UPFns route -n`). You may also validate that IP forwarding is enabled in UPF namespace.
+
+In order to clear the configuration there are a set of clear scripts that can be used in the different machines, e.g. 'clearClarity5gC.sh' to clear configuration in `free5gc` and `clearClarityUe.sh` to clear configuration in `mptcpUe`.
 
 ## Tools
 
@@ -189,6 +205,12 @@ Also we can use the command `ifstat`, which shows us the throughput for the diff
 For that purpose, you could use `tc-netem`. We have included two scripts for changing these values (`set_bw_latency.sh`) and for resetting them (`reset_bw_latency.sh`).
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/set_bw_latency.png" width="800">
+
+Additionally, the following helper tools are included:
+
+- In machine `mptcpUe` you can use `sudo ./openvpn_mgr -m start -M` or `sudo ./openvpn_mgr -m stop -M` to start or stop the openvpn tunnel inside the MPTCP namespace in the UE. Note that you need to restart the tunnel every time you change the scheduler for it to have effect. The reason is that scheduler is considered when the TCP socket opens-
+
+- In the machine `mptcpUe` you can use `./delay_mgr -m add -i v_mph_1 -d 200ms` or `./delay_mgr -m remove -i v_mph_1 -d 200ms` to add or remove delay to a given interface.
 
 ### Capture and process PCAP trace
 
@@ -252,88 +274,7 @@ bash ./free5gc_control_plane_installation.sh
 
 Congratulations! With these steps, you should have the kernel and the packages available at the `mptcpUe` VM from testbed v0.
 
-**NOTE**: The scripts from testbed v0 assumed `eth0` and `eth1` as the names of the network interfaces. The names in the NUC are `eno1` for Ethernet and `wlp0s20f3` for Wi-Fi. We have to modify the scripts to use any interface names. **[TO BE DONE]**
-
-
-
----
-
-# i2CAT's scripts 5G-CLARITY testbed
-
-## Setting up the virtual environment
-
-You can follow the steps at i2CAT's repository (https://bitbucket.i2cat.net/projects/SDWN/repos/free5gc/browse) or use the Vagrantfiles in this repository (recommended for simplicity).
-
-## Launching the free5GC testbed
-
-The goal is to set up the environment described in the following figure:
-
-![Alt text](./img/testbed_setup.png?raw=true "free5GC testbed")
-
-To setup this testbed the following scripts need to be run in this order:
-
-- 1. In the machine `free5gc` launch the 5GCore
-    - From this repo folder: `sudo ./clarity5gC.sh -n 2 -u -s 10.0.1`
-    - Wait until verbose messages stop. Look inside `clarity5gC.sh` for an explanation on the parameters
-
-- 2. In the machine `mptcpProxy` launch the openvpn server:
-    - From this repo launch script `sudo ./clarityMptcpProxy.sh`
-    - Wait until openvpn says the server is initialized
-    - You may check that there is a `tap0` interface with IP address `10.8.0.1`
-
-- 3. In the machine `mptcpUe` launch the UE that will attach to N3IWF through 2 interfaces, and launch an MPTCP namespace over which it will connect to the openvpn server
-    - Form this repo launch script: `sudo ./clarityUe.sh -n 2 -m -a -s 10.0.1 -o 10.8.0.1`
-    - Wait until verbose messages stop. Look inside `clarity5gC.sh` for an explanation on the parameters
-    - You may see some `ERR` messages in the `free5gc` console while attaching the two UEs, you can ignore those
-    - You may now ping over the openvpn connection from inside the MPTCP namespace: `sudo ip netns exec MPTCPns ping 10.8.0.1`
-
-- What to do if openvpn does not connect?
-    - First validate if you can ping from inside the MPTCP namespace in `mptcpUe` the DataNetwork in `mptpcProxy`:
-      - In `mptcpUe`:
-        - `sudo ip netns exec MPTCP ping -I v_mp_1 60.60.0.101`. Validate if path 1 is working
-        - `sudo ip netns exec MPTCP ping -I v_mp_2 60.60.0.101`. Validate if path 1 is working
-        - If above does not work validate if MPTCPns has a route towards `60.60.0/24`. This requires setup of Linux policy routing, which is done in the `clarityUe.sh` script and explained here: https://multipath-tcp.org/pmwiki.php/Users/ConfigureRouting
-      - In `mptcpProxy`:
-        - `ifconfig eth1`. Validate it has IP address `60.60.0.101` as sometimes Virtualbox reconfigures
-        - `route -n`. Validate there is a route to `10.0.1/24` via `60.60.0.102` (c.f. grafic)
-      - In `free5gc`:
-        - `sudo ip netns exec UPFns route -n`. Validate UPF has one route towards `10.0.1/24` through device `upfgtp0` and one route to `60.60.0/24` through `veth_dn_u`
-        - Validate IP forwarding is enabled in UPF namespace
-
-- In order to clear the configuration there are a set of clear scripts that can be used in the different machines, e.g. 'clearClarity5gC.sh' to clear configuration in `free5gc` and `clearClarityUe.sh` to clear configuration in `mptcpUe`.
-
-## Launching the simple testbed
-The goal is to set up the environment described in the following figure:
-
-![Alt text](./img/testbed_setup_simple.png?raw=true "simple testbed")
-
-- 1. In the machine `free5gc` launch the 5GCore (modified by UGR, so now it takes the number of UEs and the IP address is correctly calculated)
-    - From this repo folder: `sudo ./clarity5gC_simple.sh -n 3 -s 10.0.1`
-
-- 2. In the machine `mptcpProxy` launch the openvpn server:
-    - From this repo launch script `sudo ./clarityMptcpProxy.sh`
-    - Wait until openvpn says the server is initialized
-    - You may check that there is a `tap0` interface with IP address `10.8.0.1`
-
-- 3. In the machine `mptcpUe` launch the UE that will attach to N3IWF through 2 interfaces, and launch an MPTCP namespace over which it will connect to the openvpn server
-    - Form this repo launch script: `sudo ./clarityUe_simple.sh -n 3 -m -a -s 10.0.1 -o 10.8.0.1`
-    - You may now ping over the openvpn connection from inside the MPTCP namespace: `sudo ip netns exec MPTCPns ping 10.8.0.1`
-
-- What to do if openvpn does not connect?
-    - First validate if you can ping from inside the MPTCP namespace in `mptcpUe` the DataNetwork in `mptpcProxy`:
-      - In `mptcpUe`:
-        - `sudo ip netns exec MPTCP ping -I v_mp_1 60.60.0.101`. Validate if path 1 is working
-        - `sudo ip netns exec MPTCP ping -I v_mp_2 60.60.0.101`. Validate if path 1 is working
-        - `sudo ip netns exec MPTCP ping -I v_mp_3 60.60.0.101`. Validate if path 1 is working
-
-- In order to clear the configuration there are a set of clear scripts that can be used in the different machines, e.g. 'clearClarity5gC.sh' to clear configuration in `free5gc` and `clearClarityUe.sh -n 3` to clear configuration in `mptcpUe`.
-
-## Helper tools
-The following helper tools are included:
-- You can change the MPTCP scheduler in the machines `mptcpUe` or `mptcpProxy` doing: `sudo sysctl -w net.mptcp.mptcp_scheduler=default`, where scheduler can be `default`, `redundant` or `roundrobin`
-- Use `sudo sysctl -a | grep mptcp` to see what is your current MPTCP configuration
-- In machine `mptcpUe` you can use `sudo ./openvpn_mgr -m start -M` or `sudo ./openvpn_mgr -m stop -M` to start or stop the openvpn tunnel inside the MPTCP namespace in the UE. Note that you need to restart the tunnel every time you change the scheduler for it to have effect. The reason is that scheduler is considered when the TCP socket opens
-- In the machine `mptcpUe` you can use `./delay_mgr -m add -i v_mph_1 -d 200ms` or `./delay_mgr -m remove -i v_mph_1 -d 200ms` to add or remove delay to a given interface
+**NOTE**: The scripts from testbed v0 assumed `eth0` and `eth1` as the names of the network interfaces. The names in the NUC are `eno1` for Ethernet and `wlp0s20f3` for Wi-Fi. You may need to modify the scripts to use any interface names (see if_names.txt and related files).
 
 ---
 
