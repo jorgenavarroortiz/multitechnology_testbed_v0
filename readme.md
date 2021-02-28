@@ -162,7 +162,7 @@ The following image shows the scenario. You can watch a [video](https://youtu.be
 
 To setup this testbed the following scripts need to be run in this order:
 
-- **free5gc**: change to the `$HOME/go/src/free5gc` directory and run `sudo ./clarity5gC.sh -n 2 -u -s 10.0.1`. Wait until verbose messages stop. If it stops after "### Creating UE context for UeImsi=..." messages, stop it (ctrl-C) and launch it again. This might happen in low-power PCs, in which the N3IWF starts before AMF is fully deployed. It should stop after "[N3IWF] Handle NG Setup Response" message. Look inside `clarity5gC.sh` for an explanation on the parameters.
+- **free5gc**: change to the `$HOME/go/src/free5gc` directory and run `sudo ./clarity5gC.sh -n 2 -u -s 10.0.1`. Wait until verbose messages stop. If it stops after "_### Creating UE context for UeImsi=..._" messages, stop it (ctrl-C) and launch it again. This might happen in low-power PCs, in which the N3IWF starts before AMF is fully deployed. It should stop after "_[N3IWF] Handle NG Setup Response_" message. Look inside `clarity5gC.sh` for an explanation on the parameters.
 
 - **mptcpProxy**: change to the `$HOME/free5gc` directory and run `sudo ./clarityMptcpProxy.sh`. Wait until openvpn says the server is initialized. You may check that there is a `tap0` interface with IP address `10.8.0.1`.
 
