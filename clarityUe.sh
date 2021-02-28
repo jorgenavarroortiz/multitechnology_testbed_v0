@@ -25,7 +25,7 @@ while getopts ":n:mas:o:" o; do
 	    ;;
 	a)
 	    ATTACH=True
-            echo "5GCore Attac  is enabled"
+            echo "5GCore Attach is enabled"
 	    ;;
         s)
             t=1
@@ -211,7 +211,7 @@ then
 
         #############
 	# Adding a static route in the UPF to reach the MPTCP namespace
-        $EXEC_UPFNS route add -net $SMF_UE_SUBNET".0/24" dev upfgtp0
+#        $EXEC_UPFNS route add -net $SMF_UE_SUBNET".0/24" dev upfgtp0
 
         #############
         # Configure routing tables within MPTCP namespace --> packets with source IP $IP_MPTCP will get routed through a different interface $VETH_MPTCP
@@ -239,7 +239,7 @@ then
 
         # JNa: automatically modify the configuration file according to the OVPN server IP address
         cp ovpn-client1.conf.GENERIC ovpn-client1.conf
-        sed -i 's/SERVER_IP_ADDRESS/${OVPN_SERVER_IP}/' ovpn-client1.conf
+        sed -i 's/SERVER_IP_ADDRESS/'${OVPN_SERVER_IP}'/' ovpn-client1.conf
 
         $EXEC_MPTCPNS openvpn ovpn-client1.conf &
 
