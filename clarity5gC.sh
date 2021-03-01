@@ -120,7 +120,6 @@ sudo ip netns add ${UPFNS}
 # Prepare veth pairs to communicate with N3IWF over N3 interface
 sudo ip link add veth0 type veth peer name veth1
 sudo ip link set veth0 up
-#sudo ip addr add 60.60.0.1 dev lo
 sudo ip addr add 10.200.200.1/24 dev veth0 # AMF binds to this address
 sudo ip addr add 10.200.200.2/24 dev veth0
 
@@ -128,7 +127,6 @@ sudo ip link set veth1 netns ${UPFNS}
 
 ${EXEC_UPFNS} ip link set lo up
 ${EXEC_UPFNS} ip link set veth1 up
-#${EXEC_UPFNS} ip addr add 60.60.0.101 dev lo
 ${EXEC_UPFNS} ip addr add 10.200.200.101/24 dev veth1
 ${EXEC_UPFNS} ip addr add 10.200.200.102/24 dev veth1
 
