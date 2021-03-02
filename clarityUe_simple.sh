@@ -96,7 +96,7 @@ sudo sysctl -w net.mptcp.mptcp_path_manager=fullmesh
 ##################
 # Prepare MPTCP namesapce
 ##################
- 
+
 if [ ${MPTCP} ]
 then
       sleep 3
@@ -116,26 +116,26 @@ then
         VETH_MPTCP="v_mp_"$i
         VETH_MPTCP_H="v_mph_"$i
         sudo ip link add $VETH_MPTCP type veth peer name $VETH_MPTCP_H
-	sudo ifconfig "eth"$i 0.0.0.0 up
-	sudo brctl addbr "brmptcp_"$i
-	sudo brctl addif "brmptcp_"$i "eth"$i
-	sudo brctl addif "brmptcp_"$i $VETH_MPTCP_H
+        sudo ifconfig "eth"$i 0.0.0.0 up
+        sudo brctl addbr "brmptcp_"$i
+        sudo brctl addif "brmptcp_"$i "eth"$i
+        sudo brctl addif "brmptcp_"$i $VETH_MPTCP_H
         sudo ip link set $VETH_MPTCP_H up
         sudo ip link set "brmptcp_"$i up
         sudo ip link set $VETH_MPTCP netns ${MPTCPNS} # Send other end of the veth pair to the MPTCP namespace
         $EXEC_MPTCPNS ip link set $VETH_MPTCP up
 
-	IP_MPTCP=$SMF_UE_SUBNET"."$i"/24"
-	IP_MPTCP_SIMPLE=$SMF_UE_SUBNET"."$i
-### 3netconfig:	IP_MPTCP="10.1."$i".2/24"
-### 3netconfig: IP_MPTCP_SIMPLE="10.1."$i".2"
-	$EXEC_MPTCPNS ip addr add $IP_MPTCP dev $VETH_MPTCP
+        IP_MPTCP=$SMF_UE_SUBNET"."$i"/24"
+        IP_MPTCP_SIMPLE=$SMF_UE_SUBNET"."$i
+        ### 3netconfig:	IP_MPTCP="10.1."$i".2/24"
+        ### 3netconfig: IP_MPTCP_SIMPLE="10.1."$i".2"
+        $EXEC_MPTCPNS ip addr add $IP_MPTCP dev $VETH_MPTCP
         $EXEC_MPTCPNS ifconfig $VETH_MPTCP mtu 1400 # done to avoid fragmentation which breaks ovpn setup
 
         #############
         # Configure routing tables within MPTCP namespace --> packets with source IP $IP_MPTCP will get routed through a different interface $VETH_MPTCP
-### 3netconfig: IP_GW="10.1."$i".1"  # Gateway IP is 10.0.1.1, 10.0.2.1 or 10.0.3.1 depending on the interface
-### 3netconfig: SMF_UE_SUBNET="10.1."$i
+        ### 3netconfig: IP_GW="10.1."$i".1"  # Gateway IP is 10.0.1.1, 10.0.2.1 or 10.0.3.1 depending on the interface
+        ### 3netconfig: SMF_UE_SUBNET="10.1."$i
         $EXEC_MPTCPNS ip rule add from $IP_MPTCP_SIMPLE table $i # this rule forces packets coming with this IP address to be routed according to table $i
         $EXEC_MPTCPNS ip rule add oif $VETH_MPTCP table $i # this rule is forces local applications that bind to the interface (like ping -I $VETH_MPTCP) to be routed according to table $i
         $EXEC_MPTCPNS ip route add $SMF_UE_SUBNET".0/24" dev $VETH_MPTCP scope link table $i
@@ -163,5 +163,3 @@ then
 
       fi
 fi
-
-
