@@ -12,7 +12,7 @@
 #############################
 
 usage() {
-  echo "Usage: $0 [-n <NUM_UEs>] [-m -P <path manager> -S <scheduler> -C <congestion control>] [-a] [-s <SmfUeSubnet>] [-o <OvpnServerAddress>]" 1>&2;
+  echo "Usage: $0 [-n <NUM_UEs>] [-m -P <path manager> -S <scheduler> -C <congestion control>] [-a] [-s <SmfUeSubnet>] [-o <OvpnServerAddress>] [-h]" 1>&2;
 
   echo ""
   echo "E.g.: $0 -n 2 -m -P fullmesh -S default -C olia -a -s 10.0.1 -o 10.8.0.1"
@@ -20,10 +20,22 @@ usage() {
   echo "       <path manager> ........... default, fullmesh, ndiffports, binder"
   echo "       <scheduler> .............. default, roundrobin, redundant"
   echo "       <congestion control> ..... reno, cubic, lia, olia, wvegas, balia, mctcpdesync"
+  echo ""
+  echo "       -h ....................... this help"
+  exit 1;
+}
 
-exit 1; }
+# Default values
+NUM_UES=2
+MPTCP=True
+PATHMANAGER="fullmesh"
+SCHEDULER="default"
+CONGESTIONCONTROL="olia"
+ATTACH=True
+SMF_UE_SUBNET="10.0.1"
+OVPN=True
 
-while getopts ":n:mP:S:C:as:o:" o; do
+while getopts ":n:mP:S:C:as:o:h" o; do
   case "${o}" in
     n)
       NUM_UES=${OPTARG}
@@ -51,7 +63,7 @@ while getopts ":n:mP:S:C:as:o:" o; do
       ;;
 	  a)
 	    ATTACH=True
-      echo "5GCore Attac  is enabled"
+      echo "5GCore Attach is enabled"
 	    ;;
     s)
       t=1
@@ -63,6 +75,9 @@ while getopts ":n:mP:S:C:as:o:" o; do
 	    OVPN_SERVER_IP=${OPTARG}
       echo "MPTCP namespace will launch OpenVPN tunnel"
       ;;
+    h)
+      h=1
+      ;;
     *)
       usage
       ;;
@@ -70,8 +85,8 @@ while getopts ":n:mP:S:C:as:o:" o; do
 done
 shift $((OPTIND-1))
 
-if [ -z "${t}" ] || [ -z "${n}" ]; then
-    usage
+if [ $h -eq 1 ]; then
+  usage
 fi
 
 ##############################
