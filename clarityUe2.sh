@@ -12,10 +12,10 @@
 #############################
 
 usage() {
-  echo "Usage: $0 [-n <NUM_UEs>] [-m -P <path manager> -S <scheduler> -C <congestion control>] [-a] [-s <SmfUeSubnet>] [-o <OvpnServerAddress>] [-h]" 1>&2;
+  echo "Usage: $0 [-n <NUM_UEs>] [-m -P <path manager> -S <scheduler> -C <congestion control>] [-a] [-s <SmfUeSubnet>] [-i <interface directly connected to the data network> -I <IP address of the interface connected to the data network>] [-o <OvpnServerAddress>] [-d] [-h]" 1>&2;
 
   echo ""
-  echo "E.g.: $0 -n 2 -m -P fullmesh -S default -C olia -a -s 10.0.1 -o 10.8.0.1"
+  echo "E.g.: $0 -n 2 -m -P fullmesh -S default -C olia -a -s 10.0.1 -o 60.60.0.101 -i eth3 -I 60.60.0.1/24"
   echo ""
   echo "       <path manager> ........... default, fullmesh, ndiffports, binder"
   echo "       <scheduler> .............. default, roundrobin, redundant"
@@ -26,6 +26,7 @@ usage() {
 }
 
 # Default values
+DEBUG=0
 NUM_UES=2
 MPTCP=True
 PATHMANAGER="fullmesh"
@@ -35,8 +36,11 @@ ATTACH=True
 SMF_UE_SUBNET="10.0.1"
 OVPN=True
 OVPN_SERVER_IP="60.60.0.101"
+IDN=False
+IFNAMEDN="eth3"
+IPDN="60.60.0.1/24"
 
-while getopts ":n:mP:S:C:as:o:h" o; do
+while getopts ":n:mP:S:C:as:o:i:I:dh" o; do
   case "${o}" in
     n)
       NUM_UES=${OPTARG}
@@ -47,17 +51,17 @@ while getopts ":n:mP:S:C:as:o:h" o; do
       MPTCP=True
       echo "MPTCP mode is enabled"
 	    ;;
-    p)
+    P)
       p=1
       PATHMANAGER=${OPTARG}
       echo "PATHMANAGER="$PATHMANAGER
       ;;
-    s)
+    S)
       s=1
       SCHEDULER=${OPTARG}
       echo "SCHEDULER="$SCHEDULER
       ;;
-    c)
+    C)
       c=1
       CONGESTIONCONTROL=${OPTARG}
       echo "CONGESTIONCONTROL="${OPTARG}
@@ -76,6 +80,18 @@ while getopts ":n:mP:S:C:as:o:h" o; do
 	    OVPN_SERVER_IP=${OPTARG}
       echo "MPTCP namespace will launch OpenVPN tunnel"
       ;;
+    i)
+      IDN=True
+      IFNAMEDN=${OPTARG}
+      echo "IFNAMEDN="$IFNAMEDN
+      ;;
+    I)
+      IPDN=${OPTARG}
+      echo "IPDN="$IPDN
+      ;;
+    d)
+      DEBUG=1
+      ;;
     h)
       h=1
       ;;
@@ -86,7 +102,7 @@ while getopts ":n:mP:S:C:as:o:h" o; do
 done
 shift $((OPTIND-1))
 
-if [ $h -eq 1 ]; then
+if [[ $h == 1 ]]; then
   usage
 fi
 
@@ -276,6 +292,51 @@ then
 
   done
 
+  # Interface directly connected to the data network (to mptcpProxy VM)
+  # *** Check that MPTCP is True (currently we are assuming that) ***
+  if [ ${IDN} ]; then
+    i=$(($NUM_UES + 1))
+    card=$IFNAMEDN
+    MPTCPNS="MPTCPns"
+    EXEC_MPTCPNS="sudo ip netns exec ${MPTCPNS}"
+
+    VETH_MPTCP="v_mp_"$i
+    VETH_MPTCP_H="v_mph_"$i
+
+    sudo ip link add $VETH_MPTCP type veth peer name $VETH_MPTCP_H
+    sudo ifconfig $card 0.0.0.0 up
+    sudo brctl addbr "brmptcp_"$i
+    sudo brctl addif "brmptcp_"$i $card
+    sudo brctl addif "brmptcp_"$i $VETH_MPTCP_H
+    sudo ip link set $VETH_MPTCP_H up
+    sudo ip link set "brmptcp_"$i up
+    sudo ip link set $VETH_MPTCP netns ${MPTCPNS} # Send other end of the veth pair to the MPTCP namespace
+    $EXEC_MPTCPNS ip link set $VETH_MPTCP up
+    IP_MPTCP_SIMPLE=`echo $IPDN | cut -d "/" -f 1`
+    MaskCard=`echo $IPDN | cut -d "/" -f 2`
+    IP_MPTCP=$IPDN
+    GW_MPTCP=$OVPN_SERVER_IP ## *** Currently we are assuming that this interface is directly connected to the OVPN server ***
+    IFS=. read -r i1 i2 i3 i4 <<< $IP_MPTCP_SIMPLE
+    IFS=. read -r xx m1 m2 m3 m4 <<< $(for a in $(seq 1 32); do if [ $(((a - 1) % 8)) -eq 0 ]; then echo -n .; fi; if [ $a -le $MaskCard ]; then echo -n 1; else echo -n 0; fi; done)
+#    IFS=. read -r m1 m2 m3 m4 <<< "255.255.255.0"
+    NET_IP_MPTCP_SIMPLE=`printf "%d.%d.%d.%d\n" "$((i1 & (2#$m1)))" "$((i2 & (2#$m2)))" "$((i3 & (2#$m3)))" "$((i4 & (2#$m4)))"`
+    NET_IP_MPTCP=${NET_IP_MPTCP_SIMPLE}"/"${MaskCard}
+    if [[ $DEBUG == 1 ]]; then echo "NET_IP_MPTCP${i}: ${NET_IP_MPTCP}"; fi
+    if [[ $DEBUG == 1 ]]; then echo "GW_MPTCP${i}: ${GW_MPTCP}"; fi
+    $EXEC_MPTCPNS ip addr add $IP_MPTCP dev $VETH_MPTCP
+    $EXEC_MPTCPNS ifconfig $VETH_MPTCP mtu 1400   # done to avoid fragmentation which breaks ovpn setup
+
+    # Create routing tables for each interface
+    $EXEC_MPTCPNS ip rule add from $IP_MPTCP_SIMPLE table $i #2> /dev/null
+    $EXEC_MPTCPNS ip route add $NET_IP_MPTCP dev $VETH_MPTCP scope link table $i #2> /dev/null
+    $EXEC_MPTCPNS ip route add default via $GW_MPTCP dev $VETH_MPTCP table $i #2> /dev/null
+
+    # Probably not needed...
+    sudo ip link set dev $card multipath on
+    sudo ip link set dev $VETH_MPTCP_H multipath on
+    $EXEC_MPTCPNS ip link set dev $VETH_MPTCP multipath on
+  fi
+
   # Launching OVPN tunnel over MPTCP
   if [ ${OVPN} ]; then
     sleep 5
@@ -286,7 +347,7 @@ then
 
     # JNa: automatically modify the configuration file according to the OVPN server IP address
     cp ovpn-client1.conf.GENERIC ovpn-client1.conf
-    sed -i 's/SERVER_IP_ADDRESS/${OVPN_SERVER_IP}/' ovpn-client1.conf
+    sed -i 's/SERVER_IP_ADDRESS/'${OVPN_SERVER_IP}'/' ovpn-client1.conf
 
     $EXEC_MPTCPNS openvpn ovpn-client1.conf &
 
