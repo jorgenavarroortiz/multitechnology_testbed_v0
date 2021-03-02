@@ -6,13 +6,23 @@
 # Copyright: i2CAT
 # Modified by Jorge Navarro-Ortiz (jorgenavarro@ugr.es)
 
+# Starting to generalize...
+IPtoDN="60.60.0.102/24"
+DNNET="60.60.0/24"
+IPSecN3IWF="192.168.13.2"
+
 ############################
 # Parsing inputs parameters
 ############################
 
+# Default values
+NUM_UES=2
+BUILD_UPF=True
+SMF_UE_SUBNET="10.0.1"
+
 usage() { echo "Usage: $0 [-n <NUM_UEs>] [-u] [-s <SmfUeSubnet>]" 1>&2; exit 1; }
 
-while getopts ":n:us:" o; do
+while getopts ":n:us:h" o; do
     case "${o}" in
         n)
             NUM_UES=${OPTARG}
@@ -28,6 +38,9 @@ while getopts ":n:us:" o; do
             SMF_UE_SUBNET=${OPTARG}
             echo "UE Subnet configured in SMF="$SMF_UE_SUBNET
             ;;
+        h)
+          h=1
+          ;;
         *)
             usage
             ;;
@@ -35,8 +48,8 @@ while getopts ":n:us:" o; do
 done
 shift $((OPTIND-1))
 
-if [ -z "${t}" ] || [ -z "${n}" ]; then
-    usage
+if [[ $h == 1 ]]; then
+  usage
 fi
 
 ##############################
@@ -143,7 +156,7 @@ sudo brctl addif $BRNAME veth_dn_h
 sudo ifconfig $BRNAME up
 
 # Adding static routes to UE namespace and to Data network and enable IP forwarding
-${EXEC_UPFNS} ip addr add "60.60.0.102/24" dev veth_dn_u
+${EXEC_UPFNS} ip addr add $IPtoDN dev veth_dn_u
 ${EXEC_UPFNS} sysctl -w net.ipv4.ip_forward=1
 
 cd src/upf/build && ${EXEC_UPFNS} ./bin/free5gc-upfd -f config/upfcfg.test.yaml &
@@ -153,7 +166,7 @@ sleep 2
 # Adding route to mptcp namespace subnet
 ${EXEC_UPFNS} ip link set dev upfgtp0 mtu 1500
 ${EXEC_UPFNS} ip route add $SMF_UE_SUBNET"/24" dev upfgtp0
-${EXEC_UPFNS} ip route del 60.60.0/24 dev upfgtp0
+${EXEC_UPFNS} ip route del $DNNET dev upfgtp0
 
 ###################
 # 5GC control plane configuration (AMF, SMF)
@@ -172,7 +185,7 @@ cp -f config/amfcfg.n3test.conf config/amfcfg.conf
 ###################
 
 # Bring up ipsec side of the N3IWF
-sudo ip link add name ipsec0 type vti local 192.168.13.2 remote 0.0.0.0 key 5
+sudo ip link add name ipsec0 type vti local $IPSecN3IWF remote 0.0.0.0 key 5
 sudo ip addr add 10.0.0.1/24 dev ipsec0
 sudo ip link set ipsec0 up
 

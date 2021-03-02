@@ -67,7 +67,7 @@ while getopts ":i:g:p:s:c:h" o; do
 done
 shift $((OPTIND-1))
 
-if [ $h -eq 1 ]; then
+if [[ $h == 1 ]]; then
   usage
 fi
 
