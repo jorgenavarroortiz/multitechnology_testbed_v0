@@ -22,6 +22,7 @@ go get -u github.com/sirupsen/logrus
 #fi
 cd $HOME/vagrant
 tar -C $HOME -zxvf gtp5g_working_with_kernel5.0.0-23.tar.gz
+mv gtp5g_working_with_kernel5.0.0-23 gtp5g
 
 # SSH credentials for bitbucket repository
 #cp $HOME/vagrant/ssh_credentials/id_rsa $HOME/.ssh/id_rsa
