@@ -21,7 +21,7 @@ go get -u github.com/sirupsen/logrus
 #  sudo make install
 #fi
 cd $HOME/vagrant
-tar -C $HOME -zxvf free5gc_libs.tar.gz
+tar -C $HOME -zxvf gtp5g_working_with_kernel5.0.0-23.tar.gz
 
 # SSH credentials for bitbucket repository
 #cp $HOME/vagrant/ssh_credentials/id_rsa $HOME/.ssh/id_rsa
