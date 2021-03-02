@@ -294,7 +294,7 @@ then
 
   # Interface directly connected to the data network (to mptcpProxy VM)
   # *** Check that MPTCP is True (currently we are assuming that) ***
-  if [ ${IDN} ]; then
+  if [ ${IDN} == True ]; then
     i=$(($NUM_UES + 1))
     card=$IFNAMEDN
     MPTCPNS="MPTCPns"
