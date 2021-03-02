@@ -34,6 +34,7 @@ CONGESTIONCONTROL="olia"
 ATTACH=True
 SMF_UE_SUBNET="10.0.1"
 OVPN=True
+OVPN_SERVER_IP="60.60.0.101"
 
 while getopts ":n:mP:S:C:as:o:h" o; do
   case "${o}" in
@@ -260,7 +261,7 @@ then
 
     #############
 	  # Adding a static route in the UPF to reach the MPTCP namespace
-    $EXEC_UPFNS route add -net $SMF_UE_SUBNET".0/24" dev upfgtp0
+#    $EXEC_UPFNS route add -net $SMF_UE_SUBNET".0/24" dev upfgtp0
 
     #############
     # Configure routing tables within MPTCP namespace --> packets with source IP $IP_MPTCP will get routed through a different interface $VETH_MPTCP
