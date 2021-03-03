@@ -21,6 +21,7 @@ usage() {
   echo "       <scheduler> .............. default, roundrobin, redundant"
   echo "       <congestion control> ..... reno, cubic, lia, olia, wvegas, balia, mctcpdesync"
   echo ""
+  echo "       -d ....................... print debug messages"
   echo "       -h ....................... this help"
   exit 1;
 }
