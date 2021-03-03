@@ -47,17 +47,17 @@ while getopts ":n:mP:S:C:as:o:h" o; do
       MPTCP=True
       echo "MPTCP mode is enabled"
 	    ;;
-    p)
+    P)
       p=1
       PATHMANAGER=${OPTARG}
       echo "PATHMANAGER="$PATHMANAGER
       ;;
-    s)
+    S)
       s=1
       SCHEDULER=${OPTARG}
       echo "SCHEDULER="$SCHEDULER
       ;;
-    c)
+    C)
       c=1
       CONGESTIONCONTROL=${OPTARG}
       echo "CONGESTIONCONTROL="${OPTARG}
