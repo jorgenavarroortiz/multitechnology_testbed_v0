@@ -11,9 +11,9 @@
 #############################
 
 usage() {
-  echo "Usage: $0 [-i <IP address>] [-g <gateway IP address>] [-P <path manager>] [-S <scheduler>] [-C <congestion control>] [-h]" 1>&2;
+  echo "Usage: $0 [-i <IP address/mask>] [-I <interface name>] [-g <gateway IP address>] [-P <path manager>] [-S <scheduler>] [-C <congestion control>] [-h]" 1>&2;
   echo ""
-  echo "Example: $0 -i 60.60.0.101 -g 60.60.0.102 -P fullmesh -S default -C olia"
+  echo "Example: $0 -i 60.60.0.101/24 -I eth1 -g 60.60.0.102 -P fullmesh -S default -C olia"
   echo ""
   echo "       <path manager> ........... default, fullmesh, ndiffports, binder"
   echo "       <scheduler> .............. default, roundrobin, redundant"
@@ -30,13 +30,18 @@ PATHMANAGER="fullmesh"
 SCHEDULER="default"
 CONGESTIONCONTROL="olia"
 
-while getopts ":i:g:P:S:C:h" o; do
+while getopts ":i:I:g:P:S:C:h" o; do
   case "${o}" in
     i)
       MYIP=${OPTARG}
       i=1
       echo "MYIP="$MYIP
-	    ;;
+      ;;
+    I)
+      MYIFNAME=${OPTARG}
+      I=1
+      echo "MYIFNAME="$MYIFNAME
+      ;;
     g)
       GATEWAY=${OPTARG}
 	    g=1
@@ -82,7 +87,7 @@ sudo sysctl -w net.mptcp.mptcp_scheduler=$SCHEDULER
 sudo sysctl -w net.ipv4.tcp_congestion_control=$CONGESTIONCONTROL
 
 # Add data network IP address to eth1
-sudo ifconfig eth1 $MYIP"/24" up
+sudo ifconfig $MYIFNAME $MYIP up
 
 # Add static route to reach MPTCP UEs
 while read p; do
