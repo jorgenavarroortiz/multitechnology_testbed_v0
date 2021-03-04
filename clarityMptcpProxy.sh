@@ -11,9 +11,9 @@
 #############################
 
 usage() {
-  echo "Usage: $0 [-i <IP address>] [-g <gateway IP address>] [-p <path manager>] [-s <scheduler>] [-c <congestion control>] [-h]" 1>&2;
+  echo "Usage: $0 [-i <IP address>] [-g <gateway IP address>] [-P <path manager>] [-S <scheduler>] [-C <congestion control>] [-h]" 1>&2;
   echo ""
-  echo "Example: $0 -i 60.60.0.101 -g 60.60.0.102 -p fullmesh -s default -c olia"
+  echo "Example: $0 -i 60.60.0.101 -g 60.60.0.102 -P fullmesh -S default -C olia"
   echo ""
   echo "       <path manager> ........... default, fullmesh, ndiffports, binder"
   echo "       <scheduler> .............. default, roundrobin, redundant"
@@ -30,7 +30,7 @@ PATHMANAGER="fullmesh"
 SCHEDULER="default"
 CONGESTIONCONTROL="olia"
 
-while getopts ":i:g:p:s:c:h" o; do
+while getopts ":i:g:P:S:C:h" o; do
   case "${o}" in
     i)
       MYIP=${OPTARG}
@@ -42,18 +42,18 @@ while getopts ":i:g:p:s:c:h" o; do
 	    g=1
 	    echo "GATEWAY="$GATEWAY
       ;;
-    p)
-      p=1
+    P)
+      P=1
       PATHMANAGER=${OPTARG}
       echo "PATHMANAGER="$PATHMANAGER
       ;;
-    s)
-      s=1
+    S)
+      S=1
       SCHEDULER=${OPTARG}
       echo "SCHEDULER="$SCHEDULER
       ;;
-    c)
-      c=1
+    C)
+      C=1
       CONGESTIONCONTROL=${OPTARG}
       echo "CONGESTIONCONTROL="${OPTARG}
       ;;
