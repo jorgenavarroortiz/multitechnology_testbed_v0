@@ -15,7 +15,7 @@ usage() {
   echo "Usage: $0 [-n <NUM_UEs>] [-m -P <path manager> -S <scheduler> -C <congestion control>] [-a] [-s <SmfUeSubnet>] [-i <interface directly connected to the data network> -I <IP address of the interface connected to the data network>] [-o <OvpnServerAddress>] [-d] [-h]" 1>&2;
 
   echo ""
-  echo "E.g.: $0 -n 2 -m -P fullmesh -S default -C olia -a -s 10.0.1 -o 60.60.0.101 -i eth3 -I 60.60.0.1/24"
+  echo "E.g.: $0 -n 2 -m -P fullmesh -S default -C olia -a -s 10.0.1 -o 60.60.0.101 -i eth4 -I 60.60.0.1/24"
   echo ""
   echo "       <path manager> ........... default, fullmesh, ndiffports, binder"
   echo "       <scheduler> .............. default, roundrobin, redundant"
