@@ -70,13 +70,6 @@ else
     exit 1
 fi
 
-sudo -v
-if [ $? == 1 ]
-then
-    echo "Error: root permission is needed!"
-    exit 1
-fi
-
 GOPATH=$HOME/go
 if [ $OS == "Ubuntu" ]; then
     GOROOT=/usr/local/go
@@ -85,6 +78,11 @@ elif [ $OS == "Fedora" ]; then
 fi
 PATH=$PATH:$GOPATH/bin:$GOROOT/bin
 
+# Check if it is executed as root (exit otherwise)
+if [[ `id -u` != 0 ]]; then
+  echo "Please execute this script as root!"
+  exit 1
+fi
 
 ########################
 # UPF configuration
