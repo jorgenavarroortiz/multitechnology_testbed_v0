@@ -123,6 +123,12 @@ elif [ $OS == "Fedora" ]; then
 fi
 PATH=$PATH:$GOPATH/bin:$GOROOT/bin
 
+# Check if it is executed as root (exit otherwise)
+if [[ `id -u` != 0 ]]; then
+  echo "Please execute this script as root!"
+  exit 1
+fi
+
 ##############################
 # SETTING MPTCP PARAMETERS
 ##############################
