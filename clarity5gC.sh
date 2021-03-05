@@ -20,7 +20,7 @@ NUM_UES=2
 BUILD_UPF=True
 SMF_UE_SUBNET="10.0.1"
 
-usage() { echo "Usage: $0 [-n <NUM_UEs>] [-u] [-s <SmfUeSubnet>]" 1>&2; exit 1; }
+usage() { echo "Usage: $0 [-n <NUM_UEs>] [-u] [-s <SmfUeSubnet>] [-h]" 1>&2; exit 1; }
 
 while getopts ":n:us:h" o; do
     case "${o}" in
@@ -70,13 +70,6 @@ else
     exit 1
 fi
 
-sudo -v
-if [ $? == 1 ]
-then
-    echo "Error: root permission is needed!"
-    exit 1
-fi
-
 GOPATH=$HOME/go
 if [ $OS == "Ubuntu" ]; then
     GOROOT=/usr/local/go
@@ -85,6 +78,11 @@ elif [ $OS == "Fedora" ]; then
 fi
 PATH=$PATH:$GOPATH/bin:$GOROOT/bin
 
+# Check if it is executed as root (exit otherwise)
+if [[ `id -u` != 0 ]]; then
+  echo "Please execute this script as root!"
+  exit 1
+fi
 
 ########################
 # UPF configuration
