@@ -76,22 +76,28 @@ if [[ $h == 1 ]]; then
   usage
 fi
 
+# Check if it is executed as root (exit otherwise)
+if [[ `id -u` != 0 ]]; then
+  echo "Please execute this script as root!"
+  exit 1
+fi
+
 # Modify tunable variables
-sudo sysctl -w net.mptcp.mptcp_enabled=1     # Default 1
-sudo sysctl -w net.mptcp.mptcp_checksum=1    # Default 1 (both sides have to be 0 in order to disable this)
-sudo sysctl -w net.mptcp.mptcp_syn_retries=3 # Specifies how often we retransmit a SYN with the MP_CAPABLE-option. Default 3
-sudo sysctl -w net.mptcp.mptcp_path_manager=$PATHMANAGER
-sudo sysctl -w net.mptcp.mptcp_scheduler=$SCHEDULER
+sysctl -w net.mptcp.mptcp_enabled=1     # Default 1
+sysctl -w net.mptcp.mptcp_checksum=1    # Default 1 (both sides have to be 0 in order to disable this)
+sysctl -w net.mptcp.mptcp_syn_retries=3 # Specifies how often we retransmit a SYN with the MP_CAPABLE-option. Default 3
+sysctl -w net.mptcp.mptcp_path_manager=$PATHMANAGER
+sysctl -w net.mptcp.mptcp_scheduler=$SCHEDULER
 
 # Congestion control
 sudo sysctl -w net.ipv4.tcp_congestion_control=$CONGESTIONCONTROL
 
 # Add data network IP address to eth1
-sudo ifconfig $MYIFNAME $MYIP up
+ifconfig $MYIFNAME $MYIP up
 
 # Add static route to reach MPTCP UEs
 while read p; do
-  sudo ip route add $p via $GATEWAY dev eth1
+  ip route add $p via $GATEWAY dev eth1
 done <if_routes.txt
 
 # Launch openvpn server
