@@ -21,7 +21,7 @@ In both scenarios, a Vagrantfile has been developed to install the required kern
 **Few differences with testbeds from i2CAT's repo**
 
 - All functions related to MPTCP are included in the kernel, i.e. there is no need to load modules. Instead of using kernel 4.19 (which it is supported by the MPTCP version in https://www.multipath-tcp.org/), we have updated the MPTCP patch for kernel 5.4 to work with **kernel 5.5**. The main advantage is that kernel 5.5 *works properly in Intel's NUC* (i.e. *AX201 Wi-Fi6 network card* has been tested and works properly with this kernel, whereas it has some serious stability problems with kernel 5.4).
-- **mptcpUe VM**: `eth1`, `eth2` and `eth3` are configured to use an internal network (ue_5gc) instead of using a bridged adapter. Access to this VM is available through **SSH on port 12222**.
+- **mptcpUe VM**: `eth1`, `eth2` and `eth3` are configured to use an internal network (ue_5gc) instead of using a bridged adapter. `eth4` is directly connected to the _mptcpProxy_ VM. Access to this VM is available through **SSH on port 12222**.
 - **free5gc VM**: Similarly, this machine utilizes two internal networks (ue_5gc and 5gc_proxy) instead of using a bridged adapter. Access to this VM is available through **SSH on port 22222**.
 - **mptcpProxy VM**: Similarly, this machine utilizes an internal network (5gc_proxy) instead of using a bridged adapter. Access to this VM is available through **SSH on port 32222**.
 
@@ -130,9 +130,9 @@ In order to perform some experiments, remember to use the namespace `MPTCPns` an
 
 ## Launching SCENARIO 2: UE <-> free5GC <-> proxy
 
-In this scenario, a VM (mptcpUe) employs three network interfaces (`eth1`, `eth2` and `eth3`) emulating a computer with three wireless access technologies (WATs), e.g. Wi-Fi, Li-Fi and 5G NR. We assume that they are in bridge mode, i.e. connected to the same IP network. This VM is directly connected to a VM (free5gc) implementing the 5G core network. The connection is done through the N3IWF (Non-3GPP InterWorking Function) entity. Since we are employing MPTCP to simultaneously transfer data from the three network interfaces of mptcpUe VM, it is required that the other end also implements MPTCP. Due to the different kernel versions on both VMs (~~4.19.142~~5.5 for MPTCP and 5.0.0-23 for free5GC), another VM (mptcpProxy) is also required. mptcpProxy implements MPTCP for this purpose.
+In this scenario, a VM (mptcpUe) employs three network interfaces (`eth1`, `eth2` and `eth4`) emulating a computer with three wireless access technologies (WATs), e.g. Wi-Fi, Li-Fi and 5G NR (directly connected to the _mptcpProxy_ VM since there is no gNB emulator to connect through UPF). We assume that they are in bridge mode, i.e. connected to the same IP network. This VM is directly connected to a VM (free5gc) implementing the 5G core network. The connection is done through the N3IWF (Non-3GPP InterWorking Function) entity. Since we are employing MPTCP to simultaneously transfer data from the three network interfaces of mptcpUe VM, it is required that the other end also implements MPTCP. Due to the different kernel versions on both VMs (~~4.19.142~~5.5 for MPTCP and 5.0.0-23 for free5GC), another VM (mptcpProxy) is also required. mptcpProxy implements MPTCP for this purpose.
 
-**NOTE**: If required, you can add more network interfaces to the mptcpUe VM to emulate more WATs (currently three interfaces are added). The scripts will utilize consecutive network interfaces starting from eth1, eth2, eth3, etcetera.
+**NOTE**: If required, you can add more network interfaces to the mptcpUe VM to emulate more WATs connected through N3IWF (currently three interfaces are added). The scripts will utilize consecutive network interfaces starting from eth1, eth2, eth3, etcetera.
 
 **Launch scenario 2 without 5G core network**
 
@@ -166,7 +166,7 @@ To setup this testbed the following scripts need to be run in this order:
 
 - **mptcpProxy**: change to the `$HOME/free5gc` directory and run `sudo ./clarityMptcpProxy.sh -i 60.60.0.101/24 -I eth1 -g 60.60.0.102 -P fullmesh -S default -C olia`. Wait until openvpn says the server is initialized. You may check that there is a `tap0` interface with IP address `10.8.0.1`.
 
-- **mptcpUe**: to attach to N3IWF through 2 (or more) interfaces, and launch an MPTCP namespace over which it will connect to the openvpn server, change to the `$HOME/go/src/free5gc` directory and run `sudo ./clarityUe.sh -n 2 -m -P fullmesh -S default -C olia -a -s 10.0.1 -o 60.60.0.101` (for two paths through N3IWF) or run `sudo ./clarityUe.sh -n 2 -m -P fullmesh -S default -C olia -a -s 10.0.1 -o 60.60.0.101 -i eth3 -I 60.60.0.1/24` (for three paths, two through N3IWF and one directly connected to _mptcpProxy_). Wait until verbose messages stop. Look inside `clarityUe.sh` for an explanation on the parameters. 
+- **mptcpUe**: to attach to N3IWF through 2 (or more) interfaces, and launch an MPTCP namespace over which it will connect to the openvpn server, change to the `$HOME/go/src/free5gc` directory and run `sudo ./clarityUe.sh -n 2 -m -P fullmesh -S default -C olia -a -s 10.0.1 -o 60.60.0.101` (for two paths through N3IWF) or run `sudo ./clarityUe.sh -n 2 -m -P fullmesh -S default -C olia -a -s 10.0.1 -o 60.60.0.101 -i eth4 -I 60.60.0.1/24` (for three paths, two through N3IWF and one directly connected to the _mptcpProxy_ VM). Wait until verbose messages stop. Look inside `clarityUe.sh` for an explanation on the parameters. 
  
 **Validation**:
 
