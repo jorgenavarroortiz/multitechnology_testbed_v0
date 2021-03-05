@@ -164,14 +164,14 @@ To setup this testbed the following scripts need to be run in this order:
 
 - **free5gc**: change to the `$HOME/go/src/free5gc` directory and run `sudo ./clarity5gC.sh -n 2 -u -s 10.0.1`. Wait until verbose messages stop. If it stops after "_### Creating UE context for UeImsi=..._" messages, stop it (ctrl-C) and launch it again. This might happen in low-power PCs, in which the N3IWF starts before AMF is fully deployed. It should stop after "_[N3IWF] Handle NG Setup Response_" message. Look inside `clarity5gC.sh` for an explanation on the parameters.
 
-- **mptcpProxy**: change to the `$HOME/free5gc` directory and run `sudo ./clarityMptcpProxy.sh`. Wait until openvpn says the server is initialized. You may check that there is a `tap0` interface with IP address `10.8.0.1`.
+- **mptcpProxy**: change to the `$HOME/free5gc` directory and run `sudo ./clarityMptcpProxy.sh -i 60.60.0.101/24 -I eth1 -g 60.60.0.102 -P fullmesh -S default -C olia`. Wait until openvpn says the server is initialized. You may check that there is a `tap0` interface with IP address `10.8.0.1`.
 
-- **mptcpUe**: to attach to N3IWF through 2 (or more) interfaces, and launch an MPTCP namespace over which it will connect to the openvpn server, change to the `$HOME/go/src/free5gc` directory and run `sudo ./clarityUe.sh -n 2 -m -a -s 10.0.1 -o 60.60.0.101`. Wait until verbose messages stop. Look inside `clarityUe.sh` for an explanation on the parameters. 
+- **mptcpUe**: to attach to N3IWF through 2 (or more) interfaces, and launch an MPTCP namespace over which it will connect to the openvpn server, change to the `$HOME/go/src/free5gc` directory and run `sudo ./clarityUe.sh -n 2 -m -P fullmesh -S default -C olia -a -s 10.0.1 -o 60.60.0.101` (for two paths through N3IWF) or run `sudo ./clarityUe.sh -n 2 -m -P fullmesh -S default -C olia -a -s 10.0.1 -o 60.60.0.101 -i eth3 -I 60.60.0.1/24` (for three paths, two through N3IWF and one directly connected to _mptcpProxy_). Wait until verbose messages stop. Look inside `clarityUe.sh` for an explanation on the parameters. 
  
 **Validation**:
 
 - You may now ping over the OpenVPN connection from inside the MPTCP namespace: `sudo ip netns exec MPTCPns ping 10.8.0.1`
-- You may validate if you can ping from inside the MPTCP namespace in `mptcpUe` the DataNetwork in `mptpcProxy`, by running `sudo ip netns exec MPTCP ping -I v_mp_X 60.60.0.101`, where X=1,2 (the two different paths)
+- You may validate if you can ping from inside the MPTCP namespace in `mptcpUe` the DataNetwork in `mptpcProxy`, by running `sudo ip netns exec MPTCP ping -I v_mp_X 60.60.0.101`, where X=1,2 (for the case with two paths) or X=1,2,3 (for the case with three paths)
 - You may validate if MPTCPns has a route towards `60.60.0/24`
 - In mptcpProxy, you may validate that there is a route to `10.0.1/24` via `60.60.0.102` (`route -n`)
 - In `free5gc`, you may validate that UPF has one route towards `10.0.1/24` through device `upfgtp0` and one route to `60.60.0/24` through `veth_dn_u` (`sudo ip netns exec UPFns route -n`). You may also validate that IP forwarding is enabled in UPF namespace.
