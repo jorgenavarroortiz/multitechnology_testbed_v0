@@ -12,20 +12,22 @@
 #############################
 
 usage() {
-  echo "Usage: $0 [-n <NUM_UEs>] [-m -P <path manager> -S <scheduler> -C <congestion control>] [-a] [-s <SmfUeSubnet>] [-o <OvpnServerAddress>] [-h]" 1>&2;
+  echo "Usage: $0 [-n <NUM_UEs>] [-m -P <path manager> -S <scheduler> -C <congestion control>] [-a] [-s <SmfUeSubnet>] [-i <interface directly connected to the data network> -I <IP address of the interface connected to the data network>] [-o <OvpnServerAddress>] [-d] [-h]" 1>&2;
 
   echo ""
-  echo "E.g.: $0 -n 2 -m -P fullmesh -S default -C olia -a -s 10.0.1 -o 60.60.0.101"
+  echo "E.g.: $0 -n 2 -m -P fullmesh -S default -C olia -a -s 10.0.1 -o 60.60.0.101 -i eth3 -I 60.60.0.1/24"
   echo ""
   echo "       <path manager> ........... default, fullmesh, ndiffports, binder"
   echo "       <scheduler> .............. default, roundrobin, redundant"
   echo "       <congestion control> ..... reno, cubic, lia, olia, wvegas, balia, mctcpdesync"
   echo ""
+  echo "       -d ....................... print debug messages"
   echo "       -h ....................... this help"
   exit 1;
 }
 
 # Default values
+DEBUG=0
 NUM_UES=2
 MPTCP=True
 PATHMANAGER="fullmesh"
@@ -35,8 +37,11 @@ ATTACH=True
 SMF_UE_SUBNET="10.0.1"
 OVPN=True
 OVPN_SERVER_IP="60.60.0.101"
+IDN=False
+IFNAMEDN="eth3"
+IPDN="60.60.0.1/24"
 
-while getopts ":n:mP:S:C:as:o:h" o; do
+while getopts ":n:mP:S:C:as:o:i:I:dh" o; do
   case "${o}" in
     n)
       NUM_UES=${OPTARG}
@@ -76,6 +81,18 @@ while getopts ":n:mP:S:C:as:o:h" o; do
 	    OVPN_SERVER_IP=${OPTARG}
       echo "MPTCP namespace will launch OpenVPN tunnel"
       ;;
+    i)
+      IDN=True
+      IFNAMEDN=${OPTARG}
+      echo "IFNAMEDN="$IFNAMEDN
+      ;;
+    I)
+      IPDN=${OPTARG}
+      echo "IPDN="$IPDN
+      ;;
+    d)
+      DEBUG=1
+      ;;
     h)
       h=1
       ;;
@@ -86,7 +103,7 @@ while getopts ":n:mP:S:C:as:o:h" o; do
 done
 shift $((OPTIND-1))
 
-if [ $h -eq 1 ]; then
+if [[ $h == 1 ]]; then
   usage
 fi
 
@@ -108,13 +125,6 @@ else
   exit 1
 fi
 
-sudo -v
-if [ $? == 1 ]
-then
-  echo "Error: root permission is needed!"
-  exit 1
-fi
-
 GOPATH=$HOME/go
 if [ $OS == "Ubuntu" ]; then
   GOROOT=/usr/local/go
@@ -123,6 +133,12 @@ elif [ $OS == "Fedora" ]; then
 fi
 PATH=$PATH:$GOPATH/bin:$GOROOT/bin
 
+# Check if it is executed as root (exit otherwise)
+if [[ `id -u` != 0 ]]; then
+  echo "Please execute this script as root!"
+  exit 1
+fi
+
 ##############################
 # SETTING MPTCP PARAMETERS
 ##############################
@@ -130,18 +146,18 @@ PATH=$PATH:$GOPATH/bin:$GOROOT/bin
 # Show MPTCP version
 if [[ $DEBUG == 1 ]]; then
   echo ""; echo "[INFO] Show version and configuration parameters"
-  sudo dmesg | grep MPTCP
+  dmesg | grep MPTCP
 fi
 
 # Modify tunable variables
-sudo sysctl -w net.mptcp.mptcp_enabled=1     # Default 1
-sudo sysctl -w net.mptcp.mptcp_checksum=1    # Default 1 (both sides have to be 0 in order to disable this)
-sudo sysctl -w net.mptcp.mptcp_syn_retries=3 # Specifies how often we retransmit a SYN with the MP_CAPABLE-option. Default 3
-sudo sysctl -w net.mptcp.mptcp_path_manager=$PATHMANAGER
-sudo sysctl -w net.mptcp.mptcp_scheduler=$SCHEDULER
+sysctl -w net.mptcp.mptcp_enabled=1     # Default 1
+sysctl -w net.mptcp.mptcp_checksum=1    # Default 1 (both sides have to be 0 in order to disable this)
+sysctl -w net.mptcp.mptcp_syn_retries=3 # Specifies how often we retransmit a SYN with the MP_CAPABLE-option. Default 3
+sysctl -w net.mptcp.mptcp_path_manager=$PATHMANAGER
+sysctl -w net.mptcp.mptcp_scheduler=$SCHEDULER
 
 # Congestion control
-sudo sysctl -w net.ipv4.tcp_congestion_control=$CONGESTIONCONTROL
+sysctl -w net.ipv4.tcp_congestion_control=$CONGESTIONCONTROL
 
 #########################################
 # Create and prepare per-UE namespaces
@@ -150,9 +166,9 @@ sudo sysctl -w net.ipv4.tcp_congestion_control=$CONGESTIONCONTROL
 for i in $(seq 1 $NUM_UES)
 do
   UENS="UEns_"$i
-  EXEC_UENS="sudo ip netns exec ${UENS}"
+  EXEC_UENS="ip netns exec ${UENS}"
 
-  sudo ip netns add ${UENS}
+  ip netns add ${UENS}
 
   # JNa: Generalize the name of the network interface using if_names.txt
   card=`sed ${i}'q;d' if_names.txt`
@@ -160,20 +176,20 @@ do
 
   # Create bridge simulating L2 network
   BRNAME="br"$i
-  sudo brctl addbr $BRNAME
-  sudo ifconfig $card 0.0.0.0 up
-  sudo brctl addif $BRNAME $card # adding host eth interface to the bridge
+  brctl addbr $BRNAME
+  ifconfig $card 0.0.0.0 up
+  brctl addif $BRNAME $card # adding host eth interface to the bridge
 
 
   VETH_UE="veth_ue_"$i
   VETH_UE_BRIDGE="veth_ue_"$i"_"$BRNAME
-  sudo ip link add $VETH_UE type veth peer name $VETH_UE_BRIDGE
-  sudo ip link set $VETH_UE up
-  sudo ip link set $VETH_UE_BRIDGE up
-  sudo brctl addif $BRNAME $VETH_UE_BRIDGE
-  sudo ifconfig $BRNAME up
+  ip link add $VETH_UE type veth peer name $VETH_UE_BRIDGE
+  ip link set $VETH_UE up
+  ip link set $VETH_UE_BRIDGE up
+  brctl addif $BRNAME $VETH_UE_BRIDGE
+  ifconfig $BRNAME up
 
-  sudo ip link set $VETH_UE netns ${UENS} # Send other end of the veth pair to the UE namespace
+  ip link set $VETH_UE netns ${UENS} # Send other end of the veth pair to the UE namespace
 
   # Configure ipsec inside the UE namespace
   IP=$(($i + 2))
@@ -200,7 +216,7 @@ then
   do
     sleep 2
     UENS="UEns_"$i
-    EXEC_UENS="sudo ip netns exec ${UENS}"
+    EXEC_UENS="ip netns exec ${UENS}"
     IP=$(($i + 1))
     #export VETH_UE_IP="192.168.127."$IP
     export VETH_UE_IP="192.168.13."$IP
@@ -224,8 +240,8 @@ then
   echo "###############"
   echo "Preparing MPTCP namespace ..."
   MPTCPNS="MPTCPns"
-  EXEC_MPTCPNS="sudo ip netns exec ${MPTCPNS}"
-  sudo ip netns add ${MPTCPNS}
+  EXEC_MPTCPNS="ip netns exec ${MPTCPNS}"
+  ip netns add ${MPTCPNS}
 
   # Create veth_pair between the MPTCP namespace, and the UE namespace (UEs represent interfaces in this case)
   for i in $(seq 1 $NUM_UES)
@@ -233,34 +249,34 @@ then
     echo ""
     echo "Connecting MPTCP namespace to UE "$i
     UENS="UEns_"$i
-    EXEC_UENS="sudo ip netns exec ${UENS}"
+    EXEC_UENS="ip netns exec ${UENS}"
     VETH_UE="v_ue_"$i
     VETH_UE_H="v_ueh_"$i
     VETH_MPTCP="v_mp_"$i
     VETH_MPTCP_H="v_mph_"$i
-    sudo ip link add $VETH_UE type veth peer name $VETH_UE_H
-    sudo ip link add $VETH_MPTCP type veth peer name $VETH_MPTCP_H
-	  sudo brctl addbr "brmptcp_"$i
-	  sudo brctl addif "brmptcp_"$i $VETH_UE_H
-	  sudo brctl addif "brmptcp_"$i $VETH_MPTCP_H
-    sudo ip link set $VETH_UE_H up
-    sudo ip link set $VETH_MPTCP_H up
-    sudo ip link set "brmptcp_"$i up
-    sudo ip link set $VETH_UE netns ${UENS} # Send one end of the veth pair to the UE namespace
+    ip link add $VETH_UE type veth peer name $VETH_UE_H
+    ip link add $VETH_MPTCP type veth peer name $VETH_MPTCP_H
+    brctl addbr "brmptcp_"$i
+    brctl addif "brmptcp_"$i $VETH_UE_H
+    brctl addif "brmptcp_"$i $VETH_MPTCP_H
+    ip link set $VETH_UE_H up
+    ip link set $VETH_MPTCP_H up
+    ip link set "brmptcp_"$i up
+    ip link set $VETH_UE netns ${UENS} # Send one end of the veth pair to the UE namespace
     $EXEC_UENS ip link set $VETH_UE up
-    sudo ip link set $VETH_MPTCP netns ${MPTCPNS} # Send other end of the veth pair to the MPTCP namespace
+    ip link set $VETH_MPTCP netns ${MPTCPNS} # Send other end of the veth pair to the MPTCP namespace
     $EXEC_MPTCPNS ip link set $VETH_MPTCP up
-	  IP_UE=$SMF_UE_SUBNET"."$(($i + 2))"/24"
-	  IP_MPTCP=$SMF_UE_SUBNET"."$i"/24"
-	  IP_UE_SIMPLE=$SMF_UE_SUBNET"."$(($i + 2))
-	  IP_MPTCP_SIMPLE=$SMF_UE_SUBNET"."$i
-	  $EXEC_UENS ip addr add $IP_UE dev $VETH_UE
-	  $EXEC_UENS echo 1 > /proc/sys/net/ipv4/ip_forward # enable IP forwarding in the UE namespace
-	  $EXEC_MPTCPNS ip addr add $IP_MPTCP dev $VETH_MPTCP
+    IP_UE=$SMF_UE_SUBNET"."$(($i + 2))"/24"
+    IP_MPTCP=$SMF_UE_SUBNET"."$i"/24"
+    IP_UE_SIMPLE=$SMF_UE_SUBNET"."$(($i + 2))
+    IP_MPTCP_SIMPLE=$SMF_UE_SUBNET"."$i
+    $EXEC_UENS ip addr add $IP_UE dev $VETH_UE
+    $EXEC_UENS echo 1 > /proc/sys/net/ipv4/ip_forward # enable IP forwarding in the UE namespace
+    $EXEC_MPTCPNS ip addr add $IP_MPTCP dev $VETH_MPTCP
     $EXEC_MPTCPNS ifconfig $VETH_MPTCP mtu 1400 # done to avoid fragmentation which breaks ovpn setup
 
     #############
-	  # Adding a static route in the UPF to reach the MPTCP namespace
+    # Adding a static route in the UPF to reach the MPTCP namespace
 #    $EXEC_UPFNS route add -net $SMF_UE_SUBNET".0/24" dev upfgtp0
 
     #############
@@ -276,6 +292,51 @@ then
 
   done
 
+  # Interface directly connected to the data network (to mptcpProxy VM)
+  # *** Check that MPTCP is True (currently we are assuming that) ***
+  if [ ${IDN} == True ]; then
+    i=$(($NUM_UES + 1))
+    card=$IFNAMEDN
+    MPTCPNS="MPTCPns"
+    EXEC_MPTCPNS="ip netns exec ${MPTCPNS}"
+
+    VETH_MPTCP="v_mp_"$i
+    VETH_MPTCP_H="v_mph_"$i
+
+    ip link add $VETH_MPTCP type veth peer name $VETH_MPTCP_H
+    ifconfig $card 0.0.0.0 up
+    brctl addbr "brmptcp_"$i
+    brctl addif "brmptcp_"$i $card
+    brctl addif "brmptcp_"$i $VETH_MPTCP_H
+    ip link set $VETH_MPTCP_H up
+    ip link set "brmptcp_"$i up
+    ip link set $VETH_MPTCP netns ${MPTCPNS} # Send other end of the veth pair to the MPTCP namespace
+    $EXEC_MPTCPNS ip link set $VETH_MPTCP up
+    IP_MPTCP_SIMPLE=`echo $IPDN | cut -d "/" -f 1`
+    MaskCard=`echo $IPDN | cut -d "/" -f 2`
+    IP_MPTCP=$IPDN
+    GW_MPTCP=$OVPN_SERVER_IP ## *** Currently we are assuming that this interface is directly connected to the OVPN server ***
+    IFS=. read -r i1 i2 i3 i4 <<< $IP_MPTCP_SIMPLE
+    IFS=. read -r xx m1 m2 m3 m4 <<< $(for a in $(seq 1 32); do if [ $(((a - 1) % 8)) -eq 0 ]; then echo -n .; fi; if [ $a -le $MaskCard ]; then echo -n 1; else echo -n 0; fi; done)
+#    IFS=. read -r m1 m2 m3 m4 <<< "255.255.255.0"
+    NET_IP_MPTCP_SIMPLE=`printf "%d.%d.%d.%d\n" "$((i1 & (2#$m1)))" "$((i2 & (2#$m2)))" "$((i3 & (2#$m3)))" "$((i4 & (2#$m4)))"`
+    NET_IP_MPTCP=${NET_IP_MPTCP_SIMPLE}"/"${MaskCard}
+    if [[ $DEBUG == 1 ]]; then echo "NET_IP_MPTCP${i}: ${NET_IP_MPTCP}"; fi
+    if [[ $DEBUG == 1 ]]; then echo "GW_MPTCP${i}: ${GW_MPTCP}"; fi
+    $EXEC_MPTCPNS ip addr add $IP_MPTCP dev $VETH_MPTCP
+    $EXEC_MPTCPNS ifconfig $VETH_MPTCP mtu 1400   # done to avoid fragmentation which breaks ovpn setup
+
+    # Create routing tables for each interface
+    $EXEC_MPTCPNS ip rule add from $IP_MPTCP_SIMPLE table $i #2> /dev/null
+    $EXEC_MPTCPNS ip route add $NET_IP_MPTCP dev $VETH_MPTCP scope link table $i #2> /dev/null
+    $EXEC_MPTCPNS ip route add default via $GW_MPTCP dev $VETH_MPTCP table $i #2> /dev/null
+
+    # Probably not needed...
+    ip link set dev $card multipath on
+    ip link set dev $VETH_MPTCP_H multipath on
+    $EXEC_MPTCPNS ip link set dev $VETH_MPTCP multipath on
+  fi
+
   # Launching OVPN tunnel over MPTCP
   if [ ${OVPN} ]; then
     sleep 5
@@ -286,7 +347,7 @@ then
 
     # JNa: automatically modify the configuration file according to the OVPN server IP address
     cp ovpn-client1.conf.GENERIC ovpn-client1.conf
-    sed -i 's/SERVER_IP_ADDRESS/${OVPN_SERVER_IP}/' ovpn-client1.conf
+    sed -i 's/SERVER_IP_ADDRESS/'${OVPN_SERVER_IP}'/' ovpn-client1.conf
 
     $EXEC_MPTCPNS openvpn ovpn-client1.conf &
 
