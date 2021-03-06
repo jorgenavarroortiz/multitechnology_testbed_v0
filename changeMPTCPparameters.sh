@@ -1,56 +1,36 @@
 #!/usr/bin/env bash
 #
-# This script is used to setup the MPTCP proxy
+# This script is used to modify the MPTCP parameters
 #
-# Author: Daniel Camps (daniel.camps@i2cat.net)
-# Copyright: i2CAT
-# Modified by Jorge Navarro-Ortiz (jorgenavarro@ugr.es)
+# Author: Jorge Navarro-Ortiz (jorgenavarro@ugr.es)
+# Copyright: University of Granada
 
 #############################
 # Parsing inputs parameters
 #############################
 
 usage() {
-  echo "Usage: $0 [-i <IP address/mask>] [-I <interface name>] [-g <gateway IP address>] [-P <path manager> -S <scheduler> -C <congestion control> -c <CWND limited>] [-n] [-h]" 1>&2;
+  echo "Usage: $0 [-P <path manager>] [-S <scheduler>] [-C <congestion control>] [-c <CWND limited>] [-h]" 1>&2;
   echo ""
-  echo "Example: $0 -i 60.60.0.101/24 -I eth1 -g 60.60.0.102 -P fullmesh -S default -C olia"
+  echo "Example: $0 -P fullmesh -S default -C olia"
   echo ""
   echo "       <path manager> ........... default, fullmesh, ndiffports, binder"
   echo "       <scheduler> .............. default, roundrobin, redundant"
   echo "       <congestion control> ..... reno, cubic, lia, olia, wvegas, balia, mctcpdesync"
   echo "       <CWND limited> ........... for roundrobin, whether the scheduler tries to fill the congestion window on all subflows (Y) or whether it prefers to leave open space in the congestion window (N) to achieve real round-robin (even if the subflows have very different capacities)"
   echo ""
-  echo "       -n ....................... OVPN not used"
   echo "       -h ....................... this help"
   exit 1;
 }
 
 # Default values
-MYIP="60.60.0.101"
-GATEWAY="60.60.0.102"
 PATHMANAGER="fullmesh"
 SCHEDULER="default"
 CONGESTIONCONTROL="olia"
 CWNDLIMITED="Y"
-OVPN=1
 
-while getopts ":i:I:g:P:S:C:c:nh" o; do
+while getopts ":P:S:C:c:h" o; do
   case "${o}" in
-    i)
-      MYIP=${OPTARG}
-      i=1
-      echo "MYIP="$MYIP
-      ;;
-    I)
-      MYIFNAME=${OPTARG}
-      I=1
-      echo "MYIFNAME="$MYIFNAME
-      ;;
-    g)
-      GATEWAY=${OPTARG}
-      g=1
-      echo "GATEWAY="$GATEWAY
-      ;;
     P)
       P=1
       PATHMANAGER=${OPTARG}
@@ -70,9 +50,6 @@ while getopts ":i:I:g:P:S:C:c:nh" o; do
       c=1
       CWNDLIMITED=${OPTARG}
       echo "CWNDLIMITED="${OPTARG}
-      ;;
-    n)
-      OVPN=0
       ;;
     h)
       h=1
@@ -106,23 +83,3 @@ sysctl -w net.ipv4.tcp_congestion_control=$CONGESTIONCONTROL
 
 # CWND limited (only used if the scheduler is roundrobin)
 echo $CWNDLIMITED | tee /sys/module/mptcp_rr/parameters/cwnd_limited
-
-# Add data network IP address to eth1
-ifconfig $MYIFNAME $MYIP up
-
-# Add static route to reach MPTCP UEs
-while read p; do
-  ip route add $p via $GATEWAY dev eth1
-done <if_routes.txt
-
-if [[ $OVPN == 1 ]]; then
-  # Launch openvpn server
-  echo ""
-  echo "######################"
-  echo "# Launching OVPN server"
-  echo ""
-  cd ovpn-config-proxy/
-  openvpn ovpn-server.conf &
-fi
-
-# TODO: Bridge tap0 with exit interface
