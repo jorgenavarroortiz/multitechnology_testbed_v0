@@ -135,8 +135,8 @@ then
   echo "###############"
   echo "Preparing MPTCP namespace ..."
   MPTCPNS="MPTCPns"
-  EXEC_MPTCPNS="sudo ip netns exec ${MPTCPNS}"
-  sudo ip netns add ${MPTCPNS}
+  EXEC_MPTCPNS="ip netns exec ${MPTCPNS}"
+  ip netns add ${MPTCPNS}
 
   # Create veth_pair between the MPTCP namespace, and the UE namespace (UEs represent interfaces in this case)
   IP_GW=$SMF_UE_SUBNET"."$((1 + $NUM_UES))
@@ -146,14 +146,14 @@ then
     echo "Connecting MPTCP namespace to UE "$i
     VETH_MPTCP="v_mp_"$i
     VETH_MPTCP_H="v_mph_"$i
-    sudo ip link add $VETH_MPTCP type veth peer name $VETH_MPTCP_H
-    sudo ifconfig "eth"$i 0.0.0.0 up
-    sudo brctl addbr "brmptcp_"$i
-    sudo brctl addif "brmptcp_"$i "eth"$i
-    sudo brctl addif "brmptcp_"$i $VETH_MPTCP_H
-    sudo ip link set $VETH_MPTCP_H up
-    sudo ip link set "brmptcp_"$i up
-    sudo ip link set $VETH_MPTCP netns ${MPTCPNS} # Send other end of the veth pair to the MPTCP namespace
+    ip link add $VETH_MPTCP type veth peer name $VETH_MPTCP_H
+    ifconfig "eth"$i 0.0.0.0 up
+    brctl addbr "brmptcp_"$i
+    brctl addif "brmptcp_"$i "eth"$i
+    brctl addif "brmptcp_"$i $VETH_MPTCP_H
+    ip link set $VETH_MPTCP_H up
+    ip link set "brmptcp_"$i up
+    ip link set $VETH_MPTCP netns ${MPTCPNS} # Send other end of the veth pair to the MPTCP namespace
     $EXEC_MPTCPNS ip link set $VETH_MPTCP up
 
     IP_MPTCP=$SMF_UE_SUBNET"."$i"/24"
