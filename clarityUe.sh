@@ -12,7 +12,7 @@
 #############################
 
 usage() {
-  echo "Usage: $0 [-n <NUM_UEs>] [-m -P <path manager> -S <scheduler> -C <congestion control>] [-a] [-s <SmfUeSubnet>] [-i <interface directly connected to the data network> -I <IP address of the interface connected to the data network>] [-o <OvpnServerAddress>] [-d] [-h]" 1>&2;
+  echo "Usage: $0 [-n <NUM_UEs>] [-m -P <path manager> -S <scheduler> -C <congestion control> -c <CWND limited>] [-a] [-s <SmfUeSubnet>] [-i <interface directly connected to the data network> -I <IP address of the interface connected to the data network>] [-o <OvpnServerAddress>] [-d] [-h]" 1>&2;
 
   echo ""
   echo "E.g.: $0 -n 2 -m -P fullmesh -S default -C olia -a -s 10.0.1 -o 60.60.0.101 -i eth3 -I 60.60.0.1/24"
@@ -20,6 +20,7 @@ usage() {
   echo "       <path manager> ........... default, fullmesh, ndiffports, binder"
   echo "       <scheduler> .............. default, roundrobin, redundant"
   echo "       <congestion control> ..... reno, cubic, lia, olia, wvegas, balia, mctcpdesync"
+  echo "       <CWND limited> ........... for roundrobin, whether the scheduler tries to fill the congestion window on all subflows (Y) or whether it prefers to leave open space in the congestion window (N) to achieve real round-robin (even if the subflows have very different capacities)"
   echo ""
   echo "       -d ....................... print debug messages"
   echo "       -h ....................... this help"
@@ -33,6 +34,7 @@ MPTCP=True
 PATHMANAGER="fullmesh"
 SCHEDULER="default"
 CONGESTIONCONTROL="olia"
+CWNDLIMITED="Y"
 ATTACH=True
 SMF_UE_SUBNET="10.0.1"
 OVPN=True
@@ -41,7 +43,7 @@ IDN=False
 IFNAMEDN="eth3"
 IPDN="60.60.0.1/24"
 
-while getopts ":n:mP:S:C:as:o:i:I:dh" o; do
+while getopts ":n:mP:S:C:c:as:o:i:I:dh" o; do
   case "${o}" in
     n)
       NUM_UES=${OPTARG}
@@ -66,6 +68,11 @@ while getopts ":n:mP:S:C:as:o:i:I:dh" o; do
       c=1
       CONGESTIONCONTROL=${OPTARG}
       echo "CONGESTIONCONTROL="${OPTARG}
+      ;;
+    c)
+      c=1
+      CWNDLIMITED=${OPTARG}
+      echo "CWNDLIMITED="${OPTARG}
       ;;
 	  a)
 	    ATTACH=True
@@ -158,6 +165,9 @@ sysctl -w net.mptcp.mptcp_scheduler=$SCHEDULER
 
 # Congestion control
 sysctl -w net.ipv4.tcp_congestion_control=$CONGESTIONCONTROL
+
+# CWND limited (only used if the scheduler is roundrobin)
+echo $CWNDLIMITED | tee /sys/module/mptcp_rr/parameters/cwnd_limited
 
 #########################################
 # Create and prepare per-UE namespaces
