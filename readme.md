@@ -136,28 +136,6 @@ In this scenario, a VM (mptcpUe) employs three network interfaces (`eth1`, `eth2
 
 **NOTE**: If required, you can add more network interfaces to the mptcpUe VM to emulate more WATs connected through N3IWF (currently three interfaces are added). The scripts will utilize consecutive network interfaces starting from eth1, eth2, eth3, etcetera.
 
-[//]: # (**Launch scenario 2 without 5G core network**)
-
-[//]: # (The following image shows the scenario.)
-
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario2_simple.png" width="1200">
-
-To setup this scenario the following scripts have to be run in this order:
-
-- **mptcpProxy**: change to the `$HOME/free5gc/mptcp_test` directory and run `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -g 60.60.0.102 -n 60.60.0 -f 101 -o server`.
-
-- **free5gc**: change to the `$HOME/go/src/free5gc/mptcp_test` directory and run `./configure_free5gc_simple.sh`.
-
-- **mptcpUe**: change to the `$HOME/go/src/free5gc/mptcp_test` directory and run `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -g 10.1.1.222 -n 10.1.1 -u 3 -f 1 -m -o client`.
-
-To test that MPTCP is working properly, run the following scripts:
-
-- **mptcpProxy**: Check that there is a `tap0` interface by running `ifconfig`. Change to the `$HOME/free5gc/mptcp_test` directory and run `./test_throughput_tcp_server.sh`.
-
-- **mptcpUe**: Enter into namespace MPTCPns by running `sudo ip netns exec MPTCPns bash`. Check that there is a `tap0` interface by running `ifconfig`. Then launch `./test_throughput_tcp_client.sh -c 10.8.0.1 & ifstat`. You can change the interfaces state by using the script `change_interface_state.sh`, e.g. `./change_interface_state.sh -i eth2 -s backup`, `./change_interface_state.sh -i eth1 -s off`, etcetera.
-
-**Launch scenario 2 with 5G core network**
-
 The following image shows the scenario. You can watch a [video](https://youtu.be/AYZm-uw-ZXU) showing how it works.
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario2_free5gc.png" width="1200">
