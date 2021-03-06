@@ -34,7 +34,7 @@ SCHEDULER="default"
 CONGESTIONCONTROL="olia"
 CWNDLIMITED="Y"
 SMF_UE_SUBNET="10.0.1"
-OVPN=True
+OVPN=False
 OVPN_SERVER_IP="60.60.0.101"
 
 while getopts ":n:mP:S:C:c:s:o:h" o; do
@@ -179,7 +179,7 @@ then
   done
 
   # Launching OVPN tunnel over MPTCP
-  if [ ${OVPN} ]; then
+  if [[ $OVPN == True ]]; then
     sleep 5
     echo ""
     echo "Launching OVPN tunnel over MPTCP to transport L2 packets"
