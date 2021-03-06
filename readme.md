@@ -136,7 +136,7 @@ In this scenario, a VM (mptcpUe) employs three network interfaces (`eth1`, `eth2
 
 **NOTE**: If required, you can add more network interfaces to the mptcpUe VM to emulate more WATs connected through N3IWF (currently three interfaces are added). The scripts will utilize consecutive network interfaces starting from eth1, eth2, eth3, etcetera.
 
-**Launch scenario 2 without 5G core network**
+<--**Launch scenario 2 without 5G core network**
 
 The following image shows the scenario.
 
@@ -155,6 +155,7 @@ To test that MPTCP is working properly, run the following scripts:
 - **mptcpProxy**: Check that there is a `tap0` interface by running `ifconfig`. Change to the `$HOME/free5gc/mptcp_test` directory and run `./test_throughput_tcp_server.sh`.
 
 - **mptcpUe**: Enter into namespace MPTCPns by running `sudo ip netns exec MPTCPns bash`. Check that there is a `tap0` interface by running `ifconfig`. Then launch `./test_throughput_tcp_client.sh -c 10.8.0.1 & ifstat`. You can change the interfaces state by using the script `change_interface_state.sh`, e.g. `./change_interface_state.sh -i eth2 -s backup`, `./change_interface_state.sh -i eth1 -s off`, etcetera.
+-->
 
 **Launch scenario 2 with 5G core network**
 
