@@ -4,40 +4,54 @@
 #
 # Author: Daniel Camps (daniel.camps@i2cat.net)
 # Copyright: i2CAT
+# Modified by Jorge Navarro-Ortiz (jorgenavarro@ugr.es)
 
 
 #############################
 # Parsing inputs parameters
 #############################
 
-usage() { echo "Usage: $0 [-n <NUM_UEs>] [-s <SmfUeSubnet>]" 1>&2; exit 1; }
+# Default values
+NUM_UES=2
+SMF_UE_SUBNET="10.0.1"
 
-while getopts ":n:mas:o:" o; do
-    case "${o}" in
-        n)
-            NUM_UES=${OPTARG}
-	    n=1
-	    echo "NUM_UEs="$NUM_UES
-            ;;
-        s)
-            t=1
-            SMF_UE_SUBNET=${OPTARG}
-            echo "UE Subnet configured in SMF="$SMF_UE_SUBNET
-            ;;
-        *)
-            usage
-            ;;
-    esac
+usage() { echo "Usage: $0 [-n <NUM_UEs>] [-s <SmfUeSubnet>] [-h]" 1>&2; exit 1; }
+
+while getopts ":n:s:h" o; do
+  case "${o}" in
+    n)
+      n=1
+      NUM_UES=${OPTARG}
+      echo "NUM_UEs="$NUM_UES
+      ;;
+    s)
+      s=1
+      SMF_UE_SUBNET=${OPTARG}
+      echo "UE Subnet configured in SMF="$SMF_UE_SUBNET
+      ;;
+    h)
+      h=1
+      ;;
+    *)
+      usage
+      ;;
+  esac
 done
 shift $((OPTIND-1))
 
-if [ -z "${t}" ] || [ -z "${n}" ]; then
-    usage
+if [[ $h == 1 ]]; then
+  usage
+fi
+
+# Check if it is executed as root (exit otherwise)
+if [[ `id -u` != 0 ]]; then
+  echo "Please execute this script as root!"
+  exit 1
 fi
 
 # Assign IP addresses to the network interfaces
-sudo ifconfig eth1 ${SMF_UE_SUBNET}.$((1 + $NUM_UES))/24
-sudo ifconfig eth2 60.60.0.102/24
+ifconfig eth1 ${SMF_UE_SUBNET}.$((1 + $NUM_UES))/24
+ifconfig eth2 60.60.0.102/24
 
 # Enable IP forwarding
-sudo sysctl -w net.ipv4.ip_forward=1
+sysctl -w net.ipv4.ip_forward=1
