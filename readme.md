@@ -96,7 +96,7 @@ To setup this scenario the following scripts have to be run in this order:
 
 **NOTE<sub>2</sub>**: If you need a client connected with three paths to a server with 1 path, just use `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_same_network_UE2 -u 1 -m` on the machine `mptcpUe2`.
 
-NOTE<sub>2</sub>: The OpenVPN configuration files on both server and client are now automatically adjusted.
+NOTE<sub>3</sub>: The OpenVPN configuration files on both server and client are now automatically adjusted.
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1_set_MPTCP_parameters.png" width="1200">
 
