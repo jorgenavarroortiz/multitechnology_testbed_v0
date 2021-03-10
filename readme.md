@@ -27,7 +27,7 @@ In both scenarios, a Vagrantfile has been developed to install the required kern
 
 ### Hardware and software requirements
 
-Please use free5GC Stage 3 Installation Guide ([GitHub](https://github.com/free5gc/free5gc-stage-3)) as reference.
+Please use free5GC Stage 3 Installation Guide ([free5GC on GitHub](https://github.com/free5gc/free5gc-stage-3)) as reference.
 
 **Hardware requirements**
 
