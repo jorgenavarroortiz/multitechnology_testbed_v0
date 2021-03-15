@@ -23,6 +23,8 @@ usage() {
   echo "       <CWND limited> ........... for roundrobin, whether the scheduler tries to fill the congestion window on all subflows (Y) or whether it prefers to leave open space in the congestion window (N) to achieve real round-robin (even if the subflows have very different capacities)"
   echo ""
   echo "       -h ....................... this help"
+  echo ""
+  echo "Please remember to update the file if_names.txt according to your needs. This file includes the names of the network interfaces that will be used for MPTCP (one row per interface)."
   exit 1;
 }
 
@@ -144,12 +146,17 @@ then
   do
     echo ""
     echo "Connecting MPTCP namespace to UE "$i
+
+    # JNa: Generalize the name of the network interface using if_names.txt
+    card=`sed ${i}'q;d' if_names.txt`
+    echo "Interface: $card"
+
     VETH_MPTCP="v_mp_"$i
     VETH_MPTCP_H="v_mph_"$i
     ip link add $VETH_MPTCP type veth peer name $VETH_MPTCP_H
-    ifconfig "eth"$i 0.0.0.0 up
+    ifconfig $card 0.0.0.0 up
     brctl addbr "brmptcp_"$i
-    brctl addif "brmptcp_"$i "eth"$i
+    brctl addif "brmptcp_"$i $card
     brctl addif "brmptcp_"$i $VETH_MPTCP_H
     ip link set $VETH_MPTCP_H up
     ip link set "brmptcp_"$i up

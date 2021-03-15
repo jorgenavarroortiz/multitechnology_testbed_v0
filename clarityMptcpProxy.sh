@@ -22,6 +22,8 @@ usage() {
   echo ""
   echo "       -n ....................... OVPN not used"
   echo "       -h ....................... this help"
+  echo ""
+  echo "Please remember to update the file if_routes.txt according to your needs. This file includes the routes that shall be included to reach the UEs."
   exit 1;
 }
 
