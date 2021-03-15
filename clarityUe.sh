@@ -24,6 +24,8 @@ usage() {
   echo ""
   echo "       -d ....................... print debug messages"
   echo "       -h ....................... this help"
+  echo ""
+  echo "Please remember to update the file if_names.txt according to your needs. This file includes the names of the network interfaces that will be used for MPTCP (one row per interface)."
   exit 1;
 }
 
