@@ -14,8 +14,8 @@
 # Default values
 NUM_UES=2
 SMF_UE_SUBNET="10.0.1"
-CardToUEs="eth1"
-CardToDN="eth2"
+CardToUEs="eth1" #"enp2s0"
+CardToDN="eth2"  #"enx6038e0e3083f"
 
 usage() { echo "Usage: $0 [-n <NUM_UEs>] [-s <SmfUeSubnet>] [-i <interface directly connected to the data network>] [-] [-h]" 1>&2; exit 1; }
 
