@@ -14,10 +14,12 @@
 # Default values
 NUM_UES=2
 SMF_UE_SUBNET="10.0.1"
+CardToUEs="eth1"
+CardToDN="eth2"
 
-usage() { echo "Usage: $0 [-n <NUM_UEs>] [-s <SmfUeSubnet>] [-h]" 1>&2; exit 1; }
+usage() { echo "Usage: $0 [-n <NUM_UEs>] [-s <SmfUeSubnet>] [-i <interface directly connected to the data network>] [-] [-h]" 1>&2; exit 1; }
 
-while getopts ":n:s:h" o; do
+while getopts ":n:s:i:j:h" o; do
   case "${o}" in
     n)
       n=1
@@ -28,6 +30,14 @@ while getopts ":n:s:h" o; do
       s=1
       SMF_UE_SUBNET=${OPTARG}
       echo "UE Subnet configured in SMF="$SMF_UE_SUBNET
+      ;;
+    i)
+      CardToDN=${OPTARG}
+      echo "CardToDN="$CardToDN
+      ;;
+    j)
+      CardToUEs=${OPTARG}
+      echo "CardToUEs="$CardToUEs
       ;;
     h)
       h=1
@@ -50,8 +60,8 @@ if [[ `id -u` != 0 ]]; then
 fi
 
 # Assign IP addresses to the network interfaces
-ifconfig eth1 ${SMF_UE_SUBNET}.$((1 + $NUM_UES))/24
-ifconfig eth2 60.60.0.102/24
+ifconfig $CardToUEs ${SMF_UE_SUBNET}.$((1 + $NUM_UES))/24
+ifconfig $CardToDN 60.60.0.102/24
 
 # Enable IP forwarding
 sysctl -w net.ipv4.ip_forward=1
