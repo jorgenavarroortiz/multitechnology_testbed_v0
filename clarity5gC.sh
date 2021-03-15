@@ -16,13 +16,14 @@ IPSecN3IWF="192.168.13.2"
 ############################
 
 # Default values
+CardToDN="enx6038e0e3083f" #"eth2"
 NUM_UES=2
 BUILD_UPF=True
 SMF_UE_SUBNET="10.0.1"
 
-usage() { echo "Usage: $0 [-n <NUM_UEs>] [-u] [-s <SmfUeSubnet>] [-h]" 1>&2; exit 1; }
+usage() { echo "Usage: $0 [-n <NUM_UEs>] [-u] [-s <SmfUeSubnet>] [-i <interface directly connected to the data network>] [-h]" 1>&2; exit 1; }
 
-while getopts ":n:us:h" o; do
+while getopts ":n:us:i:h" o; do
     case "${o}" in
         n)
             NUM_UES=${OPTARG}
@@ -37,6 +38,10 @@ while getopts ":n:us:h" o; do
             t=1
             SMF_UE_SUBNET=${OPTARG}
             echo "UE Subnet configured in SMF="$SMF_UE_SUBNET
+            ;;
+        i)
+            CardToDN=${OPTARG}
+            echo "CardToDN="$CardToDN
             ;;
         h)
           h=1
@@ -148,8 +153,8 @@ sudo ip link set veth_dn_u netns ${UPFNS}
 ${EXEC_UPFNS} ip link set veth_dn_u up
 BRNAME="br_dn"
 sudo brctl addbr $BRNAME
-sudo ifconfig "eth2" 0.0.0.0 up
-sudo brctl addif $BRNAME "eth2"
+sudo ifconfig $CardToDN 0.0.0.0 up
+sudo brctl addif $BRNAME $CardToDN
 sudo brctl addif $BRNAME veth_dn_h
 sudo ifconfig $BRNAME up
 
