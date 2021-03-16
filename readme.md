@@ -260,7 +260,7 @@ Congratulations! With these steps, you should have the kernel and the packages a
 
 ## Raspberry Pi 4 (64 bits) installation
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/rpi4.png" width="512">
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/rpi4.jpg" width="512">
 
 _TO BE DONE_
 
