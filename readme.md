@@ -260,6 +260,8 @@ Congratulations! With these steps, you should have the kernel and the packages a
 
 ## Raspberry Pi 4 (64 bits) installation
 
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/rpi4.png" width="512">
+
 _TO BE DONE_
 
-Currently you can find kernel 5.5 (64 bits) with MPTCP support in the ``vagrant/vagrant/MPTCP_kernel5.5_RPi`` directory. **The MPTCP patch has been included and it has compiled correctly, but it has to be tested.**
+Currently you can find kernel 5.5 (64 bits) with MPTCP support in the ``vagrant/vagrant/MPTCP_kernel5.5_RPi`` directory. **The MPTCP patch has been included and it has compiled correctly, but it has not been tested yet.**
