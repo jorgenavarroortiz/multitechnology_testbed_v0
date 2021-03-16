@@ -257,3 +257,9 @@ bash ./free5gc_control_plane_installation.sh
 Congratulations! With these steps, you should have the kernel and the packages available at the `mptcpUe` VM from testbed v0.
 
 **NOTE**: The scripts from testbed v0 assumed `eth0` and `eth1` as the names of the network interfaces. The names in the NUC are `eno1` for Ethernet and `wlp0s20f3` for Wi-Fi. You may need to modify the scripts to use any interface names (see if_names.txt and related files).
+
+## Raspberry Pi 4 (64 bits) installation
+
+_TO BE DONE_
+
+Currently you can find kernel 5.5 (64 bits) with MPTCP support in the ``vagrant/vagrant/MPTCP_kernel5.5_RPi`` directory. **The MPTCP patch has been included and it has compiled correctly, but it has to be tested.**
