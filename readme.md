@@ -306,6 +306,6 @@ sudo ./nuc.sh
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/rpi4.jpg" width="512">
 
-Currently you can find kernel 5.5 (64 bits) with MPTCP support in the ``vagrant/vagrant/MPTCP_kernel5.5_RPi`` directory. **The MPTCP patch has been included and it has compiled correctly, but it has not been tested yet.**
+Currently you can find kernel 5.5 (64 bits) with MPTCP support in the ``vagrant/vagrant/MPTCP_kernel5.5_RPi`` directory. Tested with [Raspberry Pi OS (64 bits)](https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2020-08-24/2020-08-20-raspios-buster-arm64-lite.zip).
 
-_TO BE DONE_
+_TO BE WRITTEN (kernel installation + iperf + ifstat, update if_names.txt.scenario1_different_networks_UEX to use eth0 and eth1, same commands for set_MPTCP_parameters.sh; also install iproute-mptcp if we want to use MPTCP states (on,off,backup))_
