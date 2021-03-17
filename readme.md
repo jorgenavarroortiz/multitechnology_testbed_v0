@@ -208,7 +208,7 @@ The results can be plotted with xplot.org. **NOTE**: Remember to redirect the DI
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/pcap_process_plot.png" width="800">
 
-# TCP congestion window
+### TCP congestion window
 
 TCP congestion window related information is local, i.e. it is not sent in TCP packets. It is possible to add events for TCP congestion window tracing using the `/sys/kernel/debug/tracing/events/tcp/tcp_probe` file. We have developed some scripts to ease this task.
 
@@ -257,6 +257,50 @@ bash ./free5gc_control_plane_installation.sh
 Congratulations! With these steps, you should have the kernel and the packages available at the `mptcpUe` VM from testbed v0.
 
 **NOTE**: The scripts from testbed v0 assumed `eth0` and `eth1` as the names of the network interfaces. The names in the NUC are `eno1` for Ethernet and `wlp0s20f3` for Wi-Fi. You may need to modify the scripts to use any interface names (see if_names.txt and related files).
+
+## Launching SCENARIO 2: UE <-> free5GC <-> proxy with NUC
+
+In order to launch this scenario using a NUC, please follow these steps:
+
+**PC working as mptcpProxy**:
+- Check that the network interface that connects to the PC working as free5gc is configured with the correct IP address (60.60.0.101/24).
+- Execute the following commands (assuming that `enp2s0` is the name of that network interface):
+```
+cd free5gc
+sudo ./clarityMptcpProxy.sh -i 60.60.0.101/24 -I enp2s0 -g 60.60.0.102 -P fullmesh -S default -C olia
+```
+
+**PC working as free5gc**:
+- Check that the network interface that connects to the NUC (working as mptcpUe) has the correct IP address (192.168.13.2/24).
+- Check that the network interface that connects to the PC working as mptcpProxy has the correct IP address (60.60.0.102/24).
+- Execute the following commands (assuming that `enx6038e0e3083f` is the name of the network interface that connects to the mptcpProxy):
+
+```
+cd go/src/free5gc
+sudo ./clarity5gC.sh -n 2 -u -s 10.0.1 -i enx6038e0e3083f
+```
+
+**NUC**:
+- We assume that the network interfaces are named `eno1` for the Ethernet card and `wlp0s20f3` for the WIFI6 card. Then, execute:
+
+```
+cd go/src/free5gc
+sudo ./nuc.sh
+```
+
+** [TO BE FINISHED; explain here the nuc_connect_to_wifi.sh script..., and include the killing of the previous wpa_supplicant processes...]**
+
+- After that, check that the network card is connected to the WIFI6 access point. For that purpose, execute:
+
+`sudo ip netns exec UEns_2 iwconfig`
+
+- If the NUC is correctly connected, run:
+
+`sudo ./clarityUe_NUC.sh -n 2 -m -P fullmesh -S default -C olia -a -s 10.0.1 -o 60.60.0.101`
+
+- You can check that everything works fine following the commands explained in scenario 2 (with `ping` and `iperf`, within the `MPTCPns` namespace).
+
+**[Include here a picture with the results -> low datarate (~ 2 Mpbs) due to the low performance of free5gc]**
 
 ## Raspberry Pi 4 (64 bits) installation
 
