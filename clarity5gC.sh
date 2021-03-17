@@ -16,7 +16,7 @@ IPSecN3IWF="192.168.13.2"
 ############################
 
 # Default values
-CardToDN="enx6038e0e3083f" #"eth2"
+CardToDN="eth2" # "enx6038e0e3083f"
 NUM_UES=2
 BUILD_UPF=True
 SMF_UE_SUBNET="10.0.1"
