@@ -314,9 +314,7 @@ For this purpose, you should setup 2 Raspberry Pi 4. Currently it has been teste
 
 - Install [Raspberry Pi OS (64 bits)](https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2020-08-24/2020-08-20-raspios-buster-arm64-lite.zip). If you are using Windows on your PC, you could use e.g. [RUFUS](https://rufus.ie/) to save the image to the SD card.
 - Boot and add your network configuration so the RPi4 has Internet connectivity.
-- Install `iperf` and `ifstat` by executing `sudo apt-get update & sudo apt-get install iperf ifstat`.
-- Install `iproute-mptcp` (TO BE TESTED, NEEDED ONLY IF THE INTERFACES SHOULD HAVE MPTCP STATES ON/OFF/BACKUP).
-- Copy the directory [MPTCP_kernel5.5_RPi](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/tree/main/vagrant/vagrant/MPTCP_kernel5.5_RPi) from this repo to `$HOME`. Enter the directory and execute `sudo ./mptcp_kernel_installation_rpi4.sh`.
+- Copy the directory [MPTCP_kernel5.5_RPi](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/tree/main/vagrant/vagrant/MPTCP_kernel5.5_RPi) from this repo to `$HOME`. Enter the directory and execute `sudo ./mptcp_kernel_installation_rpi4.sh`. After a reboot, enter again the directory and execute `sudo ./mptcp_additional_installation_rpi4.sh`  to install `iperf`, `ifstat` and `iproute-mptcp`.
 - Copy the directory `mptcp_test` from this repo to `$HOME`.
 - Change the content of if_names.txt.scenario1_different_networks_UEX, X=1,2, so that the first network cards are `eth0` and `eth1` (you should check the name of the network cards using `ifconfig`).
 - On the first RPi4, we will use IP addresses 1.1.1.1/24 and 1.1.2.1/24. Execute `./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_different_networks_UE1 -u 2`.
