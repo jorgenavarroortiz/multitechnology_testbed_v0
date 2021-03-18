@@ -306,8 +306,21 @@ sudo ./nuc.sh
 
 ## Raspberry Pi 4 (64 bits) installation
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/rpi_scenario1.jpeg" width="512">
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/rpi4.jpg" width="368">
 
 Currently you can find kernel [rpi-5.5.y](https://github.com/raspberrypi/linux/tree/rpi-5.5.y) with MPTCP support in the ``vagrant/vagrant/MPTCP_kernel5.5_RPi`` directory. Tested with [Raspberry Pi OS (64 bits)](https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2020-08-24/2020-08-20-raspios-buster-arm64-lite.zip).
 
-_TO BE WRITTEN (kernel installation + iperf + ifstat, update if_names.txt.scenario1_different_networks_UEX to use eth0 and eth1, same commands for set_MPTCP_parameters.sh; also install iproute-mptcp if we want to use MPTCP states (on,off,backup))_
+For this purpose, you should setup 2 Raspberry Pi 4. Currently it has been tested with two Ethernets (the one available in the Raspberry Pi, and one USB Ethernet adapter), `eth0` and `eth1`. Then follow these steps for each RPi4:
+
+- Install [Raspberry Pi OS (64 bits)](https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2020-08-24/2020-08-20-raspios-buster-arm64-lite.zip). If you are using Windows on your PC, you could use e.g. [RUFUS](https://rufus.ie/) to save the image to the SD card.
+- Boot and add your network configuration so the RPi4 has Internet connectivity.
+- Install `iperf` and `ifstat` by executing `sudo apt-get update & sudo apt-get install iperf ifstat`.
+- Install `iproute-mptcp` (TO BE TESTED, NEEDED ONLY IF THE INTERFACES SHOULD HAVE MPTCP STATES ON/OFF/BACKUP).
+- Copy the directory [MPTCP_kernel5.5_RPi](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/tree/main/vagrant/vagrant/MPTCP_kernel5.5_RPi) from this repo to `$HOME`. Enter the directory and execute `sudo ./mptcp_kernel_installation_rpi4.sh` (SCRIPT TO BE DONE).
+- Copy the directory `mptcp_test` from this repo to `$HOME`.
+- Change the content of if_names.txt.scenario1_different_networks_UEX, X=1,2, so that the first network cards are `eth0` and `eth1` (you should check the name of the network cards using `ifconfig`).
+- On the first RPi4, we will use IP addresses 1.1.1.1/24 and 1.1.2.1/24. Execute `./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_different_networks_UE1 -u 2`.
+- On the second RPi4, we will use IP addresses 1.1.1.2/24 and 1.1.2.2/24. Execute `./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_different_networks_UE2 -u 2`.
+- You can check that it works by executing on the first RPi4 `iperf -s & ifstat` and on the second RPi4 `iperf -c 1.1.1.1 & ifstat`.
+
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/rpi_scenario1.jpeg" width="512">
