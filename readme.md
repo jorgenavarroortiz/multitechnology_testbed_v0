@@ -4,6 +4,8 @@ Testbed v0 (virtualized environment) for the 5G-CLARITY European Project. Based 
 
 We have also included instructions to install MPTCP in NUC (Intel NUC 10 NUC10i7FNH) using kernel ~~5.4~~5.5, which supports the usage of the Intel Wi-Fi 6 AX201 module.
 
+Similarly, it has also been tested (scenario 1, i.e. without free5gc) using a Raspberry Pi 4 with 4 GB with Raspberry OS (64 bits), based on kernel rpi-5.5.y with support for MPTCP.
+
 You can watch a [video](https://youtu.be/_7CiYgILo1g) showing how [scenario 1](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-scenario-1-two-virtual-machines-directly-connected) works.
 
 You can watch a [video](https://youtu.be/AYZm-uw-ZXU) showing how [scenario 2](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-scenario-2-ue---free5gc---proxy) works.
@@ -306,6 +308,6 @@ sudo ./nuc.sh
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/rpi4.jpg" width="512">
 
-Currently you can find kernel 5.5 (64 bits) with MPTCP support in the ``vagrant/vagrant/MPTCP_kernel5.5_RPi`` directory. Tested with [Raspberry Pi OS (64 bits)](https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2020-08-24/2020-08-20-raspios-buster-arm64-lite.zip).
+Currently you can find kernel [rpi-5.5.y](https://github.com/raspberrypi/linux/tree/rpi-5.5.y) with MPTCP support in the ``vagrant/vagrant/MPTCP_kernel5.5_RPi`` directory. Tested with [Raspberry Pi OS (64 bits)](https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2020-08-24/2020-08-20-raspios-buster-arm64-lite.zip).
 
 _TO BE WRITTEN (kernel installation + iperf + ifstat, update if_names.txt.scenario1_different_networks_UEX to use eth0 and eth1, same commands for set_MPTCP_parameters.sh; also install iproute-mptcp if we want to use MPTCP states (on,off,backup))_
