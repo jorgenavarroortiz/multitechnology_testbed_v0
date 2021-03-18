@@ -306,7 +306,7 @@ sudo ./nuc.sh
 
 ## Raspberry Pi 4 (64 bits) installation
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/rpi_scenario1.jpg" width="512">
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/rpi_scenario1.jpeg" width="512">
 
 Currently you can find kernel [rpi-5.5.y](https://github.com/raspberrypi/linux/tree/rpi-5.5.y) with MPTCP support in the ``vagrant/vagrant/MPTCP_kernel5.5_RPi`` directory. Tested with [Raspberry Pi OS (64 bits)](https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2020-08-24/2020-08-20-raspios-buster-arm64-lite.zip).
 
