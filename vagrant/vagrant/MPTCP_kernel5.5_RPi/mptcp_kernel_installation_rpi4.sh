@@ -1,5 +1,5 @@
-#/bin/bash
-# Jorge Navarro-Ortiz (jorgenavarro@ugr.es), 2021
+#!/bin/bash
+# Jorge Navarro (jorgenavarro@ugr.es), Univerity of Granada
 
 sudo dpkg -i linux-image-5.5.19-v8+_5.5.19-v8+-4_arm64.deb
 sudo dpkg -i linux-headers-5.5.19-v8+_5.5.19-v8+-4_arm64.deb
