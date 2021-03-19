@@ -70,7 +70,7 @@ while getopts ":p:s:C:c:f:u:mo:S:d" o; do
     m)
       ns=1
       MPTCPNS="MPTCPns"
-      EXEC_MPTCPNS="sudo ip netns exec ${MPTCPNS}"
+      EXEC_MPTCPNS="ip netns exec ${MPTCPNS}"
       echo "NAMESPACE=MPTCPns"
       ;;
     o)
@@ -126,7 +126,7 @@ fi
 ##############################
 #./configure.sh
 if [[ $ns == 0 ]]; then
-#  sudo ifconfig eth0 down
+#  ifconfig eth0 down
   for i in $(seq 1 $NUM_UES)
   do
 #    card="eth"$i
@@ -134,7 +134,7 @@ if [[ $ns == 0 ]]; then
 #    IPcard=$SMF_UE_SUBNET"."$(( LAST_BYTE_FIRST_UE+i-1 ))"/24"
     IPcard=`sed ${i}'q;d' $FILENAME | cut -f 2 -d ' ' | cut -f 1 -d '/'`
     MaskCard=`sed ${i}'q;d' $FILENAME | cut -f 2 -d ' ' | cut -f 2 -d '/'`
-    sudo ifconfig $card ${IPcard}/${MaskCard}
+    ifconfig $card ${IPcard}/${MaskCard}
   done
 fi
 
@@ -149,18 +149,18 @@ GlobalGW=$GW
 # Show MPTCP version
 if [[ $DEBUG == 1 ]]; then
   echo ""; echo "[INFO] Show version and configuration parameters"
-  sudo dmesg | grep MPTCP
+  dmesg | grep MPTCP
 fi
 
 # Modify tunable variables
-sudo sysctl -w net.mptcp.mptcp_enabled=1     # Default 1
-sudo sysctl -w net.mptcp.mptcp_checksum=1    # Default 1 (both sides have to be 0 in order to disable this)
-sudo sysctl -w net.mptcp.mptcp_syn_retries=3 # Specifies how often we retransmit a SYN with the MP_CAPABLE-option. Default 3
-sudo sysctl -w net.mptcp.mptcp_path_manager=$PATHMANAGER
-sudo sysctl -w net.mptcp.mptcp_scheduler=$SCHEDULER
+sysctl -w net.mptcp.mptcp_enabled=1     # Default 1
+sysctl -w net.mptcp.mptcp_checksum=1    # Default 1 (both sides have to be 0 in order to disable this)
+sysctl -w net.mptcp.mptcp_syn_retries=3 # Specifies how often we retransmit a SYN with the MP_CAPABLE-option. Default 3
+sysctl -w net.mptcp.mptcp_path_manager=$PATHMANAGER
+sysctl -w net.mptcp.mptcp_scheduler=$SCHEDULER
 
 # Congestion control
-sudo sysctl -w net.ipv4.tcp_congestion_control=$CONGESTIONCONTROL
+sysctl -w net.ipv4.tcp_congestion_control=$CONGESTIONCONTROL
 
 # CWND limited (only used if the scheduler is roundrobin)
 echo $CWNDLIMITED | tee /sys/module/mptcp_rr/parameters/cwnd_limited
@@ -177,12 +177,12 @@ if [[ $ns == 0 ]]; then
 #    card="eth"$i
     card=`sed ${i}'q;d' $FILENAME | cut -f 1 -d ' '`
 
-    sudo ip link set dev $card multipath on
+    ip link set dev $card multipath on
   done
 
 else
   # Using MPTCPns namespace
-  sudo ip netns add ${MPTCPNS}
+  ip netns add ${MPTCPNS}
 
   # Create veth_pair between the MPTCP namespace, and the UE namespace (UEs represent interfaces in this case)
   for i in $(seq 1 $NUM_UES)
@@ -192,19 +192,23 @@ else
       echo "Connecting MPTCP namespace to UE "$i
     fi
 
-    card=`sed ${i}'q;d' $FILENAME | cut -f 1 -d ' '`
-
+    UENS="UEns_"$i
+    EXEC_UENS="ip netns exec ${UENS}"
+    VETH_UE="v_ue_"$i
+    VETH_UE_H="v_ueh_"$i
     VETH_MPTCP="v_mp_"$i
     VETH_MPTCP_H="v_mph_"$i
-
-    sudo ip link add $VETH_MPTCP type veth peer name $VETH_MPTCP_H
-    sudo ifconfig $card 0.0.0.0 up
-    sudo brctl addbr "brmptcp_"$i
-    sudo brctl addif "brmptcp_"$i $card
-    sudo brctl addif "brmptcp_"$i $VETH_MPTCP_H
-    sudo ip link set $VETH_MPTCP_H up
-    sudo ip link set "brmptcp_"$i up
-    sudo ip link set $VETH_MPTCP netns ${MPTCPNS} # Send other end of the veth pair to the MPTCP namespace
+    ip link add $VETH_UE type veth peer name $VETH_UE_H
+    ip link add $VETH_MPTCP type veth peer name $VETH_MPTCP_H
+    brctl addbr "brmptcp_"$i
+    brctl addif "brmptcp_"$i $VETH_UE_H
+    brctl addif "brmptcp_"$i $VETH_MPTCP_H
+    ip link set $VETH_UE_H up
+    ip link set $VETH_MPTCP_H up
+    ip link set "brmptcp_"$i up
+    ip link set $VETH_UE netns ${UENS} # Send one end of the veth pair to the UE namespace
+    $EXEC_UENS ip link set $VETH_UE up
+    ip link set $VETH_MPTCP netns ${MPTCPNS} # Send other end of the veth pair to the MPTCP namespace
     $EXEC_MPTCPNS ip link set $VETH_MPTCP up
 
     IP_MPTCP_SIMPLE=`sed ${i}'q;d' $FILENAME | cut -f 2 -d ' ' | cut -f 1 -d '/'`
@@ -231,11 +235,11 @@ fi
 
 # Disable interfaces for MPTCP (eth0 = NAT connection in VMs, to be modified for real machines)
 if [[ $REAL_MACHINE == 0 ]]; then
-  sudo ip link set dev eth0 multipath off
+  ip link set dev eth0 multipath off
 fi
 
 # Remove previous rules
-for i in {32700..32765}; do sudo ip rule del pref $i 2>/dev/null ; done
+for i in {32700..32765}; do ip rule del pref $i 2>/dev/null ; done
 
 if [[ $ns == 0 ]]; then
   # Configure each interface (no namespaces)
@@ -254,33 +258,33 @@ if [[ $ns == 0 ]]; then
 #    GWcard=$GW
     # Create routing tables for each interface
     if [[ $DEBUG == 1 ]]; then
-      sudo ip rule add from $IPcard table $i
-      sudo ip route add ${NETcard}/24 dev $card scope link table $i
-      sudo ip route add default via $GWcard dev $card table $i
+      ip rule add from $IPcard table $i
+      ip route add ${NETcard}/24 dev $card scope link table $i
+      ip route add default via $GWcard dev $card table $i
     else
-      sudo ip rule add from $IPcard table $i 2> /dev/null
-      sudo ip route add ${NETcard}/24 dev $card scope link table $i 2> /dev/null
-      sudo ip route add default via $GWcard dev $card table $i 2> /dev/null
+      ip rule add from $IPcard table $i 2> /dev/null
+      ip route add ${NETcard}/24 dev $card scope link table $i 2> /dev/null
+      ip route add default via $GWcard dev $card table $i 2> /dev/null
     fi
   done
 
   # Default route
   if [[ $DEBUG == 1 ]]; then
-    sudo ip route add default scope global nexthop via $GlobalGW dev $GlobalEth
+    ip route add default scope global nexthop via $GlobalGW dev $GlobalEth
   else
-    sudo ip route add default scope global nexthop via $GlobalGW dev $GlobalEth 2> /dev/null
+    ip route add default scope global nexthop via $GlobalGW dev $GlobalEth 2> /dev/null
   fi
 
   # Showing routing information
   if [[ $DEBUG == 1 ]]; then
     echo ""; echo "[INFO] Show rules"
-    sudo ip rule show
+    ip rule show
     echo ""; echo "[INFO] Show routes"
-    sudo ip route
+    ip route
     echo ""; echo "[INFO] Show routing table 1"
-    sudo ip route show table 1
+    ip route show table 1
     echo ""; echo "[INFO] Show routing table 2"
-    sudo ip route show table 2
+    ip route show table 2
   fi
 
 else
@@ -321,8 +325,8 @@ else
 
     # Probably not needed...
     card=`sed ${i}'q;d' $FILENAME | cut -f 1 -d ' '`
-    sudo ip link set dev $card multipath on
-    sudo ip link set dev $VETH_MPTCP_H multipath on
+    ip link set dev $card multipath on
+    ip link set dev $VETH_MPTCP_H multipath on
     $EXEC_MPTCPNS ip link set dev $VETH_MPTCP multipath on
   done
 
