@@ -34,7 +34,6 @@ SCHEDULER="default"
 CONGESTIONCONTROL="olia"
 CWNDLIMITED="Y"
 OVPN=False
-SMF_UE_SUBNET="10.0.1"
 
 while getopts ":p:s:C:c:f:u:mo:S:d" o; do
   case "${o}" in
