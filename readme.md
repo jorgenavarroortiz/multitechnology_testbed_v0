@@ -316,9 +316,9 @@ For this purpose, you should setup 2 Raspberry Pi 4. Currently it has been teste
 - Boot and add your network configuration so the RPi4 has Internet connectivity.
 - Copy the directory [MPTCP_kernel5.5_RPi](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/tree/main/vagrant/vagrant/MPTCP_kernel5.5_RPi) from this repo to `$HOME`. Enter the directory and execute `sudo ./mptcp_kernel_installation_rpi4.sh`. After a reboot, enter again the directory and execute `sudo ./mptcp_additional_installation_rpi4.sh`  to install `iperf`, `ifstat` and `iproute-mptcp`.
 - Copy the directory `mptcp_test` from this repo to `$HOME`.
-- Change the content of if_names.txt.scenario1_different_networks_UEX, X=1,2, so that the first network cards are `eth0` and `eth1` (you should check the name of the network cards using `ifconfig`).
-- On the first RPi4, we will use IP addresses 1.1.1.1/24 and 1.1.2.1/24. Execute `./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_different_networks_UE1 -u 2`.
-- On the second RPi4, we will use IP addresses 1.1.1.2/24 and 1.1.2.2/24. Execute `./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_different_networks_UE2 -u 2`.
+- Use if_names.txt.scenario1_different_networks_RPiX, X=1,2, so that the first network cards are `eth0` and `eth1` (you should check the name of the network cards using `ifconfig`).
+- On the first RPi4, we will use IP addresses 1.1.1.1/24 and 1.1.2.1/24. Execute `./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_different_networks_RPi1 -u 2`.
+- On the second RPi4, we will use IP addresses 1.1.1.2/24 and 1.1.2.2/24. Execute `./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_different_networks_RPi2 -u 2`.
 - You can check that it works by executing on the first RPi4 `iperf -s & ifstat` and on the second RPi4 `iperf -c 1.1.1.1 & ifstat`.
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/rpi_scenario1.jpeg" width="512">
