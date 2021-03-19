@@ -6,7 +6,7 @@
 #############################
 
 usage() {
-  echo "Usage: $0 -p <path manager> -s <scheduler> -c <congestion control> -f <filename> [-u <num_UEs>] [-m] [-o <server/client>] [-S <OVPN server IP address>] [-d]" 1>&2;
+  echo "Usage: $0 [-p <path manager> -s <scheduler> -C <congestion control> -c <CWND limited>] -f <filename> [-u <num_UEs>] [-m] [-o <server/client>] [-S <OVPN server IP address>] [-d]" 1>&2;
   echo ""
   echo "E.g. for mptcpProxy: $0 -p fullmesh -s default -c olia -f if_names.txt.scenario1_different_networks_UE1 -u 3 -m -o server"
   echo "E.g. for mptcpUe:    $0 -p fullmesh -s default -c olia -f if_names.txt.scenario1_different_networks_UE2 -u 3 -m -o client -S 10.1.1.1";
@@ -14,6 +14,7 @@ usage() {
   echo "       <path manager> ........... default, fullmesh, ndiffports, binder"
   echo "       <scheduler> .............. default, roundrobin, redundant"
   echo "       <congestion control> ..... reno, cubic, lia, olia, wvegas, balia, mctcpdesync"
+  echo "       <CWND limited> ........... for roundrobin, whether the scheduler tries to fill the congestion window on all subflows (Y) or whether it prefers to leave open space in the congestion window (N) to achieve real round-robin (even if the subflows have very different capacities)"
   echo "       <filename> ............... defines the interfaces to be used (one per line), with format <interface name> <IP address/netmask> <gateway IP address>"
   echo "       -m ....................... create namespace MPTCPns with virtual interfaces"
   echo "       -o ....................... create an OpenVPN connection, indicating if this entity is server or client"
@@ -25,9 +26,16 @@ usage() {
 # Default values
 REAL_MACHINE=0
 ns=0
-LAST_BYTE_FIRST_UE=1
+DEBUG=0
+NUM_UES=2
+MPTCP=True
+PATHMANAGER="fullmesh"
+SCHEDULER="default"
+CONGESTIONCONTROL="olia"
+CWNDLIMITED="Y"
+OVPN=False
 
-while getopts ":p:s:c:f:u:mo:S:d" o; do
+while getopts ":p:s:C:c:f:u:mo:S:d" o; do
   case "${o}" in
     p)
       p=1
@@ -39,10 +47,15 @@ while getopts ":p:s:c:f:u:mo:S:d" o; do
       SCHEDULER=${OPTARG}
       echo "SCHEDULER="$SCHEDULER
       ;;
-    c)
+    C)
       c=1
       CONGESTIONCONTROL=${OPTARG}
       echo "CONGESTIONCONTROL="${OPTARG}
+      ;;
+    c)
+      w=1
+      CWNDLIMITED=${OPTARG}
+      echo "CWNDLIMITED="${OPTARG}
       ;;
     f)
       f=1
@@ -80,9 +93,9 @@ while getopts ":p:s:c:f:u:mo:S:d" o; do
 done
 shift $((OPTIND-1))
 
-#if [ -z "${p}" ] || [ -z "${s}" ] || [ -z "${c}" ] || [ -z "${f}" ] || [ -z "${u}" ] || [ -z "${OVPN}" ]; then
-#  usage
-#fi
+if [[ $h == 1 ]]; then
+  usage
+fi
 
 ##############################
 # Environment configuration
@@ -102,20 +115,11 @@ else
   exit 1
 fi
 
-#sudo -v
-#if [ $? == 1 ]
-#then
-# echo "Error: root permission is needed!"
-# exit 1
-#fi
-
-GOPATH=$HOME/go
-if [ $OS == "Ubuntu" ]; then
-  GOROOT=/usr/local/go
-elif [ $OS == "Fedora" ]; then
-  GOROOT=/usr/lib/golang
+# Check if it is executed as root (exit otherwise)
+if [[ `id -u` != 0 ]]; then
+  echo "Please execute this script as root!"
+  exit 1
 fi
-PATH=$PATH:$GOPATH/bin:$GOROOT/bin
 
 ##############################
 # CONFIGURATION
@@ -157,6 +161,14 @@ sudo sysctl -w net.mptcp.mptcp_scheduler=$SCHEDULER
 
 # Congestion control
 sudo sysctl -w net.ipv4.tcp_congestion_control=$CONGESTIONCONTROL
+
+# CWND limited (only used if the scheduler is roundrobin)
+echo $CWNDLIMITED | tee /sys/module/mptcp_rr/parameters/cwnd_limited
+
+
+##################
+# Configure network interfaces (including namespaces if required)
+##################
 
 if [[ $ns == 0 ]]; then
   # Configure each interface (no namespaces)
