@@ -322,3 +322,5 @@ For this purpose, you should setup 2 Raspberry Pi 4. Currently it has been teste
 - You can check that it works by executing on the first RPi4 `iperf -s & ifstat` and on the second RPi4 `iperf -c 1.1.1.1 & ifstat`.
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/rpi_scenario1.jpeg" width="512">
+
+**UPDATE**: An installable kernel 5.5 with MPTCP support and Weighted Round-Robin (WRR) v0.3 is available at [rpi-5.5.y-wrr03](https://github.com/raspberrypi/linux/tree/rpi-5.5.y-wrr03) directory. **WRR on RPi4 has yet to be tested!!!**
