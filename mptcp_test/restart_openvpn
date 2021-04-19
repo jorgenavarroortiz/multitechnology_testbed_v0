@@ -1,0 +1,55 @@
+#!/bin/bash
+
+# This script is used to restart openvpn from within the MPTCPns. Useful when you change the scheduler and want to restart openvpn
+
+#############################
+# Parsing inputs parameters
+#############################
+usage() {
+  echo "Usage: $0 -m <client/server>" 1>&2;
+  echo " This script should be launched from within MPTCPns!"
+  echo "       -m ....................... client/server"
+  exit 1;
+}
+
+while getopts ":m:" o; do
+  case "${o}" in
+    m)
+      MODE=${OPTARG}
+      echo "MODE="$MODE
+      ;;
+    *)
+      usage
+      ;;
+  esac
+done
+shift $((OPTIND-1))
+
+
+# Killing current openvpn connection
+echo "Killing ongoing openvpn processes ..."
+sudo killall openvpn
+sleep 3
+
+# Setting up new connection
+if [ $MODE == "client" ]; then
+  cd ovpn-config-client
+  cp ovpn-client1.conf.GENERIC ovpn-client1.conf
+  openvpn ovpn-client1.conf &
+fi
+
+if [ $MODE == "server" ]; then
+  cd ovpn-config-proxy
+  openvpn ovpn-server.conf &
+fi
+
+# It is required to remove tap0 from the MPTCP interfaces pool.
+# Otherwise, it will start not working intermittently.
+sleep 5
+TAPIF=`$EXEC_OVPN ip link show | grep tap -m 1 | cut -d ":" -f 2 | tr -d " "`
+echo "TAPIF: $TAPIF"
+ip link set dev ${TAPIF} multipath off
+
+
+
+
