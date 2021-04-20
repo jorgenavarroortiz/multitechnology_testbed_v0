@@ -331,4 +331,4 @@ For this purpose, you should setup 2 Raspberry Pi 4. Currently it has been teste
 - To modify the weights on each RPi4, go to the [mptcp_ctrl](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/tree/main/vagrant/vagrant/MPTCP_kernel5.5-WRR0.3_RPi4/mptcp_ctrl) directory and execute `python 3 -c 'import time; import mptcp_wrr_controller as wrr; rules = [{"src_ip":"10.1.1.1", "weight":3},{"src_ip":"10.1.2.1", "weight":1},{"src_ip":"10.1.3.1", "weight":1}]; wrr.set_local_interfaces_rules(rules)'`. This will use weight=3 for `eth0` and weight=1 for `eth1` (the weight for the third interface is not used in this case). Repeat for each RPi4.
 - Now you can test the proper behaviour using `iperf` within the `MPTCPns` namespace.
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/rpi4_wrr03_test.jpg" width="368">
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/rpi4_wrr03_test.jpg" width="512">
