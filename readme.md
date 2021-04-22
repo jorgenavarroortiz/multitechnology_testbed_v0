@@ -139,7 +139,7 @@ In order to perform some experiments, remember to use the namespace `MPTCPns` an
 
 In order to create a scneario with several OVPN servers, you have two alternatives:
 
-- If the VMs have to be deployed, change the value of the variable `VMS_COUNT` to the number of servers plus one (i.e. the client). Then, copy the if_names.txt.scenario1_same_network_UE1 to if_names.txt.scenario1_same_network_UEX (where X is the VM number, #VM) and modify the IP addresses to 3 * #VM + 1, 3 * #VM + 2 and 3 * #VM + 3. These files are created for the first three servers plus one client (the last file).
+- If the VMs have to be deployed, change the value of the variable `VMS_COUNT` to the number of servers plus one (i.e. the client). Then, copy the if_names.txt.scenario1_same_network_UE1 to if_names.txt.scenario1_same_network_UEX (where X is the VM number, #VM) and modify the last byte of the IP addresses to 3 * #VM + 1, 3 * #VM + 2 and 3 * #VM + 3. These files are created for the first three servers plus one client (the last file).
 
 - If you have already deployed 2 VMs (mptcpUe1 and mptcpUe2), you can create one (or several) clone of e.g. mptcpUe3. Then, you will have to change the name to mptcpUeX (where X is #VM) (on VirtualBox but also within the VM, modifying the files /etc/hostname and /etc/hosts -> this is not required but it is more clear), forward TCP port X2222 to 22 (using `vboxmanage`) and modify the files commented on the previous bullet point.
 
