@@ -23,3 +23,7 @@ bin/
 #backups
 *.save
 *.bak
+
+#ssh key
+id_rsa
+id_rsa.pub
