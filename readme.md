@@ -116,7 +116,8 @@ You can see that there are data sent on both interfaces (`eth1` and `eth2`).
 
 Additionally, you can check that each interface can be active (on), inactive (off) or used as backup (backup) on MPTCP. For that purpose, you can use the `change_interface_state.sh` script. In the following example, the test started with both interfaces as active, then 1) changing `eth2` to `backup` (so it would transfer data only if the other interface is inactive), next 2) changing `eth1` to `off` (so data was transferred using `eth2`), and finally 3) `eth1` becoming active again (so data was transferred only using `eth1`). Similarly, you can perform any other similar tests.
 
-**IMPORTANT**: The `backup` state is only used with the `default` scheduler. In the case of the `roundrobin` scheduler, `backup` is treated as `on` (i.e. the interface remains active).
+
+IMPORTANT**: The `backup` state is only used with the `default` scheduler. In the case of the `roundrobin` scheduler, `backup` is treated as `on` (i.e. the interface remains active).
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1_change_interfaces_state.png" width="1200">
 
@@ -133,6 +134,26 @@ To use a namespace (`MTPCPns`) and OpenVPN in both VMs, you have to run:
 In order to perform some experiments, remember to use the namespace `MPTCPns` and its network interfaces. For simplicity, you can run `sudo ip netns exec MPTCPns bash`. In the namespace, you can check the network interfaces by executing `ifconfig` (you should have interfaces `v_mp_1`, `v_mp_2` and `v_mp_3` for the three MPTCP paths, with IP addresses 10.1.1.X/24, with X=1..3 on the first machine and X=4..6 on the second machine, and `tun0`, with IP address 10.8.0.1/24 on the server and 10.8.0.2/24 on the client).
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1_test_namespace_ovpn.png" width="800">
+
+**Launching scenario 1 with multiple proxies (OVPN servers) with different schedulers**
+
+In order to create a scneario with several OVPN servers, you have two alternatives:
+
+- If the VMs have to be deployed, change the value of the variable `VMS_COUNT` to the number of servers plus one (i.e. the client). Then, copy the if_names.txt.scenario1_same_network_UE1 to if_names.txt.scenario1_same_network_UEX (where X is the VM number, #VM) and modify the last byte of the IP addresses to 3 * #VM + 1, 3 * #VM + 2 and 3 * #VM + 3. These files are created for the first three servers plus one client (the last file).
+
+- If you have already deployed 2 VMs (mptcpUe1 and mptcpUe2), you can create one (or several) clone of e.g. mptcpUe3. Then, you will have to change the name to mptcpUeX (where X is #VM) (on VirtualBox but also within the VM, modifying the files /etc/hostname and /etc/hosts -> this is not required but it is more clear), forward TCP port X2222 to 22 (using `vboxmanage`) and modify the files commented on the previous bullet point.
+
+To launch this scenario, e.g. with two servers, you can follow these steps:
+
+- In the machine `mptcpUe1` (which will act as server with scheduler "default") run `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_same_network_UE1 -u 3 -m -o server -N 10.8.0.0`
+
+- In the machine `mptcpUe2` (which will act as server with scheduler "roundrobin") run `./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_same_network_UE2 -u 3 -m -o server -N 10.9.0.0`
+
+- In the machine `mptcpUe3` (which will act as client, with scheduler "default" for the connection to `mptcpUe1` and scheduler "roundrobin" for the connection to `mptcpUe2`) run `./set_MPTCP_parameters.sh -p fullmesh -s default -s roundrobin -c olia -f if_names.txt.scenario1_same_network_UE3 -u 3 -m -o client -S 10.1.1.1 -S 10.1.1.4`
+
+The following image shows how iperf performs different to one server (10.8.0.1 using "default" scheduler) and to another server (10.9.0.1 using "roundrobin" scheduler).
+
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/scenario1_twoservers.png" width="800">
 
 ## Launching SCENARIO 2: UE <-> free5GC <-> proxy
 
