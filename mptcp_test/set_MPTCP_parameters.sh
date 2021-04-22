@@ -85,7 +85,7 @@ shift $((OPTIND-1))
 #fi
 
 CWNDLIMITED=Y # default Y
-echo $CWNDLIMITED | tee /sys/module/mptcp_rr/parameters/cwnd_limited
+echo $CWNDLIMITED | sudo tee /sys/module/mptcp_rr/parameters/cwnd_limited
 
 ##############################
 # Environment configuration
