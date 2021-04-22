@@ -10,7 +10,8 @@ usage() {
   echo ""
   echo "E.g. for mptcpUe1: $0 -p fullmesh -s default -c olia -f if_names.txt.scenario1_different_networks_UE1 -u 3 -m -o server -N 10.8.0.0"
   echo "E.g. for mptcpUe2: $0 -p fullmesh -s default -c olia -f if_names.txt.scenario1_different_networks_UE2 -u 3 -m -o client -S 10.1.1.1"
-  echo "NOTE: You can include several servers in the client by repeating -S <OVPN server IP address> "
+  echo "NOTE: You can include several servers in the client by repeating -S <OVPN server IP address>. Similarly, you can include several MPTCP schedulers (one per server) in the client by repeating -s <scheduler>."
+  echo "The number of servers has to match the number of MPTCP schedulers."
   echo ""
   echo "       <path manager> ........... default, fullmesh, ndiffports, binder"
   echo "       <scheduler> .............. default, roundrobin, redundant"
@@ -32,6 +33,7 @@ LAST_BYTE_FIRST_UE=1
 CWNDLIMITED="Y"
 OVPN_NETWORK_ADDRESS="10.8.0.0"
 
+s=0
 S=0
 while getopts ":p:s:C:c:f:u:mo:N:S:d" o; do
   case "${o}" in
@@ -41,9 +43,9 @@ while getopts ":p:s:C:c:f:u:mo:N:S:d" o; do
       echo "PATHMANAGER="$PATHMANAGER
       ;;
     s)
-      s=1
-      SCHEDULER=${OPTARG}
-      echo "SCHEDULER="$SCHEDULER
+      s=s+1
+      SCHEDULER+=("$OPTARG")
+      echo "SCHEDULER="$OPTARG
       ;;
     c)
       c=1
@@ -101,7 +103,11 @@ shift $((OPTIND-1))
 #  usage
 #fi
 
-CWNDLIMITED=N # default Y
+if [[ ${#SCHEDULER[@]} != ${#OVPN_SERVER_IP[@]} ]]; then
+  echo "The number of OVPN servers has to match the number of MPTCP schedulers"
+  exit
+fi
+
 echo "CWND limited:"
 echo $CWNDLIMITED | sudo tee /sys/module/mptcp_rr/parameters/cwnd_limited
 
@@ -174,7 +180,9 @@ sudo sysctl -w net.mptcp.mptcp_enabled=1     # Default 1
 sudo sysctl -w net.mptcp.mptcp_checksum=1    # Default 1 (both sides have to be 0 in order to disable this)
 sudo sysctl -w net.mptcp.mptcp_syn_retries=3 # Specifies how often we retransmit a SYN with the MP_CAPABLE-option. Default 3
 sudo sysctl -w net.mptcp.mptcp_path_manager=$PATHMANAGER
-sudo sysctl -w net.mptcp.mptcp_scheduler=$SCHEDULER
+if [[ ${#SCHEDULER[@]} == 1 ]]; then
+  sudo sysctl -w net.mptcp.mptcp_scheduler=${SCHEDULER[0]}
+fi
 
 # Congestion control
 sudo sysctl -w net.ipv4.tcp_congestion_control=$CONGESTIONCONTROL
@@ -373,6 +381,10 @@ if [[ $OVPN == 1 ]]; then
     for val in "${OVPN_SERVER_IP[@]}"; do
       i=$((i+1))
       echo "Creating VPN $i connecting to server at $val through tap$((i-1))..."
+
+      # Change the MPTCP scheduler before the new OVPN connection (over MPTCP) is created
+      sudo sysctl -w net.mptcp.mptcp_scheduler=${SCHEDULER[$((i-1))]}
+      sleep 1
 
       cp ovpn-client.conf.GENERIC ovpn-client${i}.conf
       sed -i 's/SERVER_IP_ADDRESS/'${val}'/' ovpn-client${i}.conf
