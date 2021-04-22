@@ -6,7 +6,7 @@
 #############################
 
 usage() {
-  echo "Usage: $0 -p <path manager> -s <scheduler> -c <congestion control> -f <filename> [-u <num_UEs>] [-m] [-o <server/client>] [-S <OVPN server IP address>] [-d]" 1>&2;
+  echo "Usage: $0 -p <path manager> -s <scheduler> -C <CWND limited> -c <congestion control> -f <filename> [-u <num_UEs>] [-m] [-o <server/client>] [-S <OVPN server IP address>] [-d]" 1>&2;
   echo ""
   echo "E.g. for mptcpProxy: $0 -p fullmesh -s default -c olia -f if_names.txt.scenario1_different_networks_UE1 -u 3 -m -o server"
   echo "E.g. for mptcpUe:    $0 -p fullmesh -s default -c olia -f if_names.txt.scenario1_different_networks_UE2 -u 3 -m -o client -S 10.1.1.1";
@@ -14,6 +14,7 @@ usage() {
   echo "       <path manager> ........... default, fullmesh, ndiffports, binder"
   echo "       <scheduler> .............. default, roundrobin, redundant"
   echo "       <congestion control> ..... reno, cubic, lia, olia, wvegas, balia, mctcpdesync"
+  echo "       <CWND limited> ........... for roundrobin, whether the scheduler tries to fill the congestion window on all subflows (Y) (default) or whether it prefers to leave open space in the congestion window (N) to achieve real round-robin (even if the subflows have very different capacities)"
   echo "       <filename> ............... defines the interfaces to be used (one per line), with format <interface name> <IP address/netmask> <gateway IP address>"
   echo "       -m ....................... create namespace MPTCPns with virtual interfaces"
   echo "       -o ....................... create an OpenVPN connection, indicating if this entity is server or client"
@@ -26,8 +27,9 @@ usage() {
 REAL_MACHINE=0
 ns=0
 LAST_BYTE_FIRST_UE=1
+CWNDLIMITED="Y"
 
-while getopts ":p:s:c:f:u:mo:S:d" o; do
+while getopts ":p:s:C:c:f:u:mo:S:d" o; do
   case "${o}" in
     p)
       p=1
@@ -43,6 +45,11 @@ while getopts ":p:s:c:f:u:mo:S:d" o; do
       c=1
       CONGESTIONCONTROL=${OPTARG}
       echo "CONGESTIONCONTROL="${OPTARG}
+      ;;
+    C)
+      w=1
+      CWNDLIMITED=${OPTARG}
+      echo "CWNDLIMITED="${OPTARG}
       ;;
     f)
       f=1
@@ -84,7 +91,7 @@ shift $((OPTIND-1))
 #  usage
 #fi
 
-CWNDLIMITED=Y # default Y
+CWNDLIMITED=N # default Y
 echo $CWNDLIMITED | sudo tee /sys/module/mptcp_rr/parameters/cwnd_limited
 
 ##############################
