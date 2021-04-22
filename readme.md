@@ -323,4 +323,12 @@ For this purpose, you should setup 2 Raspberry Pi 4. Currently it has been teste
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/rpi_scenario1.jpeg" width="512">
 
-**UPDATE**: An installable kernel 5.5 with MPTCP support and Weighted Round-Robin (WRR) v0.3 is available in the [MPTCP_kernel5.5-WRR0.3_RPi4](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/tree/main/vagrant/vagrant/MPTCP_kernel5.5-WRR0.3_RPi4) directory. **WRR on RPi4 has yet to be tested!!!**
+**UPDATE**: An installable kernel 5.5 with MPTCP support and Weighted Round-Robin (WRR) v0.3 is available in the [MPTCP_kernel5.5-WRR0.3_RPi4](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/tree/main/vagrant/vagrant/MPTCP_kernel5.5-WRR0.3_RPi4) directory. **Tested with two network interfaces** (the one from RPi and one USB-Ethernet adapter). Follow these steps for testing WRR v0.3:
+
+- Install the MPTCP kernel in the RPi4 by executing the script `mptcp_kernel_installation_rpi4.sh`. After reboot, check that it is installed by executing `uname -r`. Then execute the script `mptcp_additional_installation_rpi4.sh` to install the required packages. Repeat this for the second RPi.
+- On the first RPi4, go to the `mptcp_test` directory and execute `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_different_networks_RPi1 -u 2 -m -o server` (we assume that the Ethernet interfaces are eth0 and eth1, update the file `if_names.txt.scenario1_different_networks_RPi1` if needed).
+- On the second RPi4, go to the `mptcp_test` directory and execute `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_different_networks_RPi2 -u 2 -m -o client -S 10.1.1.1`.
+- To modify the weights on each RPi4, go to the [mptcp_ctrl](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/tree/main/vagrant/vagrant/MPTCP_kernel5.5-WRR0.3_RPi4/mptcp_ctrl) directory and execute `python 3 -c 'import time; import mptcp_wrr_controller as wrr; rules = [{"src_ip":"10.1.1.1", "weight":3},{"src_ip":"10.1.2.1", "weight":1},{"src_ip":"10.1.3.1", "weight":1}]; wrr.set_local_interfaces_rules(rules)'`. This will use weight=3 for `eth0` and weight=1 for `eth1` (the weight for the third interface is not used in this case). Repeat for each RPi4.
+- Now you can test the proper behaviour using `iperf` within the `MPTCPns` namespace.
+
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/rpi4_wrr03_test.jpg" width="512">
