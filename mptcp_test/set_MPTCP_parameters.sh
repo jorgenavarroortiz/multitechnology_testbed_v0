@@ -6,10 +6,11 @@
 #############################
 
 usage() {
-  echo "Usage: $0 -p <path manager> -s <scheduler> -C <CWND limited> -c <congestion control> -f <filename> [-u <num_UEs>] [-m] [-o <server/client>] [-S <OVPN server IP address>] [-d]" 1>&2;
+  echo "Usage: $0 -p <path manager> -s <scheduler> -C <CWND limited> -c <congestion control> -f <filename> [-u <num_UEs>] [-m] [-o <server/client>] [-N <OVPN IP network>] [-S <OVPN server IP address>] [-d]" 1>&2;
   echo ""
-  echo "E.g. for mptcpProxy: $0 -p fullmesh -s default -c olia -f if_names.txt.scenario1_different_networks_UE1 -u 3 -m -o server"
-  echo "E.g. for mptcpUe:    $0 -p fullmesh -s default -c olia -f if_names.txt.scenario1_different_networks_UE2 -u 3 -m -o client -S 10.1.1.1";
+  echo "E.g. for mptcpUe1: $0 -p fullmesh -s default -c olia -f if_names.txt.scenario1_different_networks_UE1 -u 3 -m -o server -N 10.8.0.0"
+  echo "E.g. for mptcpUe2: $0 -p fullmesh -s default -c olia -f if_names.txt.scenario1_different_networks_UE2 -u 3 -m -o client -S 10.1.1.1"
+  echo "NOTE: You can include several servers in the client by repeating -S <OVPN server IP address> "
   echo ""
   echo "       <path manager> ........... default, fullmesh, ndiffports, binder"
   echo "       <scheduler> .............. default, roundrobin, redundant"
@@ -18,7 +19,8 @@ usage() {
   echo "       <filename> ............... defines the interfaces to be used (one per line), with format <interface name> <IP address/netmask> <gateway IP address>"
   echo "       -m ....................... create namespace MPTCPns with virtual interfaces"
   echo "       -o ....................... create an OpenVPN connection, indicating if this entity is server or client"
-  echo "       -S ....................... OVPN server IP address"
+  echo "       -N ....................... OVPN network address (only for server)"
+  echo "       -S ....................... OVPN server IP address (only for client)"
   echo "       -d ....................... print debug messages"
   exit 1;
 }
@@ -28,8 +30,10 @@ REAL_MACHINE=0
 ns=0
 LAST_BYTE_FIRST_UE=1
 CWNDLIMITED="Y"
+OVPN_NETWORK_ADDRESS="10.8.0.0"
 
-while getopts ":p:s:C:c:f:u:mo:S:d" o; do
+S=0
+while getopts ":p:s:C:c:f:u:mo:N:S:d" o; do
   case "${o}" in
     p)
       p=1
@@ -68,14 +72,20 @@ while getopts ":p:s:C:c:f:u:mo:S:d" o; do
       echo "NAMESPACE=MPTCPns"
       ;;
     o)
-        OVPN=1
-        OVPN_ENTITY=${OPTARG}
-        echo "Create an OpenVPN connection"
-        ;;
+      OVPN=1
+      OVPN_ENTITY=${OPTARG}
+      echo "Create an OpenVPN connection"
+      ;;
+    N)
+      OVPN_NETWORK_ADDRESS=${OPTARG}
+      echo "OVPN network address ${OPTARG}"
+      ;;
     S)
-        OVPN_SERVER_IP=${OPTARG}
-        echo "OVPN server IP address"
-        ;;
+      S=S+1
+#      OVPN_SERVER_IP=${OPTARG}
+      OVPN_SERVER_IP+=("$OPTARG")
+      echo "OVPN server IP address ${OPTARG}"
+      ;;
     d)
       DEBUG=1
       echo "Include debug messages"
@@ -92,6 +102,7 @@ shift $((OPTIND-1))
 #fi
 
 CWNDLIMITED=N # default Y
+echo "CWND limited:"
 echo $CWNDLIMITED | sudo tee /sys/module/mptcp_rr/parameters/cwnd_limited
 
 ##############################
@@ -358,17 +369,22 @@ if [[ $OVPN == 1 ]]; then
     cd ovpn-config-client
 
     # Automatically modify the configuration file according to the OVPN server IP address
-    cp ovpn-client1.conf.GENERIC ovpn-client1.conf
-    sed -i 's/SERVER_IP_ADDRESS/'${OVPN_SERVER_IP}'/' ovpn-client1.conf
+    i=0
+    for val in "${OVPN_SERVER_IP[@]}"; do
+      i=$((i+1))
+      echo "Creating VPN $i connecting to server at $val through tap$((i-1))..."
 
-    $EXEC_OVPN openvpn ovpn-client1.conf &
+      cp ovpn-client.conf.GENERIC ovpn-client${i}.conf
+      sed -i 's/SERVER_IP_ADDRESS/'${val}'/' ovpn-client${i}.conf
+      $EXEC_OVPN openvpn ovpn-client${i}.conf &
 
-    # It is required to remove tap0 from the MPTCP interfaces pool.
-    # Otherwise, it will start not working intermittently.
-    sleep 5
-    TAPIF=`$EXEC_OVPN ip link show | grep tap -m 1 | cut -d ":" -f 2 | tr -d " "`
-    echo "TAPIF: $TAPIF"
-    $EXEC_OVPN ip link set dev ${TAPIF} multipath off
+      # It is required to remove tap0 from the MPTCP interfaces pool.
+      # Otherwise, it will start not working intermittently.
+      sleep 5
+      TAPIF=`$EXEC_OVPN ip link show | grep tap$((i-1)) -m 1 | cut -d ":" -f 2 | tr -d " "`
+      echo "TAPIF: $TAPIF"
+      $EXEC_OVPN ip link set dev ${TAPIF} multipath off
+    done
   else
     # OpenVPN server
     if [[ $ns == 1 ]]; then
@@ -376,7 +392,11 @@ if [[ $OVPN == 1 ]]; then
     else
       EXEC_OVPN="sudo"
     fi
+    # Automatically modify the configuration file according to the OVPN network address
     cd ovpn-config-proxy
+    cp ovpn-server.conf.GENERIC ovpn-server.conf.GENERIC
+    sed -i 's/OVPN_NETWORK_ADDRESS/'${OVPN_NETWORK_ADDRESS}'/' ovpn-server.conf
+
     $EXEC_OVPN openvpn ovpn-server.conf &
 
     # It is required to remove tap0 from the MPTCP interfaces pool.
