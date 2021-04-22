@@ -332,3 +332,5 @@ For this purpose, you should setup 2 Raspberry Pi 4. Currently it has been teste
 - Now you can test the proper behaviour using `iperf` within the `MPTCPns` namespace.
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/rpi4_wrr03_test.jpg" width="512">
+
+## REST-API
