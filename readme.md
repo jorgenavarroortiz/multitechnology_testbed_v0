@@ -137,6 +137,8 @@ In order to perform some experiments, remember to use the namespace `MPTCPns` an
 
 **Launching scenario 1 with multiple proxies (OVPN servers) with different schedulers**
 
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/scenario1_2servers.png" width="800">
+
 In order to create a scneario with several OVPN servers, you have two alternatives:
 
 - If the VMs have to be deployed, change the value of the variable `VMS_COUNT` to the number of servers plus one (i.e. the client). Then, copy the if_names.txt.scenario1_same_network_UE1 to if_names.txt.scenario1_same_network_UEX (where X is the VM number, #VM) and modify the last byte of the IP addresses to 3 * #VM + 1, 3 * #VM + 2 and 3 * #VM + 3. We have already created these files for up to three servers plus one client (the last file), but it can be easily extended.
