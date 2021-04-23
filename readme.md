@@ -141,7 +141,7 @@ In order to create a scneario with several OVPN servers, you have two alternativ
 
 - If the VMs have to be deployed, change the value of the variable `VMS_COUNT` to the number of servers plus one (i.e. the client). Then, copy the if_names.txt.scenario1_same_network_UE1 to if_names.txt.scenario1_same_network_UEX (where X is the VM number, #VM) and modify the last byte of the IP addresses to 3 * #VM + 1, 3 * #VM + 2 and 3 * #VM + 3. We have already created these files for up to three servers plus one client (the last file), but it can be easily extended.
 
-- If you have already deployed 2 VMs (mptcpUe1 and mptcpUe2), you can create one (or several) clone of e.g. mptcpUe1. Then, you will have to change the name to mptcpUeX (where X is #VM) (on VirtualBox but also within the VM, modifying the files /etc/hostname and /etc/hosts -> this is not required but it is more clear), forward TCP port X2222 to 22 (using `vboxmanage`) and modify the files commented on the previous bullet point.
+- If you have already deployed 2 VMs (mptcpUe1 and mptcpUe2), you can create one (or several) clone of e.g. mptcpUe1. Then, you will have to change the name to mptcpUeX (where X is #VM) (on VirtualBox but also within the VM, modifying the files /etc/hostname and /etc/hosts -> this is not required but it is more clear), forward TCP port X2222 to 22 (check the previous rule using `vboxmanage showvminfo mptcpUeX`, remove the previous rule with `vboxmanage modifyvm mptcpUe3 --natpf1 delete <rule name>` and add a new rule using `vboxmanage modifyvm mptcpUeX --natpf1 "tcpX2222,tcp,127.0.0.1,X2222,,22"`) and modify the files commented on the previous bullet point.
 
 To launch this scenario, e.g. with two servers, you can follow these steps:
 
