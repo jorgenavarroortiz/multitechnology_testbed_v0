@@ -103,9 +103,11 @@ shift $((OPTIND-1))
 #  usage
 #fi
 
-if [[ ${#SCHEDULER[@]} != ${#OVPN_SERVER_IP[@]} ]]; then
-  echo "The number of OVPN servers has to match the number of MPTCP schedulers"
-  exit
+if [[ $OVPN_ENTITY == "client" ]]; then
+  if [[ ${#SCHEDULER[@]} != ${#OVPN_SERVER_IP[@]} ]]; then
+    echo "The number of OVPN servers has to match the number of MPTCP schedulers"
+    exit
+  fi
 fi
 
 echo "CWND limited:"
