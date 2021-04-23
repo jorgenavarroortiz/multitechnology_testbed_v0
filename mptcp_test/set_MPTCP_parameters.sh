@@ -406,7 +406,7 @@ if [[ $OVPN == 1 ]]; then
     fi
     # Automatically modify the configuration file according to the OVPN network address
     cd ovpn-config-proxy
-    cp ovpn-server.conf.GENERIC ovpn-server.conf.GENERIC
+    cp ovpn-server.conf.GENERIC ovpn-server.conf
     sed -i 's/OVPN_NETWORK_ADDRESS/'${OVPN_NETWORK_ADDRESS}'/' ovpn-server.conf
 
     $EXEC_OVPN openvpn ovpn-server.conf &
