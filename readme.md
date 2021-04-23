@@ -334,3 +334,56 @@ For this purpose, you should setup 2 Raspberry Pi 4. Currently it has been teste
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/rpi4_wrr03_test.jpg" width="512">
 
 ## REST-API
+
+### Version 1
+
+For the first version, it is assumed that REST-API servers are deployed in all UEs to configure some parameters for AT3S functionality and to obtain telemetry data from UEs as the picture below. 
+
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/blob/uos_test/img/rest-api.jpeg" width="512">
+
+I only tested it by using the first scenario. In order to run it, in the machine `mptcpUe1`, in `/home/vagrant/free5gc/mptcp_test` type:
+
+```
+./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_different_networks_UE1 -u 3 -m -o server
+```
+
+In the machine `mptcpUe2` and the directory `/home/vagrant/free5gc/mptcp_test`, run:
+```
+./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_different_networks_UE2 -u 3 -m -o client -S 10.1.1.1
+```
+
+Inside the `MPTCPns` in the machine `mptcpUe1`, run:
+```
+iperf -s
+```
+
+Inside the `MPTCPns` in the machine `mptcpUe2`, run:
+```
+iperf -c 10.8.0.1 -t 120
+```
+which will run the client iperf for 2 minutes.
+
+At the moment, there are only 4 endpoints. It can be tested inside the `MPTCPns` in the machine `mptcpUe1` by running:
+```
+curl -X GET 'http://10.8.0.2:8000/telemetry/if_name/' -H 'accept: application/json' -H 'Content-Type: application/json'  | json_pp
+```
+or
+```
+curl -X GET 'http://10.8.0.2:8000/telemetry/data/tap0' -H 'accept: application/json' -H 'Content-Type: application/json'  | json_pp
+```
+or
+```
+curl -X GET 'http://10.8.0.2:8000/eat3s/get_probs/' -H 'accept: application/json' -H 'Content-Type: application/json'  | json_pp
+```
+or
+```
+curl -X POST 'http://10.8.0.2:8000/eat3s/set_probs/' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"wifi_prob":1,"lifi_prob":1,"gnb_prob":1}' | json_pp
+```
+
+The configuration of interfaces should be correctly set inside the `MPTCPns` in the machine `mptcpUe2`. Please make sure that the IP addresses are set correctly in `/home/vagrant/vagrant/rest-api/app/run.sh`.
+
+```
+export WIFI_IP=10.1.1.2
+export LIFI_IP=10.1.2.2
+export GNB_IP=10.1.3.2
+```
