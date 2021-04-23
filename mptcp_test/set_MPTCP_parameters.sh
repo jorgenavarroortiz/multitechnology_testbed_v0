@@ -103,9 +103,11 @@ shift $((OPTIND-1))
 #  usage
 #fi
 
-if [[ ${#SCHEDULER[@]} != ${#OVPN_SERVER_IP[@]} ]]; then
-  echo "The number of OVPN servers has to match the number of MPTCP schedulers"
-  exit
+if [[ $OVPN_ENTITY == "client" ]]; then
+  if [[ ${#SCHEDULER[@]} != ${#OVPN_SERVER_IP[@]} ]]; then
+    echo "The number of OVPN servers has to match the number of MPTCP schedulers"
+    exit
+  fi
 fi
 
 echo "CWND limited:"
@@ -406,7 +408,7 @@ if [[ $OVPN == 1 ]]; then
     fi
     # Automatically modify the configuration file according to the OVPN network address
     cd ovpn-config-proxy
-    cp ovpn-server.conf.GENERIC ovpn-server.conf.GENERIC
+    cp ovpn-server.conf.GENERIC ovpn-server.conf
     sed -i 's/OVPN_NETWORK_ADDRESS/'${OVPN_NETWORK_ADDRESS}'/' ovpn-server.conf
 
     $EXEC_OVPN openvpn ovpn-server.conf &
