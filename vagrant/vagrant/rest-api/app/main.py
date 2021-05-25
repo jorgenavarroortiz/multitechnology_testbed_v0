@@ -53,21 +53,6 @@ async def redoc_html():
         redoc_favicon_url="/static/favicon.ico",
     )
 
-@app.on_event("startup")
-async def startup_event():
-    subprocess.run(f"iptables -A OUTPUT --source {os.getenv('WIFI_IP')} --match statistic --mode random --probability 0 -j REJECT".split(' '))    
-    
-    subprocess.run(f"iptables -A OUTPUT --source {os.getenv('LIFI_IP')} --match statistic --mode random --probability 0 -j REJECT".split(' '))    
-
-    subprocess.run(f"iptables -A OUTPUT --source {os.getenv('GNB_IP')} --match statistic --mode random --probability 0 -j REJECT".split(' '))    
-    
-    subprocess.run(f"iptables -A INPUT --destination {os.getenv('WIFI_IP')} --match statistic --mode random --probability 0 -j REJECT".split(' '))
-
-    subprocess.run(f"iptables -A INPUT --destination {os.getenv('LIFI_IP')} --match statistic --mode random --probability 0 -j REJECT".split(' '))
-
-    subprocess.run(f"iptables -A INPUT --destination {os.getenv('GNB_IP')} --match statistic --mode random --probability 0 -j REJECT".split(' '))
-
-
 @app.get("/")
 async def root():
     return {"message": "go to /docs for the documentation"}

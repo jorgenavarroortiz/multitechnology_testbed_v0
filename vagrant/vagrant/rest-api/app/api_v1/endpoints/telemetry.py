@@ -8,10 +8,12 @@ import json
 import subprocess
 import time
 
+import api_v1.endpoints.mptcp_wrr_controller as wrr
+
 router = APIRouter()
 
 class IfName(BaseModel):
-    if_name: List[str]
+    list_if: List[dict]
 
 class Telemetry(BaseModel):
     valid: str
@@ -26,23 +28,33 @@ class Telemetry(BaseModel):
     tx_errors: str
     tx_dropped: str
 
+class TelemetryMPTCP(BaseModel):
+    srtt_values: List[dict]
+    cwnd_values: List[dict]
+    local_interfaces_weights: List[dict]
+    remote_interfaces_weights: List[dict]
+
 @router.get("/if_name/", response_model=IfName)
 async def get_interface_name():
 
     # run ip -j link
     try:
-        process  = subprocess.run(["ip",'-j',"link"],universal_newlines=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        process  = subprocess.run(["ip",'-j',"address"],universal_newlines=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         list_json = json.loads(process.stdout)
     except:
         list_json = []
 
     list_ifname = [] 
-    for data in list_json:
-        list_ifname.append(data['ifname'])
+    for idx, data in enumerate(list_json):
+        list_ifname.append({str(idx):{'if_name':data['ifname'],'ip_addr':data['addr_info'][0]['local']}})
 
-    return {"if_name":list_ifname}
+    return {"list_if":list_ifname}
 
+@router.get("/mptcp/",response_model=TelemetryMPTCP)
+async def get_telemetry_mptcp():
+    
+    return {'srtt_values':wrr.get_srtt_values(),'cwnd_values':wrr.get_cwnd_values(),'local_interfaces_weights':wrr.get_local_interfaces_weights(),'remote_interfaces_weights':wrr.get_remote_interfaces_weights()}
 
 @router.get("/data/{if_name}", response_model=Telemetry)
 async def get_telemetry_data(if_name: str):
