@@ -12,4 +12,4 @@ cd $HOME/vagrant/rest-api/app
 yes | sudo python -m pipenv --python 3.7
 yes | sudo  python -m pipenv install -r requirements.txt
 
-sudo pipenv run bash run.sh &
+sudo python -m pipenv run uvicorn main:app --host 0.0.0.0 --port 8000 &
