@@ -1,13 +1,13 @@
 #!/bin/bash
 
-tapIF="tap${i}"
+tapIF="tap0"
 
-noLines=`sudo ip address show m${tapIF} | grep m${tapIF} -c`
+noLines=`sudo ip netns exec MPTCPns ip address show ${tapIF} | grep ${tapIF} -c`
 
 if [[ $noLines > 0 ]]; then
   echo "${tapIF} found!"
 else
-  echo "${tapIF} not found. Have you started the OVPN server? Exitting..."
+  echo "${tapIF} not found. Have you started the OVPN server? Exiting..."
   exit 1
 fi
 
@@ -18,14 +18,14 @@ IPADDRESS=''
 if [[ $IPADDRESS1 == "" ]]; then
   echo "${tapIF} already has no IP address, checking m${tapIF} interface..."
   if [[ $IPADDRESS2 == "" ]]; then
-    echo "m${tapIF} also has no IP address, exitting..."
+    echo "m${tapIF} also has no IP address, exiting..."
     exit 1
   else
-    IPADDRESS=IPADDRESS2
+    IPADDRESS=$IPADDRESS2
     echo "IP address for m${tapIF}: ${IPADDRESS}"
   fi
 else
-  IPADDRESS=IPADDRESS1
+  IPADDRESS=$IPADDRESS1
   echo "IP address for m${tapIF}: ${IPADDRESS}"
 fi
 
@@ -46,3 +46,6 @@ sudo ip netns exec MPTCPns ifconfig br_${tapIF} 0 promisc up
 sudo ip netns exec MPTCPns ifconfig ${tapIF} 0 promisc up
 sudo ip netns exec MPTCPns ifconfig v${tapIF} 0 promisc up
 sudo ifconfig m${tapIF} ${IPADDRESS} promisc up
+
+# Act as a router
+sudo sysctl -w net.ipv4.ip_forward=1
