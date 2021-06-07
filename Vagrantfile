@@ -1,11 +1,17 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+# vagrant plugin install vagrant-reload
+
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
 #Vagrant::DEFAULT_SERVER_URL.replace('https://vagrantcloud.com')
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  # VirtualBox configuration
+  config.vm.provider "virtualbox" do |vb|
+    vb.linked_clone = true
+  end
 
   # Every Vagrant virtual environment requires a box to build off of.
   config.vm.box = "bento/ubuntu-18.04"
@@ -16,73 +22,109 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Custom: SSH graphical, X11
   config.ssh.forward_agent = true
-  config.ssh.forward_x11 = true  
+  config.ssh.forward_x11 = true
 
   # avoid mounting shared folder
   config.vm.synced_folder '.', '/vagrant', disabled: true
 
-  ####################
-  # Defining the free5gC core VM
-  ####################
-  config.vm.define "free5gc" do |a|
-	a.vm.network "private_network", ip: "192.168.13.2", auto_config: true # Net connecting to MPTCP UE
-	a.vm.network "private_network", ip: "192.168.20.2", auto_config: true # Net connecting to MPTCP Proxy    	
-    a.vm.hostname = "free5gc"	
-    a.vm.provider :virtualbox do |vm|    	
-    	# Configure networking interfaces
-		vm.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
-		vm.customize ["modifyvm", :id, "--nicpromisc3", "allow-all"]
-		# Config name that appears in virtual box
-    	vm.name = "free5gc"
-    	# DNS queries to the host, which becomes a DNS Proxy
-		vm.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-		# Lease more RAM to the guest
-		vm.customize ["modifyvm", :id, "--memory", "4096"]
-    	# Set number of CPUs
-    	vm.customize ["modifyvm", :id, "--cpus", 2]
-	end
+  ########################
+  # Defining the MPTCP VMs (i=1 for UE, i=2 and 3 for proxies)
+  ########################
+  # Number of virtual machines
+  VMS_COUNT = 3
+  (1..VMS_COUNT).each do |i|
+    config.vm.define "mptcp#{i}" do |mptcp|
+      mptcp.vm.network "forwarded_port", guest: 22, host: "#{i*10000+2222}", protocol: "tcp" # Port forwarding through the NAT interface
+      if i == 1
+        mptcp.vm.hostname = "CPE"
+        mptcp.vm.network "private_network", ip: "10.1.1.1", auto_config: true, virtualbox__intnet: "cpe_proxies" # 5G NR
+        mptcp.vm.network "private_network", ip: "10.1.1.2", auto_config: true, virtualbox__intnet: "cpe_proxies" # Wi-Fi
+        mptcp.vm.network "private_network", ip: "10.1.1.3", auto_config: true, virtualbox__intnet: "cpe_proxies" # Li-Fi#
+        mptcp.vm.network "private_network", ip: "33.3.3.1", auto_config: true, virtualbox__intnet: "client_cpe"  # To connect other PCs through the CPE
+        mptcp.vm.provider :virtualbox do |vm|
+          # Configure networking interfaces
+          vm.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
+          vm.customize ["modifyvm", :id, "--nicpromisc3", "allow-all"]
+          vm.customize ["modifyvm", :id, "--nicpromisc4", "allow-all"]
+          vm.customize ["modifyvm", :id, "--nicpromisc5", "allow-all"]
+          # Config name that appears in virtual box
+          vm.name = "CPE"
+          # DNS queries to the host, which becomes a DNS Proxy
+          vm.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+          # Lease more RAM to the guest
+          vm.customize ["modifyvm", :id, "--memory", "1024"]
+          # Set number of CPUs
+          vm.customize ["modifyvm", :id, "--cpus", 1]
+        end
+      else
+        mptcp.vm.hostname = "proxy#{i-1}"
+        mptcp.vm.network "private_network", ip: "10.1.1.#{3+(i-1)}", auto_config: true, virtualbox__intnet: "cpe_proxies"   # Proxies only have one interface towards CPE
+        mptcp.vm.network "private_network", ip: "66.6.6.#{i-1}", auto_config: true, virtualbox__intnet: "proxies_server" # Connection to server
+        mptcp.vm.provider :virtualbox do |vm|
+          # Configure networking interfaces
+          vm.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
+          vm.customize ["modifyvm", :id, "--nicpromisc3", "allow-all"]
+          # Config name that appears in virtual box
+          vm.name = "proxy#{i-1}"
+          # DNS queries to the host, which becomes a DNS Proxy
+          vm.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+          # Lease more RAM to the guest
+          vm.customize ["modifyvm", :id, "--memory", "1024"]
+          # Set number of CPUs
+          vm.customize ["modifyvm", :id, "--cpus", 1]
+        end
+      end
+      # Provisioning
+      mptcp.vm.provision "file", source: "./vagrant", destination: "$HOME/vagrant"
+      mptcp.vm.provision "shell", path: "vagrant/mptcp_kernel55_installation.sh", privileged: false
+      mptcp.vm.provision :reload
+      mptcp.vm.provision "shell", path: "vagrant/mptcp_installation.sh", privileged: false
+      mptcp.vm.provision "shell", path: "vagrant/initial_testing_2machines.sh", privileged: false
+    end
   end
 
-  ####################
-  # Defining the MPTCP UE VM
-  ####################
-  config.vm.define "mptpcUe" do |mptpcUe|
-	mptpcUe.vm.network "private_network", ip: "192.168.13.3", auto_config: true # Interface 1 connecting to free5gC core
-	mptpcUe.vm.network "private_network", ip: "192.168.13.4", auto_config: true # Interface 2 connecting to free5gC core
-	mptpcUe.vm.hostname = "mptpcUe"
-    mptpcUe.vm.provider :virtualbox do |vm|
-    	# Configure networking interfaces
-		vm.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
-		vm.customize ["modifyvm", :id, "--nicpromisc3", "allow-all"]
-		# Config name that appears in virtual box
-    	vm.name = "mptpcUe"
-    	# DNS queries to the host, which becomes a DNS Proxy
-		vm.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-		# Lease more RAM to the guest
-		vm.customize ["modifyvm", :id, "--memory", "4096"]
-    	# Set number of CPUs
-    	vm.customize ["modifyvm", :id, "--cpus", 2]		
-	end
-  end
-
-  ####################
-  # Defining the MPTCP proxy
-  ####################
-  config.vm.define "mptcpProxy" do |mptcpProxy|
-	mptcpProxy.vm.network "private_network", ip: "192.168.20.3", auto_config: true # Net connecting to free5gc core
-	mptcpProxy.vm.hostname = "mptcpProxy"
-    mptcpProxy.vm.provider :virtualbox do |vm|
-    	# Configure networking interfaces
-		vm.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
-		# Config name that appears in virtual box
-    	vm.name = "mptcpProxy"
-    	# DNS queries to the host, which becomes a DNS Proxy
-		vm.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-		# Lease more RAM to the guest
-		vm.customize ["modifyvm", :id, "--memory", "4096"]
-    	# Set number of CPUs
-    	vm.customize ["modifyvm", :id, "--cpus", 2]
-	end
+  #####################
+  # Defining normal VMs (i=1 for client, i=2 for server)
+  #####################
+  # Number of virtual machines
+  VMS_COUNT = 2
+  (1..VMS_COUNT).each do |i|
+    config.vm.define "normal#{i}" do |normal|
+      normal.vm.network "forwarded_port", guest: 22, host: "#{(i+3)*10000+2222}", protocol: "tcp" # Port forwarding through the NAT interface
+      if i == 1
+        normal.vm.hostname = "client"
+        normal.vm.network "private_network", ip: "33.3.3.2", auto_config: true, virtualbox__intnet: "client_cpe"  # Connection to the CPE
+        normal.vm.provider :virtualbox do |vm|
+          # Configure networking interfaces
+          vm.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
+          # Config name that appears in virtual box
+          vm.name = "client"
+          # DNS queries to the host, which becomes a DNS Proxy
+          vm.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+          # Lease more RAM to the guest
+          vm.customize ["modifyvm", :id, "--memory", "1024"]
+          # Set number of CPUs
+          vm.customize ["modifyvm", :id, "--cpus", 1]
+        end
+      else
+        normal.vm.hostname = "server"
+        normal.vm.network "private_network", ip: "66.6.6.3", auto_config: true, virtualbox__intnet: "proxies_server" # Connection from server to proxies
+        normal.vm.provider :virtualbox do |vm|
+          # Configure networking interfaces
+          vm.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
+          # Config name that appears in virtual box
+          vm.name = "server"
+          # DNS queries to the host, which becomes a DNS Proxy
+          vm.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+          # Lease more RAM to the guest
+          vm.customize ["modifyvm", :id, "--memory", "1024"]
+          # Set number of CPUs
+          vm.customize ["modifyvm", :id, "--cpus", 1]
+        end
+      end
+      # Provisioning
+      normal.vm.provision "file", source: "./vagrant", destination: "$HOME/vagrant"
+    end
   end
 
 end
