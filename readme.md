@@ -161,7 +161,7 @@ The following image shows how iperf performs different to one server (10.8.0.1 u
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1_cpe_ovs.png" width="1200">
 
-Copy the content of the directory `free5gc/vagrant` to your computer. Rename the file `Vagrantfile.OVS.6machines` to `Vagrantfile`. **Copy your SSH credentials** for this repository (`id_rsa` and `id_rsa.pub` files) **to the `vagrant/ssh_credentials` directory**. Change to the directory with the `Vagrantfile` file and execute `sudo vagrant up`. The execution will take around 15 minutes (depending on PC).
+Copy the content of the directory `free5gc/vagrant` to your computer. Rename the file `Vagrantfile.OVS` to `Vagrantfile`. **Copy your SSH credentials** for this repository (`id_rsa` and `id_rsa.pub` files) **to the `vagrant/ssh_credentials` directory**. Change to the directory with the `Vagrantfile` file and execute `sudo vagrant up`. The execution will take around 15 minutes (depending on PC).
 
 This `Vagrantfile` generates 6 virtual machine: one client (IP address 33.3.3.33/24) connected to the CPE, which is connected to 3 MPTCP proxies, which in turn are connected to one server (IP address 66.6.6.33/24). If the client is connected to VLAN 100, data is sent over `proxy1` (default scheduler) to the server. If the client is connected to VLAN 200, data is sent over `proxy2` (Round-Robin scheduler) to the server. If the client is connected to VLAN 300, data is sent over `proxy3` (redundant scheduler) to the server.
 
