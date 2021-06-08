@@ -165,6 +165,8 @@ Copy the content of the directory `free5gc/vagrant` to your computer. Rename the
 
 This `Vagrantfile` generates 5 virtual machine: one client (IP address 33.3.3.33/24) connected to the CPE, which is connected to 2 MPTCP proxies, which in turn are connected to one server (IP address 66.6.6.33/24). If the client is connected to VLAN 100, data is sent over `proxy1` (default scheduler) to the server. If the client is connected to VLAN 200, data is sent over `proxy2` (Round-Robin scheduler) to the server.
 
+**NOTE**: These virtual machines employ only 1GB of RAM in order to consume too much memory from the host machine. Feel free to change this if you have more resources.
+
 In order to launch this scenario, please execute these commands in the following order:
 
 - **proxy1**:
