@@ -96,7 +96,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       normal.vm.network "forwarded_port", guest: 22, host: "#{(i+3)*10000+2222}", protocol: "tcp" # Port forwarding through the NAT interface
       if i == 1
         normal.vm.hostname = "client"
-        normal.vm.network "private_network", ip: "33.3.3.2", auto_config: true, virtualbox__intnet: "client_cpe"  # Connection to the CPE
+        normal.vm.network "private_network", ip: "33.3.3.33", auto_config: true, virtualbox__intnet: "client_cpe"  # Connection to the CPE
         normal.vm.provider :virtualbox do |vm|
           # Configure networking interfaces
           vm.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
@@ -111,7 +111,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         end
       else
         normal.vm.hostname = "server"
-        normal.vm.network "private_network", ip: "66.6.6.3", auto_config: true, virtualbox__intnet: "proxies_server" # Connection from server to proxies
+        normal.vm.network "private_network", ip: "66.6.6.33", auto_config: true, virtualbox__intnet: "proxies_server" # Connection from server to proxies
         normal.vm.provider :virtualbox do |vm|
           # Configure networking interfaces
           vm.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
