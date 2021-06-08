@@ -163,7 +163,7 @@ The following image shows how iperf performs different to one server (10.8.0.1 u
 
 Copy the content of the directory `free5gc/vagrant` to your computer. Rename the file `Vagrantfile.OVS.5machines` to `Vagrantfile`. **Copy your SSH credentials** for this repository (`id_rsa` and `id_rsa.pub` files) **to the `vagrant/ssh_credentials` directory**. Change to the directory with the `Vagrantfile` file and execute `sudo vagrant up`. The execution will take around 15 minutes (depending on PC).
 
-This `Vagrantfile` generates 5 virtual machine: one client (IP address 33.3.3.33/24) connected to the CPE, which is connected to 2 MPTCP proxies, which in turn are connected to one server (IP address 66.6.6.33/24). If the client is connected to VLAN 100, data is sent over `proxy1` (default scheduler) to the server. If the client is connected to VLAN 200, data is sent over `proxy2` (Round-Robin scheduler) to the server.
+This `Vagrantfile` generates 6 virtual machine: one client (IP address 33.3.3.33/24) connected to the CPE, which is connected to 3 MPTCP proxies, which in turn are connected to one server (IP address 66.6.6.33/24). If the client is connected to VLAN 100, data is sent over `proxy1` (default scheduler) to the server. If the client is connected to VLAN 200, data is sent over `proxy2` (Round-Robin scheduler) to the server. If the client is connected to VLAN 300, data is sent over `proxy3` (redundant scheduler) to the server.
 
 **NOTE**: These virtual machines employ only 1GB of RAM in order to consume too much memory from the host machine. Feel free to change this if you have more resources.
 
@@ -187,10 +187,19 @@ chmod 777 *.sh
 ./proxy_externally_accessible.sh
 ```
 
+- **proxy3** (accessible on localhost, port 42222):
+```
+cd ~/free5gc/mptcp_test
+./set_MPTCP_parameters.sh -p fullmesh -s redundant -c olia -f if_names.txt.scenario1_same_network_proxy3 -u 1 -m -o server -N 10.10.0.0
+cd ~/vagrant/OVS/
+chmod 777 *.sh
+./proxy_externally_accessible.sh
+```
+
 - **CPE** (accessible on localhost, port 12222):
 ```
 cd ~/free5gc/mptcp_test
-./set_MPTCP_parameters.sh -p fullmesh -s default -s roundrobin -c olia -f if_names.txt.scenario1_same_network_CPE -u 3 -m -o client -S 10.1.1.4 -S 10.1.1.5
+./set_MPTCP_parameters.sh -p fullmesh -s default -s roundrobin -s redundant -c olia -f if_names.txt.scenario1_same_network_CPE -u 3 -m -o client -S 10.1.1.4 -S 10.1.1.5 -S 10.1.1.6
 cd ~/vagrant/OVS
 chmod 777 *.sh
 ./ovs_start.sh
@@ -210,11 +219,11 @@ cd ~/vagrant/OVS
 chmod 777 *.sh
 ```
 
-If the client shall send its data through ``proxy1`` (which employs MPTCP default scheduler), its Ethernet frames shall be tagged with VLANID=100. In a real deployment, a switch should be included between ``client`` and ``CPE`` using an access port with VLAN 100 (in this example) to the client and a trunk port with VLANs 100 and 200 to the CPE.
+If the client shall send its data through e.g. `proxy1` (or `proxy2` or `proxy3`) (which employs MPTCP default scheduler), its Ethernet frames shall be tagged with VLANID=100 (or 200 or 300). In a real deployment, a switch should be included between `client` and ``CPE`` using an access port with VLAN 100 (or 200 or 300) to the client and a trunk port with VLANs 100, 200 and 300 to the CPE.
 
 ```./client_tagged_vlan.sh -i eth1 -I 10.8.0.33 -G 10.8.0.1 -v 100```
 
-Please test the correct behaviour using ``ping -R 66.6.6.33``, which returns the path from ``client`` to ``server``. It should go through the IP address of ``proxy1`` in the VPN (10.8.0.1).
+Please test the correct behaviour using `ping -R 66.6.6.33`, which returns the path from `client` to `server`. It should go through the IP address of `proxy1` in the VPN (10.8.0.1).
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_vlan_support1.png" width="800">
 
@@ -226,9 +235,9 @@ Again, please test the correct behaviour using ``ping -R 66.6.6.33``. It should 
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_vlan_support2.png" width="800">
 
-Please note that, since ``CPE`` executes OVS to add/remove 802.1Q header, it cannot ping neither the client nor the proxies (using the IP addresses from the VPN pool). However, this is expected and the client can ping the proxies and the server.
+Similarly, you can repeat the process for VLAN 300 and `proxy3` (10.10.0.33 for client, 10.10.0.1 as gateway).
 
-**NOTE:** If you want to test with three proxies, you may change the first occurrence of `VMS_COUNT = 3` in the Vagrantfile to `VMS_COUNT = 4` (which will add a third proxy, accessible on localhost, port 42222). Then, you can use `./set_MPTCP_parameters.sh -p fullmesh -s redundant -c olia -f if_names.txt.scenario1_same_network_proxy3 -u 1 -m -o server -N 10.10.0.0` in `proxy3` (here we assume that `proxy3` utilizes the MPTCP redundant scheduler). The rest of the steps are indentical. The client can employ VLAN 300 to use `proxy3`. The CPE shall include the new server and scheduler when calling the `set_MPTCP_parameters.sh` script, i.e. `./set_MPTCP_parameters.sh -p fullmesh -s default -s roundrobin -s redundant -c olia -f if_names.txt.scenario1_same_network_CPE -u 3 -m -o client -S 10.1.1.4 -S 10.1.1.5 -S 10.1.1.6`. Other `client`, `server` and `CPE` scripts remain unaffected (for example, in the CPE `cpe_ovs_vlan.sh` already checks if it is connected to several VPN servers by looking at the `tap` interfaces).
+Please note that, since ``CPE`` executes OVS to add/remove 802.1Q header, it cannot ping neither the client nor the proxies (using the IP addresses from the VPN pool). However, this is expected and the client can ping the proxies and the server.
 
 ## Launching SCENARIO 2: UE <-> free5GC <-> proxy
 
