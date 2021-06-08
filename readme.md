@@ -159,7 +159,7 @@ The following image shows how iperf performs different to one server (10.8.0.1 u
 
 **Launching scenario 1 with multiple proxies (OVPN servers) with different schedulers and using CPE as a switch**
 
-[**Add a figure here with the scenario, client using VLAN tagging, CPE using OVS as switch, ... and include all the routes**]
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1_cpe_ovs.png" width="1200">
 
 Copy the content of the directory `free5gc/vagrant` to your computer. Rename the file `Vagrantfile.OVS.5machines` to `Vagrantfile`. **Copy your SSH credentials** for this repository (`id_rsa` and `id_rsa.pub` files) **to the `vagrant/ssh_credentials` directory**. Change to the directory with the `Vagrantfile` file and execute `sudo vagrant up`. The execution will take around 15 minutes (depending on PC).
 
