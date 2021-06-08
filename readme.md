@@ -220,7 +220,7 @@ Then, you may want to test sending data through ``proxy2`` (a clone of the ``cli
 
 ``./client_tagged_vlan.sh -i eth1 -I 10.9.0.33 -G 10.9.0.1 -v 200``
 
-Again, please test the correct behaviour using ``ping -R 66.6.6.3``. It should go through the IP address of ``proxy2`` in the VPN (10.8.0.2).
+Again, please test the correct behaviour using ``ping -R 66.6.6.3``. It should go through the IP address of ``proxy2`` in the VPN (10.9.0.1).
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_vlan_support2.png" width="800">
 
