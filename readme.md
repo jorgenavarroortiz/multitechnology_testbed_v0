@@ -165,6 +165,8 @@ Copy the content of the directory `free5gc/vagrant` to your computer. Rename the
 
 This `Vagrantfile` generates 5 virtual machine: one client (IP address 33.3.3.33/24) connected to the CPE, which is connected to 2 MPTCP proxies, which in turn are connected to one server (IP address 66.6.6.33/24). If the client is connected to VLAN 100, data is sent over `proxy1` (default scheduler) to the server. If the client is connected to VLAN 200, data is sent over `proxy2` (Round-Robin scheduler) to the server.
 
+**NOTE:** If you want to test with three proxies, you may clone `proxy1`, change its IP address (in file `/etc/netplan/50-vagrant.yaml` so they become 10.1.1.6/24 and 66.6.6.3/24) and use `if_names.txt.scenario1_same_network_proxy1` and 10.10.0.0 when calling the `set_MPTCP_parameters.sh` script. The rest of the steps are indentical. The client can employ VLAN 300 to use `proxy3`. `Client`, `server` and `CPE` scripts remain unaffected (for CPE, `cpe_ovs_vlan.sh` already checks if it is connected to several VPN servers by looking at the `tap` interfaces).
+
 In order to launch this scenario, please execute these commands in the following order:
 
 - **proxy1**:
