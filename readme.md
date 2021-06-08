@@ -159,8 +159,6 @@ The following image shows how iperf performs different to one server (10.8.0.1 u
 
 **Launching scenario 1 with multiple proxies (OVPN servers) with different schedulers and using CPE as a switch**
 
-[**TO BE FULLY TESTED**]
-
 [**Add a figure here with the scenario, client using VLAN tagging, CPE using OVS as switch, ... and include all the routes**]
 
 In order to launch this scenario, please execute these commands in the following order:
@@ -170,14 +168,16 @@ In order to launch this scenario, please execute these commands in the following
 cd ~/free5gc/mptcp_test
 ./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_same_network_proxy1 -u 1 -m -o server -N 10.8.0.0
 cd ~/vagrant/OVS/
+chmod 777 *.sh
 ./proxy_externally_accessible.sh
 ```
 
 - **proxy2**:
 ```
 cd ~/free5gc/mptcp_test
-./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_same_network_proxy2 -u 1 -m -o server -N 10.9.0.0
+./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_same_network_proxy2 -u 1 -m -o server -N 10.9.0.0
 cd ~/vagrant/OVS/
+chmod 777 *.sh
 ./proxy_externally_accessible.sh
 ```
 
@@ -186,6 +186,7 @@ cd ~/vagrant/OVS/
 cd ~/free5gc/mptcp_test
 ./set_MPTCP_parameters.sh -p fullmesh -s default -s roundrobin -c olia -f if_names.txt.scenario1_same_network_CPE -u 3 -m -o client -S 10.1.1.4 -S 10.1.1.5
 cd ~/vagrant/OVS
+chmod 777 *.sh
 ./ovs_start.sh
 ./cpe_ovs_vlan.sh
 ```
@@ -193,12 +194,14 @@ cd ~/vagrant/OVS
 - **server**:
 ```
 cd ~/vagrant/OVS
+chmod 777 *.sh
 ./server_routes.sh
 ```
 
 - **client**:
 ```
 cd ~/vagrant/OVS
+chmod 777 *.sh
 ```
 
 If the client shall send its data through ``proxy1`` (which employs MPTCP default scheduler), its Ethernet frames shall be tagged with VLANID=100. In a real deployment, a switch should be included between ``client`` and ``CPE`` using an access port with VLAN 100 (in this example) to the client and a trunk port with VLANs 100 and 200 to the CPE.
@@ -207,11 +210,15 @@ If the client shall send its data through ``proxy1`` (which employs MPTCP defaul
 
 Please test the correct behaviour using ``ping -R 66.6.6.3``, which returns the path from ``client`` to ``server``. It should go through the IP address of ``proxy1`` in the VPN (10.8.0.1).
 
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_vlan_support1.png" width="1200">
+
 Then, you may want to test sending data through ``proxy2`` (a clone of the ``client`` VM could be used, but we will change the VLAN ID used in order to avoid more VMs being executed). For that, execute:
 
 ``./client_tagged_vlan.sh -i eth1 -I 10.9.0.33 -G 10.9.0.1 -v 200``
 
 Again, please test the correct behaviour using ``ping -R 66.6.6.3``. It should go through the IP address of ``proxy2`` in the VPN (10.8.0.2).
+
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_vlan_support2.png" width="1200">
 
 Please note that, since ``CPE`` executes OVS to add/remove 802.1Q header, it cannot ping neither the client nor the proxies (using the IP addresses from the VPN pool). However, this is expected and the client can ping the proxies and the server.
 
