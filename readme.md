@@ -169,7 +169,7 @@ This `Vagrantfile` generates 5 virtual machine: one client (IP address 33.3.3.33
 
 In order to launch this scenario, please execute these commands in the following order:
 
-- **proxy1**:
+- **proxy1** (accessible on localhost, port 22222):
 ```
 cd ~/free5gc/mptcp_test
 ./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_same_network_proxy1 -u 1 -m -o server -N 10.8.0.0
@@ -178,7 +178,7 @@ chmod 777 *.sh
 ./proxy_externally_accessible.sh
 ```
 
-- **proxy2**:
+- **proxy2** (accessible on localhost, port 32222):
 ```
 cd ~/free5gc/mptcp_test
 ./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_same_network_proxy2 -u 1 -m -o server -N 10.9.0.0
@@ -187,7 +187,7 @@ chmod 777 *.sh
 ./proxy_externally_accessible.sh
 ```
 
-- **CPE**:
+- **CPE** (accessible on localhost, port 12222):
 ```
 cd ~/free5gc/mptcp_test
 ./set_MPTCP_parameters.sh -p fullmesh -s default -s roundrobin -c olia -f if_names.txt.scenario1_same_network_CPE -u 3 -m -o client -S 10.1.1.4 -S 10.1.1.5
@@ -197,14 +197,14 @@ chmod 777 *.sh
 ./cpe_ovs_vlan.sh
 ```
 
-- **server**:
+- **server** (accessible on localhost, port 62222):
 ```
 cd ~/vagrant/OVS
 chmod 777 *.sh
 ./server_routes.sh
 ```
 
-- **client**:
+- **client** (accessible on localhost, port 52222):
 ```
 cd ~/vagrant/OVS
 chmod 777 *.sh
@@ -228,7 +228,7 @@ Again, please test the correct behaviour using ``ping -R 66.6.6.33``. It should 
 
 Please note that, since ``CPE`` executes OVS to add/remove 802.1Q header, it cannot ping neither the client nor the proxies (using the IP addresses from the VPN pool). However, this is expected and the client can ping the proxies and the server.
 
-**NOTE:** If you want to test with three proxies, you may clone `proxy1`, change its IP address (in file `/etc/netplan/50-vagrant.yaml` so they become 10.1.1.6/24 and 66.6.6.3/24). Or you can change the first occurrence of `VMS_COUNT = 3` in the Vagrantfile to `VMS_COUNT = 4` (which will add a third proxy). Then, you can use `./set_MPTCP_parameters.sh -p fullmesh -s redundant -c olia -f if_names.txt.scenario1_same_network_proxy3 -u 1 -m -o server -N 10.10.0.0` in `proxy3` (here we assume that `proxy3` utilizes the MPTCP redundant scheduler). The rest of the steps are indentical. The client can employ VLAN 300 to use `proxy3`. The CPE shall include the new server and scheduler when calling the `set_MPTCP_parameters.sh` script, i.e. `./set_MPTCP_parameters.sh -p fullmesh -s default -s roundrobin -s redundant -c olia -f if_names.txt.scenario1_same_network_CPE -u 3 -m -o client -S 10.1.1.4 -S 10.1.1.5 -S 10.1.1.6`. Other `client`, `server` and `CPE` scripts remain unaffected (for example, in the CPE `cpe_ovs_vlan.sh` already checks if it is connected to several VPN servers by looking at the `tap` interfaces).
+**NOTE:** If you want to test with three proxies, you may change the first occurrence of `VMS_COUNT = 3` in the Vagrantfile to `VMS_COUNT = 4` (which will add a third proxy, accessible on localhost, port 42222). Then, you can use `./set_MPTCP_parameters.sh -p fullmesh -s redundant -c olia -f if_names.txt.scenario1_same_network_proxy3 -u 1 -m -o server -N 10.10.0.0` in `proxy3` (here we assume that `proxy3` utilizes the MPTCP redundant scheduler). The rest of the steps are indentical. The client can employ VLAN 300 to use `proxy3`. The CPE shall include the new server and scheduler when calling the `set_MPTCP_parameters.sh` script, i.e. `./set_MPTCP_parameters.sh -p fullmesh -s default -s roundrobin -s redundant -c olia -f if_names.txt.scenario1_same_network_CPE -u 3 -m -o client -S 10.1.1.4 -S 10.1.1.5 -S 10.1.1.6`. Other `client`, `server` and `CPE` scripts remain unaffected (for example, in the CPE `cpe_ovs_vlan.sh` already checks if it is connected to several VPN servers by looking at the `tap` interfaces).
 
 ## Launching SCENARIO 2: UE <-> free5GC <-> proxy
 
