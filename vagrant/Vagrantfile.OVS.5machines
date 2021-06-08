@@ -93,7 +93,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   VMS_COUNT = 2
   (1..VMS_COUNT).each do |i|
     config.vm.define "normal#{i}" do |normal|
-      normal.vm.network "forwarded_port", guest: 22, host: "#{(i+3)*10000+2222}", protocol: "tcp" # Port forwarding through the NAT interface
+      normal.vm.network "forwarded_port", guest: 22, host: "#{(i+4)*10000+2222}", protocol: "tcp" # Port forwarding through the NAT interface
       if i == 1
         normal.vm.hostname = "client"
         normal.vm.network "private_network", ip: "33.3.3.33", auto_config: true, virtualbox__intnet: "client_cpe"  # Connection to the CPE
