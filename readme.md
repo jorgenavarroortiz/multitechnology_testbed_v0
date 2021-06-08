@@ -161,6 +161,10 @@ The following image shows how iperf performs different to one server (10.8.0.1 u
 
 [**Add a figure here with the scenario, client using VLAN tagging, CPE using OVS as switch, ... and include all the routes**]
 
+Copy the content of the directory `free5gc/vagrant` to your computer. Rename the file `Vagrantfile.OVS.5machines` to `Vagrantfile`. **Copy your SSH credentials** for this repository (`id_rsa` and `id_rsa.pub` files) **to the `vagrant/ssh_credentials` directory**. Change to the directory with the `Vagrantfile` file and execute `sudo vagrant up`. The execution will take around 15 minutes (depending on PC).
+
+This `Vagrantfile` generates 5 virtual machine: one client (IP address 33.3.3.2/24) connected to the CPE, which is connected to 2 MPTCP proxies, which in turn are connected to one server (IP address 66.6.6.3/24). If the client is connected to VLAN 100, data is sent over `proxy1` (default scheduler) to the server. If the client is connected to VLAN 200, data is sent over `proxy2` (Round-Robin scheduler) to the server.
+
 In order to launch this scenario, please execute these commands in the following order:
 
 - **proxy1**:
@@ -210,7 +214,7 @@ If the client shall send its data through ``proxy1`` (which employs MPTCP defaul
 
 Please test the correct behaviour using ``ping -R 66.6.6.3``, which returns the path from ``client`` to ``server``. It should go through the IP address of ``proxy1`` in the VPN (10.8.0.1).
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_vlan_support1.png" width="1200">
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_vlan_support1.png" width="800">
 
 Then, you may want to test sending data through ``proxy2`` (a clone of the ``client`` VM could be used, but we will change the VLAN ID used in order to avoid more VMs being executed). For that, execute:
 
@@ -218,7 +222,7 @@ Then, you may want to test sending data through ``proxy2`` (a clone of the ``cli
 
 Again, please test the correct behaviour using ``ping -R 66.6.6.3``. It should go through the IP address of ``proxy2`` in the VPN (10.8.0.2).
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_vlan_support2.png" width="1200">
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_vlan_support2.png" width="800">
 
 Please note that, since ``CPE`` executes OVS to add/remove 802.1Q header, it cannot ping neither the client nor the proxies (using the IP addresses from the VPN pool). However, this is expected and the client can ping the proxies and the server.
 
