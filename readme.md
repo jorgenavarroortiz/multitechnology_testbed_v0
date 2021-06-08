@@ -237,7 +237,7 @@ Again, please test the correct behaviour using ``ping -R 66.6.6.33``. It should 
 
 Similarly, you can repeat the process for VLAN 300 and `proxy3` (10.10.0.33 for client, 10.10.0.1 as gateway).
 
-Please note that, since ``CPE`` executes OVS to add/remove 802.1Q header, it cannot ping neither the client nor the proxies (using the IP addresses from the VPN pool). However, this is expected and the client can ping the proxies and the server.
+Please note that, since ``CPE`` executes OVS to add/remove the 802.1Q header, it cannot ping neither the client nor the proxies (using the IP addresses from the VPN pool). However, this is expected and the client can ping the proxies and the server.
 
 ## Launching SCENARIO 2: UE <-> free5GC <-> proxy
 
