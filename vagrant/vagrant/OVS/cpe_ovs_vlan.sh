@@ -1,6 +1,6 @@
 #!/bin/bash
 
-declare -a VLANIDarray=(100 200)
+declare -a VLANIDarray=(100 200 300)
 noVLANs=${#VLANIDarray[@]}
 noVLANs=$(($noVLANs-1)) # Starting from 0, so it is the size of the array minus one
 
