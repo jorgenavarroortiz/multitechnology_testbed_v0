@@ -227,6 +227,10 @@ Please test the correct behaviour using `ping -R 66.6.6.33`, which returns the p
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_vlan_support1.png" width="800">
 
+Data rate for the different paths (using Grafana and [Node exporter](https://github.com/prometheus/node_exporter) from [Prometheus](https://prometheus.io/)) using the default MPTCP scheduler:
+
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/MPTCP_grafana_default.jfif" width="1200">
+
 Then, you may want to test sending data through ``proxy2`` (a clone of the ``client`` VM could be used, but we will change the VLAN ID used in order to avoid more VMs being executed). For that, execute:
 
 ``./client_tagged_vlan.sh -i eth1 -I 10.9.0.33 -G 10.9.0.1 -v 200``
@@ -235,7 +239,15 @@ Again, please test the correct behaviour using ``ping -R 66.6.6.33``. It should 
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_vlan_support2.png" width="800">
 
+Data rate for the different paths using the Round-Robin MPTCP scheduler:
+
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/MPTCP_grafana_default.jfif" width="1200">
+
 Similarly, you can repeat the process for VLAN 300 and `proxy3` (10.10.0.33 for client, 10.10.0.1 as gateway).
+
+Data rate for the different paths using the redundant MPTCP scheduler:
+
+<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/MPTCP_grafana_default.jfif" width="1200">
 
 Please note that, since ``CPE`` executes OVS to add/remove the 802.1Q header, it cannot ping neither the client nor the proxies (using the IP addresses from the VPN pool). However, this is expected and the client can ping the proxies and the server.
 
