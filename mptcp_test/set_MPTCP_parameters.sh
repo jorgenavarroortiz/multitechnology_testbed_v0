@@ -1,5 +1,5 @@
 #!/bin/bash
-# Jorge Navarro-Ortiz (jorgenavarro@ugr.es), University of Granada 2020
+# Jorge Navarro-Ortiz (jorgenavarro@ugr.es), University of Granada 2021
 
 #############################
 # Parsing inputs parameters
