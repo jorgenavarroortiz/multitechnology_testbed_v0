@@ -4,6 +4,7 @@
 # 11/06/2021 jjramos added scheduler type
 #
 import ipaddress
+import subprocess
 import socket
 import struct
 import time
@@ -61,8 +62,8 @@ def get_mptcp_telemetry(subflows):
             else:
                 if values_[0] == "send":
                     bps=int(tuples[j + 1][:-3])  # we want to remove the "bps" substring
-                    sample[values_[0]] = bps
-                    sample["send_"]=tuples[j + 1]
+                    sample["send_rate"] = bps
+                    # sample["send_"]=tuples[j + 1]
                     j = j + 1
                 elif values_[0] == "cubic":
                     sample["con_alg"] = values_[0]
@@ -113,7 +114,7 @@ def get_mptcp_subflows_from_inode(inode, _proc_tcp_path="/proc/net/tcp"):
 
     return socket_list
 
-def set_mptcp_scheduler(_scheduler="default",_path="net.mptcp.mptcp_scheduler"):
+def set_mptcp_scheduler(scheduler="default",_path="net.mptcp.mptcp_scheduler"):
     return execute_sysctl_command("-w "+_path+"="+scheduler)
     
 
@@ -169,10 +170,11 @@ def get_mptcp_sockets(_proc_mptcp_path="/proc/net/mptcp_net/mptcp"):
 
     return socket_list
 
-
+# to modify, so it returns a result code.
 def execute_sysctl_command(params):
-    # print("-> sysctl "+params)
-    os.system('sysctl ' + params)
+    return os.system('sysctl ' + params)
+    #result = subprocess.run('sysctl ' + params)
+    #return result.returncode
 
 
 def ip_string_to_unsigned_int(ip):
