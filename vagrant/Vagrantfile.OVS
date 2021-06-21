@@ -31,7 +31,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Defining the MPTCP VMs (i=1 for UE, i=2 and 3 for proxies)
   ########################
   # Number of virtual machines
-  VMS_COUNT = 3
+  VMS_COUNT = 4
   (1..VMS_COUNT).each do |i|
     config.vm.define "mptcp#{i}" do |mptcp|
       mptcp.vm.network "forwarded_port", guest: 22, host: "#{i*10000+2222}", protocol: "tcp" # Port forwarding through the NAT interface
