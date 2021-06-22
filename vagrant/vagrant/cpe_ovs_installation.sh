@@ -4,6 +4,8 @@
 #REALLY IMPORTANT: include mptcp with IPv6
 #REALLY IMPORTANT: all VMs with all NICs in promisc mode (vboxmanage modifyvm mptcpUeX --nicpromiscY allow-all)
 
+sudo apt-get -y install bridge-utils
+
 sudo apt-get -y install libtool
 
 git clone https://github.com/openvswitch/ovs.git
