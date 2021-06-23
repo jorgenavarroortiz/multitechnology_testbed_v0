@@ -127,6 +127,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       end
       # Provisioning
       normal.vm.provision "file", source: "./vagrant", destination: "$HOME/vagrant"
+      normal.vm.provision "shell", path: "vagrant/clientserver_installation.sh", privileged: false
     end
   end
 
