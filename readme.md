@@ -249,7 +249,17 @@ Data rate for the different paths using the redundant MPTCP scheduler:
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/MPTCP_grafana_redundant.png" width="1200">
 
-Please note that, since ``CPE`` executes OVS to add/remove the 802.1Q header, it cannot ping neither the client nor the proxies (using the IP addresses from the VPN pool). However, this is expected and the client can ping the proxies and the server.
+Additionally, it is possible to have three IP addresses on the `client`. To avoid creating new interfaces on the VM, three virtual interfaces are created on top of `eth1`. Each interface allows to communicate with the server through each of the proxies. To perform a test, execute:
+
+``./client_tagged_several_vlans.sh``
+
+Then, you can test that it works by executing `ping` and `iperf`. Each interface, with IP addresses 10.X.0.33/24 (X=8,9,10) can ping its corresponding proxy (10.X.0.1/24) and the server (66.6.6.33). For example, `ping -I 10.8.0.33 10.8.0.1` should work but `ping -I 10.8.0.33 10.9.0.1` should not. In addition, `ping -R -I 10.8.0.33 66.6.6.33` should show that the packet is routed through proxy1 (10.8.0.1). You can perform similar tests by using different interfaces (IP addresses) and destinations.
+
+In order to test with `iperf`, you shall use the `-B` option on the CPE, specifying the IP address of the interface to be used. For example, you can execute `iperf -s` on the server and execute `iperf -c 66.6.6.33 -B 10.8.0.33` on the CPE. This data shall go through the proxy1 (you can check this with Grafana or using `tshark` on the corresponding `mtapX` interface (X=0,1,2)). As an example, the following picture shows an `iperf` test through proxy2 (which executes the Round-Robin scheduler).
+
+![grafana_all_vlans_proxy2](https://user-images.githubusercontent.com/17797704/122924330-ee69c980-d365-11eb-9d9d-4ee0e49cb8d9.png)
+
+Please note that, since ``CPE`` acts as a switch (executes OVS to add/remove the 802.1Q header), it cannot ping neither the client nor the proxies (using the IP addresses from the VPN pool). However, this is expected and the client can ping the proxies and the server.
 
 ## Launching SCENARIO 2: UE <-> free5GC <-> proxy
 
