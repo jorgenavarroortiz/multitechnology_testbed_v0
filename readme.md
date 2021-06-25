@@ -204,6 +204,10 @@ cd ~/vagrant/OVS
 chmod 777 *.sh
 ./ovs_start.sh
 ./cpe_ovs_vlan.sh
+./ovs_rules_trunk_port.sh -i eth4 -v 100 -v 200 -v 300
+./ovs_rules_access_port.sh -i mtap0 -v 100
+./ovs_rules_access_port.sh -i mtap1 -v 200
+./ovs_rules_access_port.sh -i mtap2 -v 300
 ```
 
 - **server** (accessible on localhost, port 62222):
