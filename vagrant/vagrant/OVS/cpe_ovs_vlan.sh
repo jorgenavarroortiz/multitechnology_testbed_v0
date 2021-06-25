@@ -22,10 +22,11 @@ sudo ovs-vsctl add-port vpn-br eth4
 
 # Configure interfaces
 sudo ifconfig eth4 0 promisc up
-for (( i=0; i<=${noVLANs}; i++ ))
-do
-  sudo ifconfig vpn-br 10.8.0.2/24 promisc up
-done
+sudo ifconfig vpn-br 0 promisc up
+#for (( i=0; i<=${noVLANs}; i++ ))
+#do
+#  sudo ifconfig vpn-br 10.8.0.2/24 promisc up
+#done
 
 for (( i=0; i<=${noVLANs}; i++ ))
 do
