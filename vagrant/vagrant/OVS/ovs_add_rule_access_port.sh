@@ -6,7 +6,7 @@
 #############################
 
 usage() {
-  echo "Include these VLANs in the trunk interface of OVS"
+  echo "Include this VLAN in one access interface of OVS"
   echo "Usage: $0 -i <interface> -v <VLAN ID>" 1>&2;
   echo ""
   echo "E.g. for CPE, path 1: $0 -i mtap0 -v 100"
