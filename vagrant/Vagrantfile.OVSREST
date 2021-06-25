@@ -35,6 +35,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   (1..VMS_COUNT).each do |i|
     config.vm.define "mptcp#{i}" do |mptcp|
       mptcp.vm.network "forwarded_port", guest: 22, host: "#{i*10000+2222}", protocol: "tcp" # Port forwarding through the NAT interface
+      mptcp.vm.network "forwarded_port", guest: 8000, host: "#{i*1000+8888}", protocol: "tcp" # Port forwarding through the NAT interface
       if i == 1
         mptcp.vm.hostname = "CPE"
         mptcp.vm.network "private_network", ip: "10.1.1.1", auto_config: true, virtualbox__intnet: "cpe_proxies" # 5G NR
@@ -83,6 +84,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       if i == 1
         mptcp.vm.provision "shell", path: "vagrant/cpe_ovs_installation.sh", privileged: false
       end
+      mptcp.vm.provision "shell", path: "vagrant/rest_api_installation.sh", privileged: false
     end
   end
 
@@ -94,6 +96,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   (1..VMS_COUNT).each do |i|
     config.vm.define "normal#{i}" do |normal|
       normal.vm.network "forwarded_port", guest: 22, host: "#{(i+4)*10000+2222}", protocol: "tcp" # Port forwarding through the NAT interface
+      normal.vm.network "forwarded_port", guest: 8000, host: "#{(i+4)*2222+8888}", protocol: "tcp" # Port forwarding through the NAT interface
       if i == 1
         normal.vm.hostname = "client"
         normal.vm.network "private_network", ip: "33.3.3.33", auto_config: true, virtualbox__intnet: "client_cpe"  # Connection to the CPE
@@ -128,6 +131,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       # Provisioning
       normal.vm.provision "file", source: "./vagrant", destination: "$HOME/vagrant"
       normal.vm.provision "shell", path: "vagrant/clientserver_installation.sh", privileged: false
+      normal.vm.provision "shell", path: "vagrant/rest_api_installation.sh", privileged: false
     end
   end
 
