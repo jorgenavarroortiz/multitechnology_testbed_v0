@@ -52,16 +52,15 @@ do
   sudo ifconfig mtap$i 0 promisc up
 done
 
-### *** LET THE RULES BE IN A DIFFERENT SCRIPT ***
-## Configure VLANs
-#  # Trunk port
-#VLANIDstring=$(IFS=, ; echo "${VLANIDarray[*]}")
-#sudo ovs-vsctl set port eth4 trunks=${VLANIDstring}
-#for (( i=0; i<=${noVLANs}; i++ ))
-#do
-#  # Access port
-#  sudo ovs-vsctl set port mtap$i tag=${VLANIDarray[$i]}
-#done
+# Configure VLANs
+  # Trunk port
+VLANIDstring=$(IFS=, ; echo "${VLANIDarray[*]}")
+sudo ovs-vsctl set port eth4 trunks=${VLANIDstring}
+for (( i=0; i<=${noVLANs}; i++ ))
+do
+  # Access port
+  sudo ovs-vsctl set port mtap$i tag=${VLANIDarray[$i]}
+done
 
 # Configure routes (possible routes accessible through the VPN)
 # Currently all entities are in the same LAN as the VPN (10.8.0.0/24),
