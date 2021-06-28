@@ -26,5 +26,4 @@ if [ -z "${p}" ]; then
 fi
 
 # Remove previous rule
-sudo ip net exec MPTCPns tc qdisc del dev v_mp_${MPTCPPATH} root
-
+sudo ip net exec MPTCPns tc qdisc del dev v_mp_${MPTCPPATH} root >/dev/null 2>&1
