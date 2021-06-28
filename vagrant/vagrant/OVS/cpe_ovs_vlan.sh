@@ -14,7 +14,7 @@ else
 fi
 
 # Delete previous configuration
-sudo ovs-vsctl del-br vpn-br 2&>1
+sudo ovs-vsctl del-br vpn-br >/dev/null 2>&1
 
 # OVS switch
 sudo ovs-vsctl add-br vpn-br
