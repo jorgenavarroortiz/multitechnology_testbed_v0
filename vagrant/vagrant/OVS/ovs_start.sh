@@ -11,5 +11,5 @@ sudo /usr/share/openvswitch/scripts/ovs-ctl start
 #sudo ovs-vsctl --no-wait init
 #sudo ovs-vswitchd --pidfile --detach
 
-sudo ovs-vsctl del-br cpe-br 2&>1
-sudo ovs-vsctl del-br vpn-br 2&>1
+sudo ovs-vsctl del-br cpe-br >/dev/null 2>&1
+sudo ovs-vsctl del-br vpn-br >/dev/null 2>&1
