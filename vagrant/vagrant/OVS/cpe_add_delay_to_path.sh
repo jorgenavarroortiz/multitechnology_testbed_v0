@@ -38,7 +38,7 @@ INTERFACE="v_mp_${MPTCPPATH}"
 DELAYMS="${DELAY}ms"
 
 # Remove previous rule
-sudo ip net exec MPTCPns tc qdisc del dev ${INTERFACE} root
+sudo ip net exec MPTCPns tc qdisc del dev ${INTERFACE} root >/dev/null 2>&1
 
 # Add new rule
 sudo ip net exec MPTCPns tc qdisc add dev ${INTERFACE} root netem delay ${DELAYMS}
