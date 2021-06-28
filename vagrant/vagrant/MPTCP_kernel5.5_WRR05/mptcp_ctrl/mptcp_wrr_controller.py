@@ -2,6 +2,9 @@
 # 27/05/2021
 # 04/06/2021 jjramos telemetry
 # 11/06/2021 jjramos added scheduler type
+# 24/06/2021 ardimasp fixed get_mptcp_telemetry, 
+#            get_mptcp_subflows_from_inode, and get_mptcp_sockets
+#            to fit with the OVS scenario
 #
 import ipaddress
 import subprocess
@@ -9,7 +12,7 @@ import socket
 import struct
 import time
 import os
-
+import re
 
 def get_mptcp_telemetry(subflows):
     telemetry = []
@@ -23,7 +26,7 @@ def get_mptcp_telemetry(subflows):
 
     # print("> ss -nite \"" + filters+"\"")
 
-    stream = os.popen("ss -nite \"" + filters + "\"")
+    stream = os.popen("ip netns exec MPTCPns ss -nite \"" + filters + "\"")
     lines = stream.readlines()
 
     for i in range(1, len(lines), 2):
@@ -61,7 +64,23 @@ def get_mptcp_telemetry(subflows):
                     sample[label] = value  # TODO change to int/float if needed
             else:
                 if values_[0] == "send":
-                    bps=int(tuples[j + 1][:-3])  # we want to remove the "bps" substring
+                    
+                    #bps=int(tuples[j + 1][:-3])  # we want to remove the "bps" substring
+                    
+                    unit_scale = "".join(re.findall(r"[a-zA-Z]*",tuples[j+1]))
+                    
+                    if (unit_scale.lower()=='bps'):
+                        bps=float(tuples[j + 1][:-3])
+                    elif (unit_scale.lower()=='kbps'):
+                        bps=float(tuples[j + 1][:-4])*1e3
+                    elif (unit_scale.lower()=='mbps'):
+                        bps=float(tuples[j + 1][:-4])*1e6
+                    elif (unit_scale.lower()=='gbps'):
+                        bps=float(tuples[j + 1][:-4])*1e9
+                    else:
+                        raise Exception("tuples is "+str(tuples[j + 1]))
+
+                    
                     sample["send_rate"] = bps
                     # sample["send_"]=tuples[j + 1]
                     j = j + 1
@@ -82,37 +101,35 @@ def proc_net_address_to_host(address):
 def proc_net_port_to_host(port):
     return int(port, 16)
 
-
-def get_mptcp_subflows_from_inode(inode, _proc_tcp_path="/proc/net/tcp"):
+def get_mptcp_subflows_from_inode(inode):
     socket_list = []
+    process  = subprocess.run(["ip","netns","exec","MPTCPns","cat","/proc/net/tcp"],universal_newlines=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    
+    i = 0
+    # Let's parse the line:
+    for line in process.stdout.splitlines():
+        # First line is a header.
+        if i > 0:
+            values = line.split()
+            # print(values)
+            _inode = int(values[9])
 
-    with open(_proc_tcp_path, "rt") as file:
-        lines = file.readlines()
+            if _inode == inode:
+                address = values[1].split(":")
+                local_address = proc_net_address_to_host(address[0])
+                local_port = proc_net_port_to_host(address[1])
 
-        i = 0
-        # Let's parse the line:
-        for line in lines:
-            # First line is a header.
-            if i > 0:
-                values = line.split()
-                # print(values)
-                _inode = int(values[9])
+                address = values[2].split(":")
+                remote_address = proc_net_address_to_host(address[0])
+                remote_port = proc_net_port_to_host(address[1])
 
-                if _inode == inode:
-                    address = values[1].split(":")
-                    local_address = proc_net_address_to_host(address[0])
-                    local_port = proc_net_port_to_host(address[1])
-
-                    address = values[2].split(":")
-                    remote_address = proc_net_address_to_host(address[0])
-                    remote_port = proc_net_port_to_host(address[1])
-
-                    socket_list.append(
-                        {"local_ip": local_address, "local_port": local_port, "remote_ip": remote_address,
-                         "remote_port": remote_port})
-            i = i + 1
+                socket_list.append(
+                    {"local_ip": local_address, "local_port": local_port, "remote_ip": remote_address,
+                        "remote_port": remote_port})
+        i = i + 1
 
     return socket_list
+
 
 def set_mptcp_scheduler(scheduler="default",_path="net.mptcp.mptcp_scheduler"):
     return execute_sysctl_command("-w "+_path+"="+scheduler)
@@ -140,35 +157,32 @@ def get_mptcp_socket(inode):
     
     return socket
 
-
-
-def get_mptcp_sockets(_proc_mptcp_path="/proc/net/mptcp_net/mptcp"):
+def get_mptcp_sockets():
     socket_list = []
+    process  = subprocess.run(["ip","netns","exec","MPTCPns","cat","/proc/net/mptcp_net/mptcp"],universal_newlines=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    
+    i = 0
+    # Let's parse the line:
+    for line in process.stdout.splitlines():
+        # First line is a header.
+        if i > 0:
+            values = line.split()
+            # print(values)
 
-    with open(_proc_mptcp_path, "rt") as file:
-        lines = file.readlines()
+            address = values[4].split(":")
+            local_address = proc_net_address_to_host(address[0])
+            local_port = proc_net_port_to_host(address[1])
 
-        i = 0
-        # Let's parse the line:
-        for line in lines:
-            # First line is a header.
-            if i > 0:
-                values = line.split()
-                # print(values)
+            address = values[5].split(":")
+            remote_address = proc_net_address_to_host(address[0])
+            remote_port = proc_net_port_to_host(address[1])
 
-                address = values[4].split(":")
-                local_address = proc_net_address_to_host(address[0])
-                local_port = proc_net_port_to_host(address[1])
-
-                address = values[5].split(":")
-                remote_address = proc_net_address_to_host(address[0])
-                remote_port = proc_net_port_to_host(address[1])
-
-                socket_list.append({"inode": int(values[9]), "local_ip": local_address, "local_port": local_port,
-                                    "remote_ip": remote_address, "remote_port": remote_port, "scheduler": values[10]})
-            i = i + 1
+            socket_list.append({"inode": int(values[9]), "local_ip": local_address, "local_port": local_port,
+                                "remote_ip": remote_address, "remote_port": remote_port, "scheduler": values[10]})
+        i = i + 1
 
     return socket_list
+
 
 # to modify, so it returns a result code.
 def execute_sysctl_command(params):
