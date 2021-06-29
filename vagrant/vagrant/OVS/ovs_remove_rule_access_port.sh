@@ -45,4 +45,4 @@ fi
 
 # Configure VLANs
   # Access port
-sudo ovs-vsctl remove port ${INTERFACE} tag=${VLANID}
+sudo ovs-vsctl remove port ${INTERFACE} tag ${VLANID}
