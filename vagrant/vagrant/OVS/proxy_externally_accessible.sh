@@ -36,16 +36,18 @@ fi
 # --> mtap$i can be used to access the VPN from the main namespace
 sudo ip link add v${tapIF} type veth peer name m${tapIF}
 sudo ip link set m${tapIF} up
+sudo ip link set m${tapIF} multicast off
 sudo ip link set v${tapIF} netns MPTCPns
 sudo ip netns exec MPTCPns ip link set v${tapIF} up
+sudo ip netns exec MPTCPns ip link set v${tapIF} multicast off
 sudo ip netns exec MPTCPns brctl addbr br_${tapIF}
 sudo ip netns exec MPTCPns brctl addif br_${tapIF} v${tapIF}
 sudo ip netns exec MPTCPns brctl addif br_${tapIF} ${tapIF}
 
-sudo ip netns exec MPTCPns ifconfig br_${tapIF} 0 promisc up
-sudo ip netns exec MPTCPns ifconfig ${tapIF} 0 promisc up
-sudo ip netns exec MPTCPns ifconfig v${tapIF} 0 promisc up
-sudo ifconfig m${tapIF} ${IPADDRESS} promisc up
+sudo ip netns exec MPTCPns ifconfig br_${tapIF} 0 promisc up -multicast
+sudo ip netns exec MPTCPns ifconfig ${tapIF} 0 promisc up -multicast
+sudo ip netns exec MPTCPns ifconfig v${tapIF} 0 promisc up -multicast
+sudo ifconfig m${tapIF} ${IPADDRESS} promisc up -multicast
 
 # Act as a router
 sudo sysctl -w net.ipv4.ip_forward=1
