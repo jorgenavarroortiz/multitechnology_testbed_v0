@@ -265,6 +265,72 @@ In order to test with `iperf`, you shall use the `-B` option on the CPE, specify
 
 Please note that, since ``CPE`` acts as a switch (executes OVS to add/remove the 802.1Q header), it cannot ping neither the client nor the proxies (using the IP addresses from the VPN pool). However, this is expected and the client can ping the proxies and the server.
 
+**Launching scenario 1 with multiple proxies (OVPN servers) with different schedulers and using both CPE and proxies jointly as one switch**
+
+This scenario is similar to the previous one, but it has some advantages:
+- The CPE and the proxies can be seen as a black box, acting as a switch. That is, it is transparent for both the client and server, which are in the same network (e.g. IP address 66.6.6.22/24 for client and 66.6.6.33/24 for server).
+- Since the client always connects with the same IP address, and CPE and proxies act as a layer 2 switch, the CPE can dinamically change which proxy (and therefore MPTCP scheduler) is being used at any moment. This allows us to change the MPTCP scheduler being used in real time during the same client's TCP session (e.g. one `iperf` experiment).
+
+Steps to execute this scenario:
+
+- **proxy1**:
+```
+cd ~/free5gc/mptcp_test
+./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_same_network_proxy1 -u 1 -m -o server -N 10.8.0.0
+cd ~/vagrant/OVS/
+chmod 777 *.sh
+./proxy_externally_accessible.sh
+./proxy_bridged_mode.sh
+```
+
+- **proxy2**:
+```
+cd ~/free5gc/mptcp_test
+./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_same_network_proxy2 -u 1 -m -o server -N 10.9.0.0
+cd ~/vagrant/OVS/
+chmod 777 *.sh
+./proxy_externally_accessible.sh
+./proxy_bridged_mode.sh
+```
+
+- **proxy3**:
+```
+cd ~/free5gc/mptcp_test
+./set_MPTCP_parameters.sh -p fullmesh -s redundant -c olia -f if_names.txt.scenario1_same_network_proxy3 -u 1 -m -o server -N 10.10.0.0
+cd ~/vagrant/OVS/
+chmod 777 *.sh
+./proxy_externally_accessible.sh
+./proxy_bridged_mode.sh
+```
+
+- **CPE**:
+```
+cd ~/free5gc/mptcp_test
+./set_MPTCP_parameters.sh -p fullmesh -s default -s roundrobin -s redundant -c olia -f if_names.txt.scenario1_same_network_CPE -u 3 -m -o client -S 10.1.1.4 -S 10.1.1.5 -S 10.1.1.6
+cd ~/vagrant/OVS
+chmod 777 *.sh
+./ovs_start.sh
+./cpe_ovs_vlan.sh
+./ovs_remove_vlans.sh
+./cpe_bridged_mode.sh
+```
+
+In order to modify the proxy being used for one specific IP, you can execute on the `CPE` (example for client with IP 66.6.6.22 selecting proxy 2, i.e. with WRR scheduler):
+```
+./cpe_configure_client.sh -s 66.6.6.22 -p 2
+```
+
+- **client**: no need to execute anything related to CPE or proxies (i.e. transparent for client), but being in the server's IP network
+```
+sudo ifconfig eth1 66.6.6.22/24
+```
+
+- **server**: no need to execute anything (i.e. transparent for server)
+
+Once that the scenario is launched, you may test it using `iperf -s` on the server and `iperf -c 66.6.6.33 -t 100` on the client. Then, you may change the proxy for this particular client executing on the CPE `./cpe_configure_client.sh -s 66.6.6.22 -p X`, where X=1,2,3 is the specific proxy (1 for default scheduler, 2 for WRR scheduler and 3 for redundant scheduler). This can be done in real time within the same `iperf` session. An example is shown in the following figure.
+
+![image](https://user-images.githubusercontent.com/17797704/123972208-f0add280-d9ba-11eb-80c9-1be53351884e.png)
+
 ## Launching SCENARIO 2: UE <-> free5GC <-> proxy
 
 In this scenario, a VM (mptcpUe) employs three network interfaces (`eth1`, `eth2` and `eth4`) emulating a computer with three wireless access technologies (WATs), e.g. Wi-Fi, Li-Fi and 5G NR (directly connected to the _mptcpProxy_ VM since there is no gNB emulator to connect through UPF). We assume that they are in bridge mode, i.e. connected to the same IP network. This VM is directly connected to a VM (free5gc) implementing the 5G core network. The connection is done through the N3IWF (Non-3GPP InterWorking Function) entity. Since we are employing MPTCP to simultaneously transfer data from the three network interfaces of mptcpUe VM, it is required that the other end also implements MPTCP. Due to the different kernel versions on both VMs (~~4.19.142~~5.5 for MPTCP and 5.0.0-23 for free5GC), another VM (mptcpProxy) is also required. mptcpProxy implements MPTCP for this purpose.
