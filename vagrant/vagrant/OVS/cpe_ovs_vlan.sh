@@ -72,3 +72,5 @@ done
 # Flow entries (if required, by default using NORMAL i.e. a standard learning switch)
 #sudo ovs-ofctl add-flow vpn-br in_port=eth4,actions=LOCAL -OOpenFlow13
 #sudo ovs-ofctl add-flow vpn-br in_port=LOCAL,actions=output:eth4 -OOpenFlow13
+
+sudo ovs-vsctl set bridge vpn-br stp_enable=true
