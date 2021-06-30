@@ -157,7 +157,7 @@ The following image shows how iperf performs different to one server (10.8.0.1 u
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/scenario1_twoservers.png" width="800">
 
-**Launching scenario 1 with multiple proxies (OVPN servers) with different schedulers and using CPE as a switch**
+**Launching scenario 1 with multiple proxies (OVPN servers) with different schedulers and using CPE as a switch and proxies as routers (_ip_forward=1_)**
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1_cpe_ovs.png" width="1200">
 
@@ -264,6 +264,72 @@ In order to test with `iperf`, you shall use the `-B` option on the CPE, specify
 ![grafana_all_vlans_proxy2](https://user-images.githubusercontent.com/17797704/122924330-ee69c980-d365-11eb-9d9d-4ee0e49cb8d9.png)
 
 Please note that, since ``CPE`` acts as a switch (executes OVS to add/remove the 802.1Q header), it cannot ping neither the client nor the proxies (using the IP addresses from the VPN pool). However, this is expected and the client can ping the proxies and the server.
+
+**Launching scenario 1 with multiple proxies (OVPN servers) with different schedulers and using both CPE and proxies jointly as one switch**
+
+This scenario is similar to the previous one, but it has some advantages:
+- The CPE and the proxies can be seen as a black box, acting as a switch. That is, it is transparent for both the client and server, which are in the same network (e.g. IP address 66.6.6.22/24 for client and 66.6.6.33/24 for server).
+- Since the client always connects with the same IP address, and CPE and proxies act as a layer 2 switch, the CPE can dinamically change which proxy (and therefore MPTCP scheduler) is being used at any moment. This allows us to change the MPTCP scheduler being used in real time during the same client's TCP session (e.g. one `iperf` experiment).
+
+Steps to execute this scenario:
+
+- **proxy1**:
+```
+cd ~/free5gc/mptcp_test
+./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_same_network_proxy1 -u 1 -m -o server -N 10.8.0.0
+cd ~/vagrant/OVS/
+chmod 777 *.sh
+./proxy_externally_accessible.sh
+./proxy_bridged_mode.sh
+```
+
+- **proxy2**:
+```
+cd ~/free5gc/mptcp_test
+./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_same_network_proxy2 -u 1 -m -o server -N 10.9.0.0
+cd ~/vagrant/OVS/
+chmod 777 *.sh
+./proxy_externally_accessible.sh
+./proxy_bridged_mode.sh
+```
+
+- **proxy3**:
+```
+cd ~/free5gc/mptcp_test
+./set_MPTCP_parameters.sh -p fullmesh -s redundant -c olia -f if_names.txt.scenario1_same_network_proxy3 -u 1 -m -o server -N 10.10.0.0
+cd ~/vagrant/OVS/
+chmod 777 *.sh
+./proxy_externally_accessible.sh
+./proxy_bridged_mode.sh
+```
+
+- **CPE**:
+```
+cd ~/free5gc/mptcp_test
+./set_MPTCP_parameters.sh -p fullmesh -s default -s roundrobin -s redundant -c olia -f if_names.txt.scenario1_same_network_CPE -u 3 -m -o client -S 10.1.1.4 -S 10.1.1.5 -S 10.1.1.6
+cd ~/vagrant/OVS
+chmod 777 *.sh
+./ovs_start.sh
+./cpe_ovs_vlan.sh
+./ovs_remove_vlans.sh
+./cpe_bridged_mode.sh
+```
+
+In order to modify the proxy being used for one specific IP, you can execute on the `CPE` (example for client with IP 66.6.6.22 selecting proxy 2, i.e. with WRR scheduler):
+```
+./cpe_configure_client.sh -s 66.6.6.22 -p 2
+```
+
+- **client**: no need to execute anything related to CPE or proxies (i.e. transparent for client), but being in the server's IP network
+```
+sudo ifconfig eth1 66.6.6.22/24
+```
+
+- **server**: no need to execute anything (i.e. transparent for server)
+
+Once that the scenario is launched, you may test it using `iperf -s` on the server and `iperf -c 66.6.6.33 -t 100` on the client. Then, you may change the proxy for this particular client executing on the CPE `./cpe_configure_client.sh -s 66.6.6.22 -p X`, where X=1,2,3 is the specific proxy (1 for default scheduler, 2 for WRR scheduler and 3 for redundant scheduler). This can be done in real time within the same `iperf` session. An example is shown in the following figure. In this test, first the proxy 1 (default scheduler) is selected, being changed to proxy 2 (WRR scheduler) and finally to proxy 3 (redundant scheduler).
+
+![image](https://user-images.githubusercontent.com/17797704/123972208-f0add280-d9ba-11eb-80c9-1be53351884e.png)
 
 ## Launching SCENARIO 2: UE <-> free5GC <-> proxy
 
