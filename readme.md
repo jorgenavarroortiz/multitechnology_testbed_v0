@@ -157,7 +157,7 @@ The following image shows how iperf performs different to one server (10.8.0.1 u
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/scenario1_twoservers.png" width="800">
 
-**Launching scenario 1 with multiple proxies (OVPN servers) with different schedulers and using CPE as a switch**
+**Launching scenario 1 with multiple proxies (OVPN servers) with different schedulers and using CPE as a switch and proxies as routers (_ip_forward=1_)**
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1_cpe_ovs.png" width="1200">
 
