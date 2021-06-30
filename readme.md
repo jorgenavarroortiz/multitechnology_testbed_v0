@@ -327,7 +327,7 @@ sudo ifconfig eth1 66.6.6.22/24
 
 - **server**: no need to execute anything (i.e. transparent for server)
 
-Once that the scenario is launched, you may test it using `iperf -s` on the server and `iperf -c 66.6.6.33 -t 100` on the client. Then, you may change the proxy for this particular client executing on the CPE `./cpe_configure_client.sh -s 66.6.6.22 -p X`, where X=1,2,3 is the specific proxy (1 for default scheduler, 2 for WRR scheduler and 3 for redundant scheduler). This can be done in real time within the same `iperf` session. An example is shown in the following figure.
+Once that the scenario is launched, you may test it using `iperf -s` on the server and `iperf -c 66.6.6.33 -t 100` on the client. Then, you may change the proxy for this particular client executing on the CPE `./cpe_configure_client.sh -s 66.6.6.22 -p X`, where X=1,2,3 is the specific proxy (1 for default scheduler, 2 for WRR scheduler and 3 for redundant scheduler). This can be done in real time within the same `iperf` session. An example is shown in the following figure. In this test, first the proxy 1 (default scheduler) is selected, being changed to proxy 2 (WRR scheduler) and finally to proxy 3 (redundant scheduler).
 
 ![image](https://user-images.githubusercontent.com/17797704/123972208-f0add280-d9ba-11eb-80c9-1be53351884e.png)
 
