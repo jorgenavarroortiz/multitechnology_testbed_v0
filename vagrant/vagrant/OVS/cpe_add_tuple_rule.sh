@@ -73,37 +73,11 @@ elif [ $PROXY -eq 3 ]; then
 fi
 
 
-# Remove previous flows related to this client
-#sudo ovs-ofctl del-flows vpn-br
+# Remove previous flows
+sudo ovs-ofctl del-flows vpn-br
 #sudo ovs-ofctl add-flow vpn-br priority=0,actions=output:NORMAL
 
-  # For ARP
-if [[ $d -eq 1 ]]; then
-  sudo ovs-ofctl del-flows vpn-br arp,nw_dst=${SRCIPADDRESS},nw_src=${DSTIPADDRESS}
-  sudo ovs-ofctl del-flows vpn-br arp,nw_src=${SRCIPADDRESS},nw_dst=${DSTIPADDRESS}
-else
-  sudo ovs-ofctl del-flows vpn-br arp,nw_dst=${SRCIPADDRESS}
-  sudo ovs-ofctl del-flows vpn-br arp,nw_src=${SRCIPADDRESS}
-fi
-
-  # To client (through eth4 -> check using "ovs-ofctl show vpn-br")
-RULE="nw_dst=${SRCIPADDRESS}"
-if [[ $d -eq 1 ]]; then RULE="${RULE},nw_src=${DSTIPADDRESS}"; fi
-if [[ $p -eq 1 ]]; then RULE="${RULE},protocol=${PROTOCOL}"; fi
-if [[ $S -eq 1 ]]; then RULE="${RULE},tp_src=${SRCPORT}"; fi
-if [[ $D -eq 1 ]]; then RULE="${RULE},tp_dst=${DSTPORT}"; fi
-sudo ovs-ofctl del-flows vpn-br ip,${RULE}
-
-  # Through proxy
-RULE="nw_src=${SRCIPADDRESS}"
-if [[ $d -eq 1 ]]; then RULE="${RULE},nw_dst=${DSTIPADDRESS}"; fi
-if [[ $p -eq 1 ]]; then RULE="${RULE},protocol=${PROTOCOL}"; fi
-if [[ $S -eq 1 ]]; then RULE="${RULE},tp_dst=${SRCPORT}"; fi
-if [[ $D -eq 1 ]]; then RULE="${RULE},tp_src=${DSTPORT}"; fi
-sudo ovs-ofctl del-flows vpn-br ip,${RULE}
-
-# Add new flows for this client
-  # For ARP
+# For ARP
 if [[ $d -eq 1 ]]; then
   sudo ovs-ofctl add-flow vpn-br priority=10,arp,nw_dst=${SRCIPADDRESS},nw_src=${DSTIPADDRESS},actions=output:1
   sudo ovs-ofctl add-flow vpn-br priority=10,arp,nw_src=${SRCIPADDRESS},nw_dst=${DSTIPADDRESS},actions=output:$OUTPUTPORT
@@ -112,7 +86,7 @@ else
   sudo ovs-ofctl add-flow vpn-br priority=10,arp,nw_src=${SRCIPADDRESS},actions=output:$OUTPUTPORT
 fi
 
-  # To client (through eth4 -> check using "ovs-ofctl show vpn-br")
+# To client (through eth4 -> check using "ovs-ofctl show vpn-br")
 RULE="nw_dst=${SRCIPADDRESS}"
 if [[ $d -eq 1 ]]; then RULE="${RULE},nw_src=${DSTIPADDRESS}"; fi
 if [[ $p -eq 1 ]]; then RULE="${RULE},protocol=${PROTOCOL}"; fi
@@ -120,10 +94,11 @@ if [[ $S -eq 1 ]]; then RULE="${RULE},tp_src=${SRCPORT}"; fi
 if [[ $D -eq 1 ]]; then RULE="${RULE},tp_dst=${DSTPORT}"; fi
 sudo ovs-ofctl add-flow vpn-br priority=10,ip,${RULE},actions=output:1
 
-  # Through proxy
+# Through proxy
 RULE="nw_src=${SRCIPADDRESS}"
 if [[ $d -eq 1 ]]; then RULE="${RULE},nw_dst=${DSTIPADDRESS}"; fi
 if [[ $p -eq 1 ]]; then RULE="${RULE},protocol=${PROTOCOL}"; fi
 if [[ $S -eq 1 ]]; then RULE="${RULE},tp_dst=${SRCPORT}"; fi
 if [[ $D -eq 1 ]]; then RULE="${RULE},tp_src=${DSTPORT}"; fi
 sudo ovs-ofctl add-flow vpn-br priority=10,ip,${RULE},actions=output:$OUTPUTPORT
+

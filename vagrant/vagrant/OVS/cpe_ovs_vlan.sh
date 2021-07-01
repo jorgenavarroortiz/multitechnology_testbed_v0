@@ -14,18 +14,18 @@ else
 fi
 
 # Delete previous configuration
-sudo ovs-vsctl del-br vpn-br >/dev/null >/dev/null 2>&1
+sudo ovs-vsctl del-br vpn-br >/dev/null 2>&1
 
 # OVS switch
 sudo ovs-vsctl add-br vpn-br
 sudo ovs-vsctl add-port vpn-br eth4
 
 # Configure interfaces
-sudo ifconfig eth4 0 promisc up -multicast
-sudo ifconfig vpn-br 0 promisc up -multicast
+sudo ifconfig eth4 0 promisc up
+sudo ifconfig vpn-br 0 promisc up
 #for (( i=0; i<=${noVLANs}; i++ ))
 #do
-#  sudo ifconfig vpn-br 10.8.0.2/24 promisc up -multicast
+#  sudo ifconfig vpn-br 10.8.0.2/24 promisc up
 #done
 
 for (( i=0; i<=${noVLANs}; i++ ))
@@ -39,24 +39,19 @@ do
     #     it can be connected to the OVS switch
   sudo ip link add vtap$i type veth peer name mtap$i
   sudo ip link set mtap$i up
-  sudo ip link set mtap$i multicast off
   sudo ip link set vtap$i netns MPTCPns
   sudo ip netns exec MPTCPns ip link set vtap$i up
-  sudo ip netns exec MPTCPns ip link set vtap$i multicast off
     # vtap$i will be bridged to tap$i using standard bridge control (brctl)
   sudo ip netns exec MPTCPns brctl addbr br_tap$i
   sudo ip netns exec MPTCPns brctl addif br_tap$i vtap$i
   sudo ip netns exec MPTCPns brctl addif br_tap$i tap$i
-  sudo ip netns exec MPTCPns ifconfig br_tap$i 0 promisc up -multicast
-  sudo ip netns exec MPTCPns ifconfig tap$i 0 promisc up -multicast
-  sudo ip netns exec MPTCPns ifconfig vtap$i 0 promisc up -multicast
+  sudo ip netns exec MPTCPns ifconfig br_tap$i 0 promisc up
+  sudo ip netns exec MPTCPns ifconfig tap$i 0 promisc up
+  sudo ip netns exec MPTCPns ifconfig vtap$i 0 promisc up
     # mtap$i will be in the OVS
   sudo ovs-vsctl add-port vpn-br mtap$i
-  sudo ifconfig mtap$i 0 promisc up -multicast
+  sudo ifconfig mtap$i 0 promisc up
 done
-
-sudo ip link set ovs-system multicast off
-sudo ovs-vsctl set bridge vpn-br stp_enable=true
 
 ### *** LET THE RULES BE IN A DIFFERENT SCRIPT ***
 ## Configure VLANs
@@ -77,3 +72,5 @@ sudo ovs-vsctl set bridge vpn-br stp_enable=true
 # Flow entries (if required, by default using NORMAL i.e. a standard learning switch)
 #sudo ovs-ofctl add-flow vpn-br in_port=eth4,actions=LOCAL -OOpenFlow13
 #sudo ovs-ofctl add-flow vpn-br in_port=LOCAL,actions=output:eth4 -OOpenFlow13
+
+sudo ovs-vsctl set bridge vpn-br stp_enable=true

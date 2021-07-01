@@ -20,12 +20,12 @@ while getopts ":i:v:" o; do
     i)
       i=1
       INTERFACE=${OPTARG}
-      echo "INTERFACE=$INTERFACE"
+#      echo "INTERFACE=$INTERFACE"
       ;;
     v)
       v=1
       VLANID=${OPTARG}
-      echo "VLANID=$VLANID"
+#      echo "VLANID=$VLANID"
       ;;
     *)
       usage
