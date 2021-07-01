@@ -319,7 +319,7 @@ chmod 777 *.sh
 
 In order to modify the proxy being used for one specific IP, you can execute on the `CPE` (example for client with IP 66.6.6.22 selecting proxy 2, i.e. with WRR scheduler):
 ```
-./cpe_configure_client.sh -s 66.6.6.22 -p 2
+./cpe_configure_client.sh -s 66.6.6.22 -P 2
 ```
 
 - **client**: no need to execute anything related to CPE or proxies (i.e. transparent for client), but being in the server's IP network
