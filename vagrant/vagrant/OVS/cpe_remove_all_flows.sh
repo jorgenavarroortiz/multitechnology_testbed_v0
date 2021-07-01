@@ -15,7 +15,7 @@ usage() {
 while getopts ":h" o; do
   case "${o}" in
     h)
-      usage()
+      usage
       exit 0
       ;;
     *)
