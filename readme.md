@@ -159,7 +159,7 @@ The following image shows how iperf performs different to one server (10.8.0.1 u
 
 **Launching scenario 1 with multiple proxies (OVPN servers) with different schedulers and using CPE as a switch and proxies as routers (_ip_forward=1_)**
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1_cpe_ovs.png" width="1200">
+![image](https://user-images.githubusercontent.com/17797704/124088738-885eff80-da53-11eb-8807-ea690e6f8371.png)
 
 Copy the content of the directory `free5gc/vagrant` to your computer. Rename the file `Vagrantfile.OVS` to `Vagrantfile`. **Copy your SSH credentials** for this repository (`id_rsa` and `id_rsa.pub` files) **to the `vagrant/ssh_credentials` directory**. Change to the directory with the `Vagrantfile` file and execute `sudo vagrant up`.
 
@@ -271,7 +271,7 @@ This scenario is similar to the previous one, but it has some advantages:
 - The CPE and the proxies can be seen as a black box, acting as a switch. That is, it is transparent for both the client and server, which are in the same network (e.g. IP address 66.6.6.22/24 for client and 66.6.6.33/24 for server).
 - Since the client always connects with the same IP address, and CPE and proxies act as a layer 2 switch, the CPE can dinamically change which proxy (and therefore MPTCP scheduler) is being used at any moment. This allows us to change the MPTCP scheduler being used in real time during the same client's TCP session (e.g. one `iperf` experiment).
 
-![image](https://user-images.githubusercontent.com/17797704/124088203-feaf3200-da52-11eb-8a49-6478731b55d9.png)
+![image](https://user-images.githubusercontent.com/17797704/124088526-4e8df900-da53-11eb-88ac-f404812ddadc.png)
 
 Steps to execute this scenario:
 
