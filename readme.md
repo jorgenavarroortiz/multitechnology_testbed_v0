@@ -271,6 +271,8 @@ This scenario is similar to the previous one, but it has some advantages:
 - The CPE and the proxies can be seen as a black box, acting as a switch. That is, it is transparent for both the client and server, which are in the same network (e.g. IP address 66.6.6.22/24 for client and 66.6.6.33/24 for server).
 - Since the client always connects with the same IP address, and CPE and proxies act as a layer 2 switch, the CPE can dinamically change which proxy (and therefore MPTCP scheduler) is being used at any moment. This allows us to change the MPTCP scheduler being used in real time during the same client's TCP session (e.g. one `iperf` experiment).
 
+![image](https://user-images.githubusercontent.com/17797704/124088203-feaf3200-da52-11eb-8a49-6478731b55d9.png)
+
 Steps to execute this scenario:
 
 - **proxy1**:
