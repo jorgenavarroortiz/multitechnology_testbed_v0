@@ -74,7 +74,7 @@ fi
 
 
 # Remove previous flows related to this client
-#sudo ovs-ofctl del-flows vpn-br
+sudo ovs-ofctl del-flows vpn-br
 #sudo ovs-ofctl add-flow vpn-br priority=0,actions=output:NORMAL
 
   # For ARP
