@@ -20,10 +20,13 @@ from fastapi.staticfiles import StaticFiles
 
 import subprocess
 import os
+import re
 
 import json
 import time
 import itertools
+
+from collections import Iterable
 
 tags_metadata = [
         {
@@ -33,6 +36,10 @@ tags_metadata = [
         {
             "name":"MPTCP",
             "description": "endpoints related to MPTCP"
+            },
+        {
+            "name":"OVS",
+            "description": "endpoints related to OVS"
             },
         ]
 
@@ -152,3 +159,114 @@ async def get_metrics():
         return {"status":"success", "telemetries":telemetries}
     except:
         return {"status":"error"}
+
+
+@app.get("/ovs/show", tags=["OVS"])
+async def get_ovs_status():
+    try:
+        process  = subprocess.run("ovs-vsctl -f json show".split(" "),universal_newlines=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        # parsing
+        list_text = process.stdout.split('\n')
+        dict_text = {}
+        prev_bridge_name = None;
+        prev_port_name = None;
+        status_insert_bridge = False;
+        status_insert_port = False
+        for i,txt in enumerate(list_text):
+            if 'Bridge' in txt:
+                bridge_name = re.split(r" +",txt)[-1]
+                dict_text[bridge_name] = {}
+                prev_bridge_name = bridge_name
+                status_insert_bridge = True
+                continue
+
+            if 'Port' in txt:
+                port_name = re.split(r" +",txt)[-1]
+                dict_text[bridge_name][port_name] = {}
+                prev_port_name = port_name
+                status_insert_port = True
+                continue
+                
+            tmp = re.match(r"^ *[a-zA-Z]",txt)
+            if tmp is not None:
+                if tmp.span()[-1]-1 == 12:
+                    key = re.split(r" +",txt)[1].replace(":","")
+                    value = "".join(re.split(r" +",txt)[2:])
+                    dict_text[bridge_name][port_name][key] = value
+
+        return {"status":"success", "message":dict_text}
+
+    except Exception as e:
+        return {"status":"error", "message": str(e)}
+
+@app.get("/ovs/bridge_info/{bridge_name}", tags=["OVS"])
+async def get_ovs_bridge_info(bridge_name: str):
+    try:
+        process  = subprocess.run(f"/home/vagrant/vagrant/OVS/ovs_show_of.sh -b {bridge_name}".split(" "),universal_newlines=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        text = process.stdout
+        list_text = text.split('\n')
+        list_text.pop()
+
+        # parsing
+
+        prev_port_name = None;
+
+
+        ## get the port names
+        port_names = []
+        tmp = re.findall(r".*\d\((.*)\)",text)
+        if tmp:
+            port_names.append(tmp)
+
+        tmp = re.findall(r".*LOCAL\((.*)\)",text)
+        if tmp:
+            port_names.append(tmp)
+
+        ## flatten
+        port_names = list(itertools.chain(*port_names))
+
+        ## initiate dict
+        dict_text = {}
+
+        tmp = re.findall(r".*n_tables:(\d+)",text)
+        if tmp:
+            dict_text['n_tables'] = tmp[0]
+
+        tmp = re.findall(r".*n_buffers:(\d+)",text)
+        if tmp:
+            dict_text['n_buffers'] = tmp[0]
+
+        tmp = re.findall(r".*capabilities: (.+)",text)
+        if tmp:
+            dict_text['capabilities'] = tmp[0]
+
+        tmp = re.findall(r".*actions: (.+)",text)
+        if tmp:
+            dict_text['actions'] = tmp[0]
+
+        for port_name in port_names:
+            dict_text[port_name] = {}
+
+        ## loop
+        for i,txt in enumerate(list_text):
+
+            port_name = [el for el in port_names if isinstance(el, Iterable) and (el in txt)]
+            if port_name:
+                port_name = port_name[0]
+                tmp = re.findall(r".*addr:(.+)",txt)
+                dict_text[port_name]["addr"] = tmp[0]
+                prev_port_name = port_name
+                continue
+
+            tmp = re.match(r"^ *[a-zA-Z]",txt)
+            if tmp is not None:
+                if tmp.span()[-1]-1 == 5:
+                    key = re.split(r" +",txt)[1].replace(":","")
+                    value = "".join(re.split(r" +",txt)[2:])
+                    dict_text[prev_port_name][key] = value
+
+        return {"status":"success", "message":dict_text} 
+
+    except Exception as e:
+        return {"status":"error", "message": str(e)}
