@@ -79,6 +79,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # app.include_router(api_router)
 
 class IfName(BaseModel):
+    status: str
     list_if: List[dict]
 
 class Rules(BaseModel):
@@ -175,12 +176,19 @@ async def get_interface_name():
         except:
             pass
 
-    return {"list_if":list_ifname}
+    if list_ifname:
+        return {"status":"success", "list_if":list_ifname}
+    else:
+        return {"status":"error", "list_if":list_ifname}
 
 @app.get("/mptcp/scheduler", tags=["MPTCP"])
 async def get_scheduler():
 
-    return {'scheduler':wrr.get_mptcp_current_scheduler().split('=')[1].strip()}
+    tmp = wrr.get_mptcp_current_scheduler().split('=')[1].strip()
+    if tmp:
+        return {"status":"success", 'scheduler':wrr.get_mptcp_current_scheduler().split('=')[1].strip()}
+    else:
+        return {"status":"error"}
 
 @app.post("/mptcp/set_rules", tags=["MPTCP"])
 async def set_rules(rules: Rules):
