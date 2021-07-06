@@ -155,7 +155,7 @@ async def cpe_scheduler_mptcp_get_rules(service,inode):
         return {'status':'error'}
 
 @app.post("/cpe/services/{service}/sockets/{inode}/scheduler/mptcp/weights", tags=["MPTCP"])
-async def cpe_scheduler_mptcp_set_rules(rules: Rules):    
+async def cpe_scheduler_mptcp_set_rules(service, inode, rules: Rules):    
     try:
         status = wrr.set_local_interfaces_rules(rules.rule)
 

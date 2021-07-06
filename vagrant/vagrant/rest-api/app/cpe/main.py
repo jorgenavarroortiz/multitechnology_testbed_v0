@@ -1,6 +1,6 @@
 import sys
-sys.path.insert(1, '/home/vagrant/vagrant/MPTCP_kernel5.5_WRR05/mptcp_ctrl')
-import mptcp_wrr_controller as wrr
+# sys.path.insert(1, '/home/vagrant/vagrant/MPTCP_kernel5.5_WRR05/mptcp_ctrl')
+# import mptcp_wrr_controller as wrr
 
 from typing import Optional
 from pydantic import BaseModel
@@ -36,6 +36,10 @@ tags_metadata = [
         {
             "name":"MPTCP",
             "description": "endpoints related to MPTCP"
+            },
+        {
+            "name":"services",
+            "description": "endpoints related to services"
             },
         {
             "name":"OVS",
@@ -75,6 +79,29 @@ app.add_middleware(
 
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+#######################
+#
+# jjramos 04/0/2021
+#
+print("Reading configuration file...")
+
+config={}
+namespace=None
+
+with open("cpe.cfg") as json_file:
+    config=json.load(json_file)
+
+if "wrr_library_path" in config:
+    sys.path.insert(1, config["wrr_library_path"])   # jjramos, 2/7/2021 '/home/mptcp/v06'
+    import mptcp_wrr_controller as wrr
+
+    print("WRR library path... "+config["wrr_library_path"])
+if "sockets" in config:
+    if "namespace" in config["sockets"]:
+        namespace=config["sockets"]["namespace"]
+        print("Sockets namespace... "+namespace)
+#######################
 
 # app.include_router(api_router)
 
@@ -133,6 +160,23 @@ class Delay(BaseModel):
                     }
                 }
 
+class Services(BaseModel):
+    services: List[dict]
+
+    class Config:
+        schema_extra = {
+                "example": 
+                    [{"redundant":{"enabled":True}},{"low-delay":{"enabled":False}},{"weighted-round-robin":{"enabled":True}}]
+                }
+
+class ServiceSockets(BaseModel):
+    services: List[dict]
+
+    class Config:
+        schema_extra = {
+                "example": 
+                    [{"inode":12313}]
+                }
 
 @app.get("/docs", include_in_schema=False)
 async def custom_swagger_ui_html():
@@ -190,9 +234,58 @@ async def get_scheduler():
     else:
         return {"status":"error"}
 
-@app.post("/mptcp/set_rules", tags=["MPTCP"])
-async def set_rules(rules: Rules):
+# @app.post("/mptcp/set_rules", tags=["MPTCP"])
+# async def set_rules(rules: Rules):
     
+#     try:
+#         status = wrr.set_local_interfaces_rules(rules.rule)
+
+#         return {'status':'success', 'msg': f"The rule is {rules.rule}"}
+#     except ValueError as e:
+#         return {'status':'error', 'msg': f"The rule is {rules.rule}", 'error_msg': str(e)}
+
+# @app.get("/mptcp/metrics", tags=["MPTCP"])
+# async def get_metrics():
+    
+#     try:
+#         mptcp_sockets=wrr.get_mptcp_sockets()
+
+#         # For each socket
+#         for mptcp_socket in mptcp_sockets:
+#             # We get the identifier of this socket (its inode)
+#             inode=mptcp_socket["inode"]
+#             mptcp_subflows=wrr.get_mptcp_subflows_from_inode(inode)
+        
+#         telemetries = []
+#         for subflow in mptcp_subflows:
+#             telemetries.append(wrr.get_mptcp_telemetry([subflow]))
+
+#         telemetries = list(itertools.chain(*telemetries))
+
+#         return {"status":"success", "telemetries":telemetries}
+#     except Exception as e:
+#         return {"status":"error", "message": str(e)}
+
+@app.get("/cpe/services", tags=["services"], response_model=Services)
+async def get_cpe_services():
+    services_list=[{"redundant":{"enabled":True}},{"low-delay":{"enabled":True}},{"weighted-round-robin":{"enabled":True}}]
+
+    return { "services":services_list}
+
+@app.get("/cpe/services/{service}/sockets/{inode}/scheduler/mptcp/weights", tags=["MPTCP"])
+async def cpe_scheduler_mptcp_get_rules(service,inode):
+    
+    try:
+        status = wrr.get_local_interfaces_rules()
+
+        print(status)
+
+        return {'status':'success', 'rules': status}
+    except ValueError as e:
+        return {'status':'error'}
+
+@app.post("/cpe/services/{service}/sockets/{inode}/scheduler/mptcp/weights", tags=["MPTCP"])
+async def cpe_scheduler_mptcp_set_rules(service, inode, rules: Rules):    
     try:
         status = wrr.set_local_interfaces_rules(rules.rule)
 
@@ -200,28 +293,103 @@ async def set_rules(rules: Rules):
     except ValueError as e:
         return {'status':'error', 'msg': f"The rule is {rules.rule}", 'error_msg': str(e)}
 
-@app.get("/mptcp/metrics", tags=["MPTCP"])
-async def get_metrics():
-    
+
+@app.get("/cpe/services/{service}/sockets/{inode}", tags=["services"])
+async def get_cpe_service_socket_inode(service,inode):
+    service_to_scheduler={"weighted-round-robin":"roundrobin","redundant":"redundant","low-delay":"default"}
+    sched=service_to_scheduler[service]
+    inode=int(inode)
+
+    service_info=[]
+
     try:
-        mptcp_sockets=wrr.get_mptcp_sockets()
+        # Only for WRR:
+        if service=="weighted-round-robin":
+             
+                scheduler=wrr.get_mptcp_socket_scheduler(inode,namespace)
+                print("-> "+str(inode)+" "+sched)
+
+                print(scheduler)
+
+                if scheduler==sched:
+                    mptcp_subflows=wrr.get_mptcp_subflows_from_inode(inode,namespace)
+                    service_info.append({"inode":inode, "scheduler": sched, "subflows":mptcp_subflows})
+        else:
+            service_info.append({"inode":inode, "scheduler": sched})
+
+        return {"status":"success", "socket_info":service_info}
+    except:
+        return {"status":"error"}
+
+@app.get("/cpe/services/{service}/sockets", tags=["services"])
+async def get_cpe_service_sockets(service):
+    service_to_scheduler={"weighted-round-robin":"roundrobin","redundant":"redundant","low-delay":"default"}
+    sched=service_to_scheduler[service]
+
+    service_info=[]
+
+    try:
+        # Only for WRR:
+        if service=="weighted-round-robin":
+            mptcp_sockets=wrr.get_mptcp_sockets(namespace)
+
+                # For each socket
+            for mptcp_socket in mptcp_sockets:
+                # We get the identifier of this socket (its inode)
+                inode=mptcp_socket["inode"]
+
+                scheduler=wrr.get_mptcp_socket_scheduler(inode,namespace)
+
+                print(scheduler)
+
+                if scheduler==sched:
+                    mptcp_subflows=wrr.get_mptcp_subflows_from_inode(inode,namespace)
+                    service_info.append({"inode":inode, "scheduler": sched, "subflows":mptcp_subflows})
+        else:
+            service_info.append({"inode":inode, "scheduler": sched})
+
+        return {"status":"success", "sockets_info":service_info}
+    except:
+        return {"status":"error"}
+
+@app.get("/cpe/telemetry/sockets", tags=["telemetry"])
+async def get_cpe_telemetry_sockets():
+
+    try:
+        mptcp_sockets=wrr.get_mptcp_sockets(namespace)
+
+        telemetries = []
 
         # For each socket
         for mptcp_socket in mptcp_sockets:
             # We get the identifier of this socket (its inode)
             inode=mptcp_socket["inode"]
-            mptcp_subflows=wrr.get_mptcp_subflows_from_inode(inode)
-        
-        telemetries = []
-        for subflow in mptcp_subflows:
-            telemetries.append(wrr.get_mptcp_telemetry([subflow]))
+            mptcp_subflows=wrr.get_mptcp_subflows_from_inode(inode,namespace)
+
+            for subflow in mptcp_subflows:
+                telemetries.append(wrr.get_mptcp_telemetry([subflow],namespace))
 
         telemetries = list(itertools.chain(*telemetries))
 
-        return {"status":"success", "telemetries":telemetries}
-    except Exception as e:
-        return {"status":"error", "message": str(e)}
+        return {"status":"success", "telemetry":telemetries}
+    except:
+        return {"status":"error"}
 
+@app.get("/cpe/telemetry/sockets/{inode}", tags=["telemetry"])
+async def get_cpe_telemetry_socket_inode(inode):
+    try:
+        inode=int(inode)
+        mptcp_subflows=wrr.get_mptcp_subflows_from_inode(inode,namespace)
+        
+        telemetries = []
+        for subflow in mptcp_subflows:
+            telemetries.append(wrr.get_mptcp_telemetry([subflow],namespace))
+
+        telemetries = list(itertools.chain(*telemetries))
+
+        return {"status":"success", "telemetry":telemetries}
+    except:
+        return {"status":"error"}
 
 @app.get("/ovs/show", tags=["OVS"])
 async def get_ovs_status():
