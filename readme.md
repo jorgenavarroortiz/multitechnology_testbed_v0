@@ -6,13 +6,13 @@ We have also included instructions to install MPTCP in NUC (Intel NUC 10 NUC10i7
 
 Similarly, it has also been tested (scenario 1, i.e. without free5gc) using a Raspberry Pi 4 with 4 GB with Raspberry OS (64 bits), based on kernel rpi-5.5.y with support for MPTCP.
 
+You can find the patch for linux kernel 5.5 with MPTCP support in the [MPTCP_patches](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/tree/main/MPTCP_patches) directory. This patch has been submitted to the multipath-tcp.org mailing list following the instructions from [here](https://multipath-tcp.org/pmwiki.php/Developer/SubmitAPatch).
+
 You can watch a [video](https://youtu.be/_7CiYgILo1g) showing how [scenario 1](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-scenario-1-two-virtual-machines-directly-connected) works.
 
 You can watch a [video](https://youtu.be/AYZm-uw-ZXU) showing how [scenario 2](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-scenario-2-ue---free5gc---proxy) works.
 
 You can watch a [video](https://user-images.githubusercontent.com/17797704/125672786-4ee5dcec-b28b-4b11-885f-fd782e0a948f.mp4) showing how the scenario with OVS and using several MPTCP proxies works. Please download the video first if it is not correctly displayed on your browser.
-
-You can find the patch for linux kernel 5.5 with MPTCP support in the [MPTCP_patches](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/tree/main/MPTCP_patches) directory. This patch has been submitted to the multipath-tcp.org mailing list following the instructions from [here](https://multipath-tcp.org/pmwiki.php/Developer/SubmitAPatch).
 
 ## Setting up the virtual environment
 
