@@ -337,10 +337,17 @@ Once that the scenario is launched, you may test it using `iperf -s` on the serv
 
 ![image](https://user-images.githubusercontent.com/17797704/123972208-f0add280-d9ba-11eb-80c9-1be53351884e.png)
 
+If you have intalled the repo for statistics, execute (you may want to do it within a screen session, using e.g. `screen -S stats`):
+
+```
+cd ~/vagrant/stats/5g-clarity_testbed_v0_stats
+./start_stats.sh
+```
+
 If you want to launch the REST API (uncomplete, only for testing purposes) you can execute (you may want to do it within a screen session, using e.g. `screen -S testapi`):
 
 ```
-cd vagrant/rest-api/app/cpe/
+cd ~/vagrant/rest-api/app/cpe/
 sudo python -m pipenv run uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
