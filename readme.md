@@ -344,14 +344,16 @@ cd ~/vagrant/stats/5g-clarity_testbed_v0_stats
 ./start_stats.sh
 ```
 
-If you want to launch the REST API (uncomplete, only for testing purposes) you can execute (you may want to do it within a screen session, using e.g. `screen -S testapi`):
+Then, you may connect to `http://<server IP address>:13000`.
+
+Similarly, if you want to launch the REST API (uncomplete, only for testing purposes) you can execute (you may want to do it within a screen session, using e.g. `screen -S testapi`):
 
 ```
 cd ~/vagrant/rest-api/app/cpe/
 sudo python -m pipenv run uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
-This test API includes calls to select a specific proxy, change a few parameters (e.g. WRR weigths, an additional artificial delay, etc), or to show/modify OVS flow entries.
+This test API includes calls to select a specific proxy, change a few parameters (e.g. WRR weigths, an additional artificial delay, etc), or to show/modify OVS flow entries. You may connect to `http://<server IP address>:18000`.
 
 ## Launching SCENARIO 2: UE <-> free5GC <-> proxy
 
