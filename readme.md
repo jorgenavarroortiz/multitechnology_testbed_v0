@@ -157,15 +157,6 @@ The following image shows how iperf performs different to one server (10.8.0.1 u
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/scenario1_twoservers.png" width="800">
 
-If you want to launch the REST API (uncomplete, only for testing purposes) you can execute (you may want to do it within a screen session, using e.g. `screen -S testapi`):
-
-```
-cd vagrant/rest-api/app/cpe/
-sudo python -m pipenv run uvicorn main:app --host 0.0.0.0 --port 8000
-```
-
-This test API includes calls to select a specific proxy, change a few parameters (e.g. WRR weigths, an additional artificial delay, etc), or to show/modify OVS flow entries.
-
 ## Launching SCENARIO 2: UE <-> free5GC <-> proxy
 
 In this scenario, a VM (mptcpUe) employs three network interfaces (`eth1`, `eth2` and `eth4`) emulating a computer with three wireless access technologies (WATs), e.g. Wi-Fi, Li-Fi and 5G NR (directly connected to the _mptcpProxy_ VM since there is no gNB emulator to connect through UPF). We assume that they are in bridge mode, i.e. connected to the same IP network. This VM is directly connected to a VM (free5gc) implementing the 5G core network. The connection is done through the N3IWF (Non-3GPP InterWorking Function) entity. Since we are employing MPTCP to simultaneously transfer data from the three network interfaces of mptcpUe VM, it is required that the other end also implements MPTCP. Due to the different kernel versions on both VMs (~~4.19.142~~5.5 for MPTCP and 5.0.0-23 for free5GC), another VM (mptcpProxy) is also required. mptcpProxy implements MPTCP for this purpose.
