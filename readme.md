@@ -167,6 +167,8 @@ The following image shows how iperf performs different to one server (10.8.0.1 u
 
 Copy the content of the directory `free5gc/vagrant` to your computer. Rename the file `Vagrantfile.OVS` to `Vagrantfile`. **Copy your SSH credentials** for this repository (`id_rsa` and `id_rsa.pub` files) **to the `vagrant/ssh_credentials` directory**. Change to the directory with the `Vagrantfile` file and execute `sudo vagrant up`.
 
+**NOTE**: This Vagrantfile has been modified to use kernel 5.4.144 with MPTCP 0.96 and WRR 0.5. Other kernels in this repo utilize MPTCP 0.95. If required, you may modify the file Vagrantfile.OVS to select your preferred kernel.
+
 This `Vagrantfile` generates 6 virtual machine: one client (IP address 33.3.3.33/24) connected to the CPE, which is connected to 3 MPTCP proxies, which in turn are connected to one server (IP address 66.6.6.33/24). If the client is connected to VLAN 100, data is sent over `proxy1` (default scheduler) to the server. If the client is connected to VLAN 200, data is sent over `proxy2` (Round-Robin scheduler) to the server. If the client is connected to VLAN 300, data is sent over `proxy3` (redundant scheduler) to the server.
 
 **NOTE**: These virtual machines employ only 1GB of RAM in order to consume too much memory from the host machine. Feel free to change this if you have more resources.
