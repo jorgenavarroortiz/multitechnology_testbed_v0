@@ -54,7 +54,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       end
       # Provisioning
       mptcpUe.vm.provision "file", source: "./vagrant", destination: "$HOME/vagrant"
-      mptcpUe.vm.provision "shell", path: "vagrant/mptcp_kernel55_installation.sh", privileged: false
+      mptcpUe.vm.provision "shell", path: "vagrant/mptcp_kernel54144_installation.sh", privileged: false
       mptcpUe.vm.provision :reload
       mptcpUe.vm.provision "shell", path: "vagrant/mptcp_installation.sh", privileged: false
       mptcpUe.vm.provision "shell", path: "vagrant/initial_testing_2machines.sh", privileged: false
