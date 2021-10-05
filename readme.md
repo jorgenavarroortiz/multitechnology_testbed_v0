@@ -277,7 +277,7 @@ This scenario is similar to the previous one, but it has some advantages:
 - The CPE and the proxies can be seen as a black box, acting as a switch. That is, it is transparent for both the client and server, which are in the same network (e.g. IP address 66.6.6.22/24 for client and 66.6.6.33/24 for server).
 - Since the client always connects with the same IP address, and CPE and proxies act as a layer 2 switch, the CPE can dinamically change which proxy (and therefore MPTCP scheduler) is being used at any moment. This allows us to change the MPTCP scheduler being used in real time during the same client's TCP session (e.g. one `iperf` experiment).
 
-![image](https://user-images.githubusercontent.com/17797704/124088526-4e8df900-da53-11eb-88ac-f404812ddadc.png)
+![mptcp_vlan_ovs](https://user-images.githubusercontent.com/17797704/136075063-5600cc32-f90b-49fd-9601-644c9b0f9963.png)
 
 Steps to execute this scenario:
 
