@@ -163,7 +163,7 @@ The following image shows how iperf performs different to one server (10.8.0.1 u
 
 **Launching scenario 1 with multiple proxies (OVPN servers) with different schedulers and using CPE as a switch and proxies as routers (_ip_forward=1_)**
 
-![image](https://user-images.githubusercontent.com/17797704/124088738-885eff80-da53-11eb-8807-ea690e6f8371.png)
+![mptcp_vlan_ovs1](https://user-images.githubusercontent.com/17797704/136077467-59a7a5fd-d3ad-4d25-84bb-0a20f2d9b6d1.png)
 
 Copy the content of the directory `free5gc/vagrant` to your computer. Rename the file `Vagrantfile.OVS` to `Vagrantfile`. **Copy your SSH credentials** for this repository (`id_rsa` and `id_rsa.pub` files) **to the `vagrant/ssh_credentials` directory**. Change to the directory with the `Vagrantfile` file and execute `sudo vagrant up`.
 
