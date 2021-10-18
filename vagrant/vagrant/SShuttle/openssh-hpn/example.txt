@@ -1,0 +1,1 @@
+ssh -oNoneSwitch=yes -oNoneEnabled=yes -v vagrant@localhost
