@@ -21,4 +21,3 @@ sudo route add default gw 10.0.2.2
 # Flow entries
 #sudo ovs-ofctl add-flow cpe-br in_port=eth0,actions=LOCAL -OOpenFlow13
 #sudo ovs-ofctl add-flow cpe-br in_port=LOCAL,actions=output:eth0 -OOpenFlow13
-

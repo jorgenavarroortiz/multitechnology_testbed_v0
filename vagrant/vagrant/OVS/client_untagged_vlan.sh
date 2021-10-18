@@ -70,4 +70,3 @@ rm tmp.txt
 
 echo "Adding default route through gateway ${GATEWAY}"
 sudo route add default gw ${GATEWAY}
-

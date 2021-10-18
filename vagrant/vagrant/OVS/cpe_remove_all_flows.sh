@@ -27,4 +27,3 @@ shift $((OPTIND-1))
 
 # Remove all flows
 sudo ovs-ofctl del-flows vpn-br
-

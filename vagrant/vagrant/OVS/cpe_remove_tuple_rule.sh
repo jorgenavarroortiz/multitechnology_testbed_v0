@@ -76,4 +76,3 @@ if [[ $p -eq 1 ]]; then RULE="${RULE},protocol=${PROTOCOL}"; fi
 if [[ $S -eq 1 ]]; then RULE="${RULE},tp_dst=${SRCPORT}"; fi
 if [[ $D -eq 1 ]]; then RULE="${RULE},tp_src=${DSTPORT}"; fi
 sudo ovs-ofctl del-flows vpn-br ip,${RULE}
-

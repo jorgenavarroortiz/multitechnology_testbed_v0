@@ -20,4 +20,3 @@ sudo ifconfig cpe-br 192.168.56.2/24
 # Flow entries
 #sudo ovs-ofctl add-flow cpe-br in_port=eth4,actions=LOCAL -OOpenFlow13
 #sudo ovs-ofctl add-flow cpe-br in_port=LOCAL,actions=output:eth4 -OOpenFlow13
-
