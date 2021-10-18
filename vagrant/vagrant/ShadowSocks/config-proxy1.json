@@ -1,0 +1,11 @@
+{
+    "server":"10.1.1.4",
+    "server_port":8388,
+    "local_port":1080,
+    "password":"5GLaboratory",
+    "timeout":60,
+    "method":"none",
+    "fast_open": true,
+    "mode":"tcp_and_udp",
+    "mtu":1600
+}
