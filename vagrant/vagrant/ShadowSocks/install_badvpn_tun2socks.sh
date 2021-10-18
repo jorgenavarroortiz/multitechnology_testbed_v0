@@ -1,5 +1,7 @@
 sudo apt-get -y install cmake
 
+cd /home/vagrant/vagrant/ShadowSocks
+
 tar xvfz badvpn.tar.gz
 
 cd badvpn/build

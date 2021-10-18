@@ -4,6 +4,8 @@ sudo apt-get -y install asciidoc
 sudo apt-get -y install libc-ares-dev
 sudo apt-get -y install libev-dev
 
+cd vagrant/ShadowSocks
+
 tar xvfz shadowsocks-libev-nocrypto.tar.gz
 
 cd shadowsocks-libev-nocrypto
