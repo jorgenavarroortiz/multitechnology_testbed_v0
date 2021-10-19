@@ -359,7 +359,7 @@ This test API includes calls to select a specific proxy, change a few parameters
 
 **Launching scenario 1 with an SSH tunnel (_SShuttle_) instead of OpenVPN**
 
-In this case, for simplicity, no namespaces are employed.
+In this case, for simplicity, no namespaces are employed. This scenario is available if you use the ``Vagrantfile.ALL`` file (please rename it to ``Vagrantfile``).
 
 ![image](https://user-images.githubusercontent.com/17797704/137905634-a07f6f91-635c-4913-b27e-4439fce41411.png)
 
@@ -400,7 +400,7 @@ After these steps, you may perform an ``iperf`` experiment using ``iperf -s`` on
 
 **Launching scenario 1 with a SOCKS5 server (_ShadowSocks_) instead of OpenVPN**
 
-In this case, for simplicity, no namespaces are employed.
+In this case, for simplicity, no namespaces are employed. This scenario is available if you use the ``Vagrantfile.ALL`` file (please rename it to ``Vagrantfile``).
 
 ![image](https://user-images.githubusercontent.com/17797704/137905882-0702f2f6-9cc3-4dfc-89f3-17f777eb2768.png)
 
