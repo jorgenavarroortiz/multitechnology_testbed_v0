@@ -357,6 +357,89 @@ sudo python -m pipenv run uvicorn main:app --host 0.0.0.0 --port 8000
 
 This test API includes calls to select a specific proxy, change a few parameters (e.g. WRR weigths, an additional artificial delay, etc), or to show/modify OVS flow entries. You may connect to `http://<server IP address>:18000`.
 
+**Launching scenario 1 with an SSH tunnel (_SShuttle_) instead of OpenVPN**
+
+In this case, for simplicity, no namespaces are employed.
+
+![image](https://user-images.githubusercontent.com/17797704/137905634-a07f6f91-635c-4913-b27e-4439fce41411.png)
+
+Steps to execute this scenario:
+
+- **client**:
+```
+sudo route del default
+sudo route add default gw 33.3.3.1
+```
+
+- **server**:
+```
+sudo route del default
+sudo route add default gw 66.6.6.1
+```
+
+- **proxy1**:
+```
+sudo route del default
+cd ~/free5gc/mptcp_test
+sudo ip link set dev eth2 multipath off
+./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_same_network_proxy1 -u 1
+sudo sysctl -w net.ipv4.ip_forward=1
+```
+
+- **CPE**:
+```
+sudo route del default
+cd ~/free5gc/mptcp_test
+./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_same_network_CPE -u 3
+cd vagrant/SShuttle
+```
+
+On the CPE, there are two alternatives. Using _SShuttle_ with NAT (only TCP) or with TProxy (both TCP and UDP). For _SShuttle_ with NAT, please execute ``./cpe_sshuttle_nat_onlytcp.sh``. For SShuttle with TProxy, please execute ``./cpe_sshuttle_tproxy_tcpandudp.sh``.
+
+After these steps, you may perform an ``iperf`` experiment using ``iperf -s`` on the server and ``iperf -c 66.6.6.33`` (add ``-u`` for UDP and ``-P 10`` for e.g. 10 parallel flows).
+
+**Launching scenario 1 with a SOCKS5 server (_ShadowSocks_) instead of OpenVPN**
+
+In this case, for simplicity, no namespaces are employed.
+
+![image](https://user-images.githubusercontent.com/17797704/137905882-0702f2f6-9cc3-4dfc-89f3-17f777eb2768.png)
+
+Steps to execute this scenario:
+
+- **client**:
+```
+sudo route del default
+sudo route add default gw 33.3.3.1
+```
+
+- **server**:
+```
+sudo route del default
+sudo route add default gw 66.6.6.1
+```
+
+- **proxy1**:
+```
+sudo route del default
+cd ~/free5gc/mptcp_test
+sudo ip link set dev eth2 multipath off
+./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_same_network_proxy1 -u 1
+cd ~/vagrant/ShadowSocks
+./proxy_shadowsocks.sh
+```
+
+- **CPE**:
+```
+sudo route del default
+cd ~/free5gc/mptcp_test
+./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_same_network_CPE -u 3
+cd ~/vagrant/ShadowSocks
+```
+
+On the CPE, there are two alternatives. Using _ShadowSocks_ with _badvpn-tun2socks_ (both TCP and UDP) or with _ip2socks_ (only TCP but better performance). _badvpn-tun2socks_ creates a ``tun`` interface, whereas _ip2socks_ can select between a ``tun`` or a ``tap`` interface (please check the ``config-cpe-ip2socks.yml`` file). For _ShadowSocks_ with _badvpn-tun2socks_, please execute ``./cpe_shadowsocks_tun2socks_tun_tcpandudp.sh``. For _ShadowSocks_ with _ip2socks_, please execute ``./cpe_shadowsocks_ip2socks_onlytcp.sh``.
+
+After these steps, you may perform an ``iperf`` experiment using ``iperf -s`` on the server and ``iperf -c 66.6.6.33`` (add ``-u`` for UDP and ``-P 10`` for e.g. 10 parallel flows).
+
 ## Launching SCENARIO 2: UE <-> free5GC <-> proxy
 
 In this scenario, a VM (mptcpUe) employs three network interfaces (`eth1`, `eth2` and `eth4`) emulating a computer with three wireless access technologies (WATs), e.g. Wi-Fi, Li-Fi and 5G NR (directly connected to the _mptcpProxy_ VM since there is no gNB emulator to connect through UPF). We assume that they are in bridge mode, i.e. connected to the same IP network. This VM is directly connected to a VM (free5gc) implementing the 5G core network. The connection is done through the N3IWF (Non-3GPP InterWorking Function) entity. Since we are employing MPTCP to simultaneously transfer data from the three network interfaces of mptcpUe VM, it is required that the other end also implements MPTCP. Due to the different kernel versions on both VMs (~~4.19.142~~5.5 for MPTCP and 5.0.0-23 for free5GC), another VM (mptcpProxy) is also required. mptcpProxy implements MPTCP for this purpose.
