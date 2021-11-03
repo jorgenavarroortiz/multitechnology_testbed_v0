@@ -2,11 +2,13 @@
 
 Testbed v0 (virtualized environment) for the 5G-CLARITY European Project. Based on Daniel Camps' work (from i2CAT), see https://bitbucket.i2cat.net/projects/SDWN/repos/free5gc/browse. Please contact Jorge Navarro-Ortiz (jorgenavarro@ugr.es) or Juan J. Ramos-Munoz (jjramos@ugr.es) for further details.
 
-We have also included instructions to install MPTCP in NUC (Intel NUC 10 NUC10i7FNH) using kernel ~~5.4~~5.5, which supports the usage of the Intel Wi-Fi 6 AX201 module.
+We have also included instructions to install MPTCP in NUC (Intel NUC 10 NUC10i7FNH) using kernel ~~5.45.5~~5.4.144 (*), which supports the usage of the Intel Wi-Fi 6 AX201 module.
+
+(*) We have some stability problems for the Wi-Fi card before with kernel 5.4, but it seems that it is now working properly. So we returned to kernel 5.4 since it is the LTS version.
 
 Similarly, it has also been tested (scenario 1, i.e. without free5gc) using a Raspberry Pi 4 with 4 GB with Raspberry OS (64 bits), based on kernel rpi-5.5.y with support for MPTCP.
 
-You can find the patch for linux kernel 5.5 with MPTCP support in the [MPTCP_patches](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/tree/main/MPTCP_patches) directory. This patch has been submitted to the multipath-tcp.org mailing list following the instructions from [here](https://multipath-tcp.org/pmwiki.php/Developer/SubmitAPatch).
+You can find the patch for linux kernel 5.5 with MPTCP support in the [MPTCP_patches](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/tree/main/MPTCP_patches) directory. This patch has been submitted to the multipath-tcp.org mailing list following the instructions from [here](https://multipath-tcp.org/pmwiki.php/Developer/SubmitAPatch). Included as a new repo (https://github.com/jorgenavarroortiz/linux-kernel-5.5-mptcp) as suggested by the developers from multipath-tcp.org.
 
 You can watch a [video](https://youtu.be/_7CiYgILo1g) showing how [scenario 1](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-scenario-1-two-virtual-machines-directly-connected) works.
 
@@ -26,7 +28,7 @@ In both scenarios, a Vagrantfile has been developed to install the required kern
 
 **Few differences with testbeds from i2CAT's repo**
 
-- All functions related to MPTCP are included in the kernel, i.e. there is no need to load modules. Instead of using kernel 4.19 (which it is supported by the MPTCP version in https://www.multipath-tcp.org/), we have updated the MPTCP patch for kernel 5.4 to work with **kernel 5.5**. The main advantage is that kernel 5.5 *works properly in Intel's NUC* (i.e. *AX201 Wi-Fi6 network card* has been tested and works properly with this kernel, whereas it has some serious stability problems with kernel 5.4).
+- All functions related to MPTCP are included in the kernel, i.e. there is no need to load modules. Instead of using kernel 4.19 (which it is supported by the MPTCP version in https://www.multipath-tcp.org/), we have updated the MPTCP patch for kernel 5.4 to work with **kernel 5.5**. ~~The main advantage is that kernel 5.5 *works properly in Intel's NUC* (i.e. *AX201 Wi-Fi6 network card* has been tested and works properly with this kernel, whereas it has some serious stability problems with kernel 5.4).~~_Returned to kernel 5.4 (5.4.144)._
 - **mptcpUe VM**: `eth1`, `eth2` and `eth3` are configured to use an internal network (ue_5gc) instead of using a bridged adapter. `eth4` is directly connected to the _mptcpProxy_ VM. Access to this VM is available through **SSH on port 12222**.
 - **free5gc VM**: Similarly, this machine utilizes two internal networks (ue_5gc and 5gc_proxy) instead of using a bridged adapter. Access to this VM is available through **SSH on port 22222**.
 - **mptcpProxy VM**: Similarly, this machine utilizes an internal network (5gc_proxy) instead of using a bridged adapter. Access to this VM is available through **SSH on port 32222**.
@@ -442,7 +444,7 @@ After these steps, you may perform an ``iperf`` experiment using ``iperf -s`` on
 
 ## Launching SCENARIO 2: UE <-> free5GC <-> proxy
 
-In this scenario, a VM (mptcpUe) employs three network interfaces (`eth1`, `eth2` and `eth4`) emulating a computer with three wireless access technologies (WATs), e.g. Wi-Fi, Li-Fi and 5G NR (directly connected to the _mptcpProxy_ VM since there is no gNB emulator to connect through UPF). We assume that they are in bridge mode, i.e. connected to the same IP network. This VM is directly connected to a VM (free5gc) implementing the 5G core network. The connection is done through the N3IWF (Non-3GPP InterWorking Function) entity. Since we are employing MPTCP to simultaneously transfer data from the three network interfaces of mptcpUe VM, it is required that the other end also implements MPTCP. Due to the different kernel versions on both VMs (~~4.19.142~~5.5 for MPTCP and 5.0.0-23 for free5GC), another VM (mptcpProxy) is also required. mptcpProxy implements MPTCP for this purpose.
+In this scenario, a VM (mptcpUe) employs three network interfaces (`eth1`, `eth2` and `eth4`) emulating a computer with three wireless access technologies (WATs), e.g. Wi-Fi, Li-Fi and 5G NR (directly connected to the _mptcpProxy_ VM since there is no gNB emulator to connect through UPF). We assume that they are in bridge mode, i.e. connected to the same IP network. This VM is directly connected to a VM (free5gc) implementing the 5G core network. The connection is done through the N3IWF (Non-3GPP InterWorking Function) entity. Since we are employing MPTCP to simultaneously transfer data from the three network interfaces of mptcpUe VM, it is required that the other end also implements MPTCP. Due to the different kernel versions on both VMs (~~4.19.1425.5~~5.4 for MPTCP and 5.0.0-23 for free5GC), another VM (mptcpProxy) is also required. mptcpProxy implements MPTCP for this purpose.
 
 **NOTE**: If required, you can add more network interfaces to the mptcpUe VM to emulate more WATs connected through N3IWF (currently three interfaces are added). The scripts will utilize consecutive network interfaces starting from eth1, eth2, eth3, etcetera.
 
@@ -537,13 +539,13 @@ The installation scripts for testbed v0 can be used to setup MPTCP on an Intel's
 - Fresh install Ubuntu Server 18.04 (64-bit) on the NUC.
 - Copy the `5g-clarity_testbed_v0/vagrant/vagrant` directory from this repository to `$HOME`, so it becomes `$HOME/vagrant`.
 - Check that you have network connectivity. For that purpose, you may configure a YAML file at `/etc/netplan`. Please check `$HOME/vagrant/NUC/50-nuc.yaml.1` as an example.
-- Install kernel 5.5 with MPTCP support and reboot:
+- Install kernel ~~5.5~~5.4.144 with MPTCP support and reboot:
 ```
 cd $HOME/vagrant
 bash ./mptcp_kernel55_installation.sh
 sudo reboot
 ```
-- After rebooting, the NUC will have kernel 5.5 (you should check it by executing `uname -r`) ~~but you will loose the driver for the Intel Gigabit Ethernet Controller I219-V. In order to install the driver (e1000e version 3.8.7) execute:~~ (this was for kernel 5.4, which has some stabiltiy problems for the Wi-Fi card; it is not required with kernel 5.5).
+- After rebooting, the NUC will have kernel ~~5.5~~5.4.144 (you should check it by executing `uname -r`) ~~but you will loose the driver for the Intel Gigabit Ethernet Controller I219-V. In order to install the driver (e1000e version 3.8.7) execute: (this was for kernel 5.4, which has some stabiltiy problems for the Wi-Fi card; it is not required with kernel 5.5)~~.
 ~~`cd $HOME/vagrant`~~
 ~~`bash ./nuc_network1.sh`~~
 Modify your network settings in the file `/etc/netplan/50-nuc.yaml` and reboot. Please check that you have network connectivity again.
