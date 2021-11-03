@@ -4,7 +4,7 @@ Testbed v0 (virtualized environment) for the 5G-CLARITY European Project. Based 
 
 We have also included instructions to install MPTCP in NUC (Intel NUC 10 NUC10i7FNH) using kernel ~~5.45.5~~5.4.144 (*), which supports the usage of the Intel Wi-Fi 6 AX201 module.
 
-(*) We have some stability problems for the Wi-Fi card before with kernel 5.4, but it seems that it is now working properly. So we returned to kernel 5.4 since it is the LTS version.
+(*) _We have some stability problems for the Wi-Fi card before with kernel 5.4, but it seems that it is now working properly. So we returned to kernel 5.4 since it is the LTS version._
 
 Similarly, it has also been tested (scenario 1, i.e. without free5gc) using a Raspberry Pi 4 with 4 GB with Raspberry OS (64 bits), based on kernel rpi-5.5.y with support for MPTCP.
 
@@ -28,7 +28,7 @@ In both scenarios, a Vagrantfile has been developed to install the required kern
 
 **Few differences with testbeds from i2CAT's repo**
 
-- All functions related to MPTCP are included in the kernel, i.e. there is no need to load modules. Instead of using kernel 4.19 (which it is supported by the MPTCP version in https://www.multipath-tcp.org/), we have updated the MPTCP patch for kernel 5.4 to work with **kernel 5.5**. ~~The main advantage is that kernel 5.5 *works properly in Intel's NUC* (i.e. *AX201 Wi-Fi6 network card* has been tested and works properly with this kernel, whereas it has some serious stability problems with kernel 5.4).~~_Returned to kernel 5.4 (5.4.144)._
+- All functions related to MPTCP are included in the kernel, i.e. there is no need to load modules. Instead of using kernel 4.19 (which it is supported by the MPTCP version in https://www.multipath-tcp.org/), we have updated the MPTCP patch for kernel 5.4 to work with **kernel 5.5**. ~~The main advantage is that kernel 5.5 *works properly in Intel's NUC* (i.e. *AX201 Wi-Fi6 network card* has been tested and works properly with this kernel, whereas it has some serious stability problems with kernel 5.4).~~ _Returned to kernel 5.4 (5.4.144)._
 - **mptcpUe VM**: `eth1`, `eth2` and `eth3` are configured to use an internal network (ue_5gc) instead of using a bridged adapter. `eth4` is directly connected to the _mptcpProxy_ VM. Access to this VM is available through **SSH on port 12222**.
 - **free5gc VM**: Similarly, this machine utilizes two internal networks (ue_5gc and 5gc_proxy) instead of using a bridged adapter. Access to this VM is available through **SSH on port 22222**.
 - **mptcpProxy VM**: Similarly, this machine utilizes an internal network (5gc_proxy) instead of using a bridged adapter. Access to this VM is available through **SSH on port 32222**.
