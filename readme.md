@@ -4,7 +4,7 @@ Testbed v0 (virtualized environment) for the 5G-CLARITY European Project. Based 
 
 We have also included instructions to install MPTCP in NUC (Intel NUC 10 NUC10i7FNH) using kernel ~~5.45.5~~5.4.144 (*), which supports the usage of the Intel Wi-Fi 6 AX201 module.
 
-(*) _We have some stability problems for the Wi-Fi card before with kernel 5.4, but it seems that it is now working properly. So we returned to kernel 5.4 since it is the LTS version._
+(*) _We have some stability problems for the Wi-Fi card before with kernel 5.4, but it seems that it is now working properly. So, we returned to kernel 5.4 since it is the LTS version._
 
 Similarly, it has also been tested (scenario 1, i.e. without free5gc) using a Raspberry Pi 4 with 4 GB with Raspberry OS (64 bits), based on kernel rpi-5.5.y with support for MPTCP.
 
