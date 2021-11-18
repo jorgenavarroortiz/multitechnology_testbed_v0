@@ -398,7 +398,7 @@ cd vagrant/SShuttle
 
 On the CPE, there are two alternatives. Using _SShuttle_ with NAT (only TCP) or with TProxy (both TCP and UDP). For _SShuttle_ with NAT, please execute ``./cpe_sshuttle_nat_onlytcp.sh``. For SShuttle with TProxy, please execute ``./cpe_sshuttle_tproxy_tcpandudp.sh``.
 
-After these steps, you may perform an ``iperf`` experiment using ``iperf -s`` on the server and ``iperf -c 66.6.6.33`` (add ``-u`` for UDP and ``-P 10`` for e.g. 10 parallel flows). If you want to measure latency, you may want to use [``tcpping``](https://github.com/deajan/tcpping).
+After these steps, you may perform an ``iperf`` experiment using ``iperf -s`` on the server and ``iperf -c 66.6.6.33`` on the client (add ``-u`` for UDP and ``-P 10`` for e.g. 10 parallel flows). If you want to measure latency, you may want to use [``tcpping``](https://github.com/deajan/tcpping).
 
 **Launching scenario 1 with a SOCKS5 server (_ShadowSocks_) instead of OpenVPN**
 
@@ -440,7 +440,7 @@ cd ~/vagrant/ShadowSocks
 
 On the CPE, there are two alternatives. Using _ShadowSocks_ with _badvpn-tun2socks_ (both TCP and UDP) or with _ip2socks_ (only TCP but better performance). _badvpn-tun2socks_ creates a ``tun`` interface, whereas _ip2socks_ can select between a ``tun`` or a ``tap`` interface (please check the ``config-cpe-ip2socks.yml`` file). For _ShadowSocks_ with _badvpn-tun2socks_, please execute ``./cpe_shadowsocks_tun2socks_tun_tcpandudp.sh``. For _ShadowSocks_ with _ip2socks_, please execute ``./cpe_shadowsocks_ip2socks_onlytcp.sh``.
 
-After these steps, you may perform an ``iperf`` experiment using ``iperf -s`` on the server and ``iperf -c 66.6.6.33`` (add ``-u`` for UDP and ``-P 10`` for e.g. 10 parallel flows). If you want to measure latency, you may want to use [``tcpping``](https://github.com/deajan/tcpping).
+After these steps, you may perform an ``iperf`` experiment using ``iperf -s`` on the server and ``iperf -c 66.6.6.33`` on the client (add ``-u`` for UDP and ``-P 10`` for e.g. 10 parallel flows). If you want to measure latency, you may want to use [``tcpping``](https://github.com/deajan/tcpping).
 
 ## Launching SCENARIO 2: UE <-> free5GC <-> proxy
 
