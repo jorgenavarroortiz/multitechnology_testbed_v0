@@ -313,7 +313,7 @@ else
     IP_MPTCP_SIMPLE=`sed ${i}'q;d' $FILENAME | cut -f 2 -d ' ' | cut -f 1 -d '/'`
     MaskCard=`sed ${i}'q;d' $FILENAME | cut -f 2 -d ' ' | cut -f 2 -d '/'`
     IP_MPTCP=${IP_MPTCP_SIMPLE}"/"${MaskCard}
-    GW_MPTCP=`sed ${i}'q;d' $FILENAME | cut -f 3 -d ' '`
+    GW_MPTCP=`sed ${i}'q;d' $FILENAME | cut -f 3 -d ' '| tr -d '\r'`
     IFS=. read -r i1 i2 i3 i4 <<< $IP_MPTCP_SIMPLE
     IFS=. read -r xx m1 m2 m3 m4 <<< $(for a in $(seq 1 32); do if [ $(((a - 1) % 8)) -eq 0 ]; then echo -n .; fi; if [ $a -le $MaskCard ]; then echo -n 1; else echo -n 0; fi; done)
     NET_IP_MPTCP_SIMPLE=`printf "%d.%d.%d.%d\n" "$((i1 & (2#$m1)))" "$((i2 & (2#$m2)))" "$((i3 & (2#$m3)))" "$((i4 & (2#$m4)))"`
