@@ -1,6 +1,6 @@
-# 5G-CLARITY testbed v0 setup
+# Multi-technology testbed v0 setup
 
-Testbed v0 (virtualized environment) for the 5G-CLARITY European Project. Based on Daniel Camps' work (from i2CAT), see https://bitbucket.i2cat.net/projects/SDWN/repos/free5gc/browse. Please contact Jorge Navarro-Ortiz (jorgenavarro@ugr.es) or Juan J. Ramos-Munoz (jjramos@ugr.es) for further details.
+Multi-technology testbed v0 (virtualized environment). Based on Daniel Camps' work (from i2CAT), see https://bitbucket.i2cat.net/projects/SDWN/repos/free5gc/browse. Please contact Jorge Navarro-Ortiz (jorgenavarro@ugr.es) or Juan J. Ramos-Munoz (jjramos@ugr.es) for further details.
 
 We have also included instructions to install MPTCP in NUC (Intel NUC 10 NUC10i7FNH) using kernel ~~5.45.5~~5.4.144 (*), which supports the usage of the Intel Wi-Fi 6 AX201 module.
 
