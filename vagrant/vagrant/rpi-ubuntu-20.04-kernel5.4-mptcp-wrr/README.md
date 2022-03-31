@@ -15,7 +15,7 @@ apt list linux-image*raspi
 ```
 apt show linux-image-5.4.0-1056-raspi
 ```
-3) Remove that version (DO NOT REBOOT HERE!!!):
+3) Remove that version (**DO NOT REBOOT HERE!!!**):
 ```
 sudo apt-get remove linux-image-5.4.0-1056-raspi --purge
 ```
