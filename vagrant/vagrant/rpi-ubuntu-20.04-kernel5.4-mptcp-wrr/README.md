@@ -1,4 +1,4 @@
-#Kernel installation
+## Kernel installation
 
 To install one of the available kernels (see `pkg*` directories), change to that directory and execute:
 ```
