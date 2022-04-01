@@ -52,5 +52,6 @@ sudo umount /mnt
 
 An example, using two Raspberry Pis, one with Raspberry OS and another with Ubuntu 20.04 (both with MPTCP support and WRR v0.5):
 
-![image](https://user-images.githubusercontent.com/17797704/161347759-7f58a3f3-d61a-45ac-b7e7-8e1d9edd9333.png)
+![image](https://user-images.githubusercontent.com/17797704/161347804-2d80caba-30ea-4b8d-bc29-c1d73590fda7.png)
+
 
