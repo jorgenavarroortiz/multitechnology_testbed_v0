@@ -49,3 +49,8 @@ sudo mount -t vfat -o uid=root /dev/mmcblk0p1 /mnt
 sudo nano /mnt/cmdline.txt
 sudo umount /mnt
 ```
+
+An example, using two Raspberry Pis, one with Raspberry OS and another with Ubuntu 20.04 (both with MPTCP support and WRR v0.5):
+
+![image](https://user-images.githubusercontent.com/17797704/161347759-7f58a3f3-d61a-45ac-b7e7-8e1d9edd9333.png)
+
