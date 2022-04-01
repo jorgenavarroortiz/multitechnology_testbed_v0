@@ -1,5 +1,7 @@
 ## Kernel installation
 
+Tested with Ubuntu 20.04 for ARM64 (https://cdimage.ubuntu.com/releases/20.04.4/release/ubuntu-20.04.4-preinstalled-server-arm64+raspi.img.xz)
+
 To install one of the available kernels (see `pkg*` directories), change to that directory and execute:
 ```
 sudo dpkg -i *.deb
