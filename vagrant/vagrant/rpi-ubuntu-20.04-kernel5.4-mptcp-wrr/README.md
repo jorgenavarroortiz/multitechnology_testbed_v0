@@ -40,3 +40,10 @@ dpkg --get-selections | grep "linux-image"
 ```
 
 **TO DISABLE IPV6 (required for MPTCP)**, you can add `ipv6.disable=1` to the arguments in the /boot/cmdline.txt file, so it is removed from the kernel.
+
+**NOTE**: You can mount the FAT partition of the SD card to modify the cmdline.txt file with the following commands:
+```
+sudo mount -t vfat -o uid=root /dev/mmcblk0p1 /mnt
+sudo nano /mnt/cmdline.txt
+sudo umount /mnt
+```
