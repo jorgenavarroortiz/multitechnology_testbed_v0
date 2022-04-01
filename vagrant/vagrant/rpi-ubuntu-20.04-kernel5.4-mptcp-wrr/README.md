@@ -39,9 +39,4 @@ echo "linux-image-5.4.0-1055-raspi hold" | sudo dpkg --set-selections
 dpkg --get-selections | grep "linux-image"
 ```
 
-**TO DISABLE IPV6 (required for MPTCP)**, you can use the GRUB configuration (from https://pimylifeup.com/ubuntu-disable-ipv6/). To do so, edit the `/etc/default/grub` file and modify the following directives:
-```
-GRUB_CMDLINE_LINUX_DEFAULT="ipv6.disable=1"
-GRUB_CMDLINE_LINUX="ipv6.disable=1"
-```
-Then, execute `sudo update-grub` to update the GRUB.
+**TO DISABLE IPV6 (required for MPTCP)**, you can add `ipv6.disable=1` to the arguments in the /boot/cmdline.txt file, so it is removed from the kernel.
