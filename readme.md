@@ -631,7 +631,7 @@ For this purpose, you should setup 2 Raspberry Pi 4. Currently it has been teste
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/rpi_scenario1.jpeg" width="512">
 
-**UPDATE**: An installable kernel 5.5 with MPTCP support and Weighted Round-Robin (WRR) v0.5 is available in the [MPTCP_kernel5.5-WRR0.5_RPi4](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/tree/main/vagrant/vagrant/MPTCP_kernel5.5_WRR05_RPi4) directory. **Tested with two network interfaces** (the one from RPi and one USB-Ethernet adapter). Follow these steps for testing WRR v0.5:
+**UPDATE**: An installable kernel 5.5 for Raspbian OS with MPTCP support and Weighted Round-Robin (WRR) v0.5 is available in the [MPTCP_kernel5.5-WRR0.5_RPi4](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/tree/main/vagrant/vagrant/MPTCP_kernel5.5_WRR05_RPi4) directory. **Tested with two network interfaces** (the one from RPi and one USB-Ethernet adapter). Follow these steps for testing WRR v0.5:
 
 - Install the MPTCP kernel in the RPi4 by executing the script `mptcp_kernel_installation_rpi4.sh`. After reboot, check that it is installed by executing `uname -r`. Then execute the script `mptcp_additional_installation_rpi4.sh` to install the required packages. Repeat this for the second RPi.
 - On the first RPi4, go to the `mptcp_test` directory and execute `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_different_networks_RPi1 -u 2 -m -o server` (we assume that the Ethernet interfaces are `eth0` (10.1.1.1/24) and `eth1` (10.1.2.1/24), update the file `if_names.txt.scenario1_different_networks_RPi1` if needed).
@@ -640,3 +640,5 @@ For this purpose, you should setup 2 Raspberry Pi 4. Currently it has been teste
 - Now you can test the proper behaviour using `iperf` within the `MPTCPns` namespace.
 
 <img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/rpi4_wrr05_test.jpg" width="512">
+
+**UPDATE**: An installable kernel 5.4 (LTS) for Ubuntu 20.04 (ARM64) with MPTCP support and Weighted Round-Robin (WRR) v0.5 is available in the [rpi-ubuntu-20.04-kernel5.4-mptcp-wrr](https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/tree/main/vagrant/vagrant/rpi-ubuntu-20.04-kernel5.4-mptcp-wrr) directory. There you can find the instructions to install it. **Tested with two network interfaces** (the one from RPi and one USB-Ethernet adapter).
