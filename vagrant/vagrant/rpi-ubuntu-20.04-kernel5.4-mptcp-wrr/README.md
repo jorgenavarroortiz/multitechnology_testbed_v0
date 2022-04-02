@@ -1,4 +1,4 @@
-## Kernel installation
+## Kernel installation (kernel 5.4 for Ubuntu 20.04 (ARM64))
 
 Tested with Ubuntu 20.04 for ARM64 (https://cdimage.ubuntu.com/releases/20.04.4/release/ubuntu-20.04.4-preinstalled-server-arm64+raspi.img.xz)
 
