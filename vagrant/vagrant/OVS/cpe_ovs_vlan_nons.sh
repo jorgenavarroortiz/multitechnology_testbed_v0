@@ -31,6 +31,7 @@ sudo ifconfig vpn-br 0 promisc up
 
 for (( i=0; i<=${noVLANs}; i++ ))
 do
+  echo "Configuring tap${i}..."
   VLANID=${VLANIDarray[$i]}
   # Add tap$i within the MPTCPns namespace to the OVS switch
     # Create a pair mtap$i <-> vtap$i
@@ -47,13 +48,13 @@ do
 #  sudo ip netns exec MPTCPns brctl addif br_tap$i vtap$i
 #  sudo ip netns exec MPTCPns brctl addif br_tap$i tap$i
 #  sudo ip netns exec MPTCPns ifconfig br_tap$i 0 promisc up
-#  sudo ip netns exec MPTCPns ifconfig tap$i 0 promisc up
   sudo ifconfig tap$i 0 promisc up
 #  sudo ip netns exec MPTCPns ifconfig vtap$i 0 promisc up
     # mtap$i will be in the OVS
 #  sudo ovs-vsctl add-port vpn-br mtap$i
-  sudo ovs-vsctl add-port vpn-br tap$i
 #  sudo ifconfig mtap$i 0 promisc up
+  sudo ovs-vsctl add-port vpn-br tap$i
+  sudo ifconfig tap$i 0 promisc up
 done
 
 ### *** LET THE RULES BE IN A DIFFERENT SCRIPT ***
@@ -63,8 +64,9 @@ done
 #sudo ovs-vsctl set port eth4 trunks=${VLANIDstring}
 #for (( i=0; i<=${noVLANs}; i++ ))
 #do
-#  # Access port
+  # Access port
 #  sudo ovs-vsctl set port mtap$i tag=${VLANIDarray[$i]}
+#  sudo ovs-vsctl set port tap$i tag=${VLANIDarray[$i]}
 #done
 
 # Configure routes (possible routes accessible through the VPN)
@@ -76,4 +78,4 @@ done
 #sudo ovs-ofctl add-flow vpn-br in_port=eth4,actions=LOCAL -OOpenFlow13
 #sudo ovs-ofctl add-flow vpn-br in_port=LOCAL,actions=output:eth4 -OOpenFlow13
 
-#sudo ovs-vsctl set bridge vpn-br stp_enable=true # Not required because it will stop one of the tap interfaces
+#####sudo ovs-vsctl set bridge vpn-br stp_enable=true ### *** CHECH THIS ***
