@@ -359,6 +359,63 @@ sudo python -m pipenv run uvicorn main:app --host 0.0.0.0 --port 8000
 
 This test API includes calls to select a specific proxy, change a few parameters (e.g. WRR weigths, an additional artificial delay, etc), or to show/modify OVS flow entries. You may connect to `http://<server IP address>:18000`.
 
+## Experiment with _OpenVPN_ acting both _CPE_ and _proxies_ as switches without namespaces (may be useful for testbeds with real equipment)
+
+In this experiment we will employ an OpenVPN connection between _CPE_ and _proxy 1_, which will tunnel the connection between _client_ and _server_. _CPE_ and _proxy 1_ will employ the 5G-CLARITY scheduler. To launch this experiment, follow these steps:
+
+- On _proxy 1_:
+
+```
+cd ~/free5gc/mptcp_test
+./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_same_network_proxy1 -u 1 -o server -N 10.8.0.0
+cd ~/vagrant/OVS/
+chmod 777 *.sh
+./proxy_externally_accessible_nons.sh
+./proxy_bridged_mode_nons.sh
+```
+
+- On _proxy 2_:
+
+```
+cd ~/free5gc/mptcp_test
+./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_same_network_proxy2 -u 1 -o server -N 10.9.0.0
+cd ~/vagrant/OVS/
+chmod 777 *.sh
+./proxy_externally_accessible_nons.sh
+./proxy_bridged_mode_nons.sh
+```
+
+
+- On _CPE_:
+
+```
+cd ~/free5gc/mptcp_test
+./set_MPTCP_parameters.sh -p fullmesh -s default -s roundrobin -c olia -f if_names.txt.scenario1_same_network_CPE -u 3 -o client -S 10.1.1.4 -S 10.1.1.5
+cd ~/vagrant/OVS
+chmod 777 *.sh
+./ovs_start.sh
+./cpe_ovs_vlan_nons.sh
+./ovs_remove_vlans_nons.sh
+##./cpe_bridged_mode.sh
+./cpe_configure_client.sh -s 66.6.6.22 -P 2 # To select proxy 2
+./cpe_configure_client.sh -s 66.6.6.22 -P 1 # To select proxy 1
+```
+
+- On _server_:
+
+```
+iperf -s
+```
+
+- On _client_:
+
+```
+sudo ifconfig eth1 66.6.6.22/24
+iperf -c 66.6.6.33
+```
+
+**NOTE**: Use `ifstat` on _CPE_ (and also on _proxies_) to check that the required interfaces (and only those) are transmitting data, i.e. all the paths are working.
+
 **Launching scenario 1 with an SSH tunnel (_SShuttle_) instead of OpenVPN**
 
 In this case, for simplicity, no namespaces are employed. This scenario is available if you use the ``Vagrantfile.ALL`` file (please rename it to ``Vagrantfile``).
