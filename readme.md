@@ -359,7 +359,7 @@ sudo python -m pipenv run uvicorn main:app --host 0.0.0.0 --port 8000
 
 This test API includes calls to select a specific proxy, change a few parameters (e.g. WRR weigths, an additional artificial delay, etc), or to show/modify OVS flow entries. You may connect to `http://<server IP address>:18000`.
 
-**Experiment with _OpenVPN_ acting both _CPE_ and _proxies_ as switches without namespaces (may be useful for testbeds with real equipment)**
+**Launching scenario 1 with multiple proxies (OVPN servers) with different schedulers and using both CPE and proxies jointly as one switch without namespaces (may be useful for testbeds with real equipment)**
 
 In this experiment we will employ an OpenVPN connection between _CPE_ and _proxy 1_, which will tunnel the connection between _client_ and _server_. _CPE_ and _proxy 1_ will employ the 5G-CLARITY scheduler. To launch this experiment, follow these steps:
 
