@@ -78,4 +78,4 @@ done
 #sudo ovs-ofctl add-flow vpn-br in_port=eth4,actions=LOCAL -OOpenFlow13
 #sudo ovs-ofctl add-flow vpn-br in_port=LOCAL,actions=output:eth4 -OOpenFlow13
 
-#####sudo ovs-vsctl set bridge vpn-br stp_enable=true ### *** CHECH THIS ***
+#####sudo ovs-vsctl set bridge vpn-br stp_enable=true ### Not needed since it blocks one of the tap interfaces
