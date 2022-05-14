@@ -1,5 +1,7 @@
 #!/bin/bash
 
+IFTOCLIENT=`cat if_toclient.txt`
+
 declare -a VLANIDarray=(100 200 300)
 noVLANs=${#VLANIDarray[@]}
 noVLANs=$(($noVLANs-1)) # Starting from 0, so it is the size of the array minus one
@@ -18,10 +20,10 @@ sudo ovs-vsctl del-br vpn-br >/dev/null 2>&1
 
 # OVS switch
 sudo ovs-vsctl add-br vpn-br
-sudo ovs-vsctl add-port vpn-br eth4
+sudo ovs-vsctl add-port vpn-br ${IFTOCLIENT}
 
 # Configure interfaces
-sudo ifconfig eth4 0 promisc up
+sudo ifconfig ${IFTOCLIENT} 0 promisc up
 sudo ifconfig vpn-br 0 promisc up
 #for (( i=0; i<=${noVLANs}; i++ ))
 #do
@@ -57,7 +59,7 @@ done
 ## Configure VLANs
 #  # Trunk port
 #VLANIDstring=$(IFS=, ; echo "${VLANIDarray[*]}")
-#sudo ovs-vsctl set port eth4 trunks=${VLANIDstring}
+#sudo ovs-vsctl set port ${IFTOCLIENT} trunks=${VLANIDstring}
 #for (( i=0; i<=${noVLANs}; i++ ))
 #do
 #  # Access port
@@ -70,7 +72,7 @@ done
 #sudo route add default gw 192.168.56.1
 
 # Flow entries (if required, by default using NORMAL i.e. a standard learning switch)
-#sudo ovs-ofctl add-flow vpn-br in_port=eth4,actions=LOCAL -OOpenFlow13
-#sudo ovs-ofctl add-flow vpn-br in_port=LOCAL,actions=output:eth4 -OOpenFlow13
+#sudo ovs-ofctl add-flow vpn-br in_port=${IFTOCLIENT},actions=LOCAL -OOpenFlow13
+#sudo ovs-ofctl add-flow vpn-br in_port=LOCAL,actions=output:${IFTOCLIENT} -OOpenFlow13
 
 sudo ovs-vsctl set bridge vpn-br stp_enable=true

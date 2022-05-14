@@ -1,5 +1,7 @@
 #!/bin/bash
 
+IFTOCLIENT=`cat if_toclient.txt`
+
 #declare -a VLANIDarray=(100 200 300)
 declare -a VLANIDarray=(100 200)
 noVLANs=${#VLANIDarray[@]}
@@ -19,10 +21,10 @@ sudo ovs-vsctl del-br vpn-br >/dev/null 2>&1
 
 # OVS switch
 sudo ovs-vsctl add-br vpn-br
-sudo ovs-vsctl add-port vpn-br eth4
+sudo ovs-vsctl add-port vpn-br ${IFTOCLIENT}
 
 # Configure interfaces
-sudo ifconfig eth4 0 promisc up
+sudo ifconfig ${IFTOCLIENT} 0 promisc up
 sudo ifconfig vpn-br 0 promisc up
 #for (( i=0; i<=${noVLANs}; i++ ))
 #do
@@ -31,7 +33,6 @@ sudo ifconfig vpn-br 0 promisc up
 
 for (( i=0; i<=${noVLANs}; i++ ))
 do
-  echo "Configuring tap${i}..."
   VLANID=${VLANIDarray[$i]}
   # Add tap$i within the MPTCPns namespace to the OVS switch
     # Create a pair mtap$i <-> vtap$i
@@ -48,25 +49,24 @@ do
 #  sudo ip netns exec MPTCPns brctl addif br_tap$i vtap$i
 #  sudo ip netns exec MPTCPns brctl addif br_tap$i tap$i
 #  sudo ip netns exec MPTCPns ifconfig br_tap$i 0 promisc up
+#  sudo ip netns exec MPTCPns ifconfig tap$i 0 promisc up
   sudo ifconfig tap$i 0 promisc up
 #  sudo ip netns exec MPTCPns ifconfig vtap$i 0 promisc up
     # mtap$i will be in the OVS
 #  sudo ovs-vsctl add-port vpn-br mtap$i
-#  sudo ifconfig mtap$i 0 promisc up
   sudo ovs-vsctl add-port vpn-br tap$i
-  sudo ifconfig tap$i 0 promisc up
+#  sudo ifconfig mtap$i 0 promisc up
 done
 
 ### *** LET THE RULES BE IN A DIFFERENT SCRIPT ***
 ## Configure VLANs
 #  # Trunk port
 #VLANIDstring=$(IFS=, ; echo "${VLANIDarray[*]}")
-#sudo ovs-vsctl set port eth4 trunks=${VLANIDstring}
+#sudo ovs-vsctl set port ${IFTOCLIENT} trunks=${VLANIDstring}
 #for (( i=0; i<=${noVLANs}; i++ ))
 #do
-  # Access port
+#  # Access port
 #  sudo ovs-vsctl set port mtap$i tag=${VLANIDarray[$i]}
-#  sudo ovs-vsctl set port tap$i tag=${VLANIDarray[$i]}
 #done
 
 # Configure routes (possible routes accessible through the VPN)
@@ -75,7 +75,7 @@ done
 #sudo route add default gw 192.168.56.1
 
 # Flow entries (if required, by default using NORMAL i.e. a standard learning switch)
-#sudo ovs-ofctl add-flow vpn-br in_port=eth4,actions=LOCAL -OOpenFlow13
-#sudo ovs-ofctl add-flow vpn-br in_port=LOCAL,actions=output:eth4 -OOpenFlow13
+#sudo ovs-ofctl add-flow vpn-br in_port=${IFTOCLIENT},actions=LOCAL -OOpenFlow13
+#sudo ovs-ofctl add-flow vpn-br in_port=LOCAL,actions=output:${IFTOCLIENT} -OOpenFlow13
 
-#####sudo ovs-vsctl set bridge vpn-br stp_enable=true ### Not needed since it blocks one of the tap interfaces
+sudo ovs-vsctl set bridge vpn-br stp_enable=true
