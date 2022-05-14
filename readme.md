@@ -366,7 +366,7 @@ sudo python -m pipenv run uvicorn main:app --host 0.0.0.0 --port 8000
 
 This test API includes calls to select a specific proxy, change a few parameters (e.g. WRR weigths, an additional artificial delay, etc), or to show/modify OVS flow entries. You may connect to `http://<server IP address>:18000`.
 
-**Launching scenario 1 with multiple proxies (OVPN servers) with different schedulers and using both CPE and proxies jointly as one switch without namespaces (may be useful for testbeds with real equipment)**
+**Launching scenario 1 with multiple proxies (OVPN servers) with different schedulers and using both CPE and proxies jointly as one switch without namespaces on the CPE (may be useful for testbeds with real equipment)**
 
 In this experiment we will employ an OpenVPN connection between _CPE_ and _proxy 1_, which will tunnel the connection between _client_ and _server_. _CPE_ and _proxy 1_ will employ the 5G-CLARITY scheduler. To launch this experiment, follow these steps:
 
@@ -375,11 +375,12 @@ In this experiment we will employ an OpenVPN connection between _CPE_ and _proxy
 ```
 cd ~/free5gc/mptcp_test
 ln -s if_names.txt.scenario1_same_network_proxy1 if_names.txt
-./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt -u 1 -o server -N 10.8.0.0
+./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt -u 1 -m -o server -N 10.8.0.0
 cd ~/vagrant/OVS/
 chmod 777 *.sh
-./proxy_externally_accessible_nons.sh
-./proxy_bridged_mode_nons.sh
+./proxy_externally_accessible.sh
+./proxy_bridged_mode.sh
+sudo sysctl -w net.ipv4.ip_forward=0
 ```
 
 - On _proxy 2_:
@@ -387,11 +388,12 @@ chmod 777 *.sh
 ```
 cd ~/free5gc/mptcp_test
 ln -s if_names.txt.scenario1_same_network_proxy2 if_names.txt
-./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt -u 1 -o server -N 10.9.0.0
+./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt -u 1 -m -o server -N 10.9.0.0
 cd ~/vagrant/OVS/
 chmod 777 *.sh
-./proxy_externally_accessible_nons.sh
-./proxy_bridged_mode_nons.sh
+./proxy_externally_accessible.sh
+./proxy_bridged_mode.sh
+sudo sysctl -w net.ipv4.ip_forward=0
 ```
 
 
@@ -406,6 +408,7 @@ chmod 777 *.sh
 ./ovs_start.sh
 ./cpe_ovs_vlan_nons.sh
 ./ovs_remove_vlans_nons.sh
+sudo sysctl -w net.ipv4.ip_forward=0
 ##./cpe_bridged_mode.sh
 ./cpe_configure_client.sh -s 66.6.6.22 -P 2 # To select proxy 2
 ./cpe_configure_client.sh -s 66.6.6.22 -P 1 # To select proxy 1
@@ -425,6 +428,7 @@ iperf -c 66.6.6.33
 ```
 
 **NOTE**: Use `ifstat` on _CPE_ (and also on _proxies_) to check that the required interfaces (and only those) are transmitting data, i.e. all the paths are working.
+**NOTE**: If we do not use namespaces on the proxies, some interfaces get blocked from the STP perspective and the scenario does not work properly. You can check if the ports are in `forwarding` or `blocked` state using the scripts `~/vagrant/OVS/cpe_show_stp.sh` and `~/vagrant/OVS/proxy_show_stp.sh`.
 
 **Launching scenario 1 with an SSH tunnel (_SShuttle_) instead of OpenVPN**
 
