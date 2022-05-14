@@ -180,7 +180,8 @@ In order to launch this scenario, please execute these commands in the following
 - **proxy1** (accessible on localhost, port 22222):
 ```
 cd ~/free5gc/mptcp_test
-./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_same_network_proxy1 -u 1 -m -o server -N 10.8.0.0
+ln -s if_names.txt.scenario1_same_network_proxy1 if_names.txt
+./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt -u 1 -m -o server -N 10.8.0.0
 cd ~/vagrant/OVS/
 chmod 777 *.sh
 ./proxy_externally_accessible.sh
@@ -189,7 +190,8 @@ chmod 777 *.sh
 - **proxy2** (accessible on localhost, port 32222):
 ```
 cd ~/free5gc/mptcp_test
-./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_same_network_proxy2 -u 1 -m -o server -N 10.9.0.0
+ln -s if_names.txt.scenario1_same_network_proxy2 if_names.txt
+./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names -u 1 -m -o server -N 10.9.0.0
 cd ~/vagrant/OVS/
 chmod 777 *.sh
 ./proxy_externally_accessible.sh
@@ -198,7 +200,8 @@ chmod 777 *.sh
 - **proxy3** (accessible on localhost, port 42222):
 ```
 cd ~/free5gc/mptcp_test
-./set_MPTCP_parameters.sh -p fullmesh -s redundant -c olia -f if_names.txt.scenario1_same_network_proxy3 -u 1 -m -o server -N 10.10.0.0
+ln -s if_names.txt.scenario1_same_network_proxy3 if_names.txt
+./set_MPTCP_parameters.sh -p fullmesh -s redundant -c olia -f if_names.txt -u 1 -m -o server -N 10.10.0.0
 cd ~/vagrant/OVS/
 chmod 777 *.sh
 ./proxy_externally_accessible.sh
@@ -286,7 +289,8 @@ Steps to execute this scenario:
 - **proxy1**:
 ```
 cd ~/free5gc/mptcp_test
-./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_same_network_proxy1 -u 1 -m -o server -N 10.8.0.0
+ln -s if_names.txt.scenario1_same_network_proxy1 if_names.txt
+./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt -u 1 -m -o server -N 10.8.0.0
 cd ~/vagrant/OVS/
 chmod 777 *.sh
 ./proxy_externally_accessible.sh
@@ -296,7 +300,8 @@ chmod 777 *.sh
 - **proxy2**:
 ```
 cd ~/free5gc/mptcp_test
-./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_same_network_proxy2 -u 1 -m -o server -N 10.9.0.0
+ln -s if_names.txt.scenario1_same_network_proxy2 if_names.txt
+./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt -u 1 -m -o server -N 10.9.0.0
 cd ~/vagrant/OVS/
 chmod 777 *.sh
 ./proxy_externally_accessible.sh
@@ -306,7 +311,8 @@ chmod 777 *.sh
 - **proxy3**:
 ```
 cd ~/free5gc/mptcp_test
-./set_MPTCP_parameters.sh -p fullmesh -s redundant -c olia -f if_names.txt.scenario1_same_network_proxy3 -u 1 -m -o server -N 10.10.0.0
+ln -s if_names.txt.scenario1_same_network_proxy3 if_names.txt
+./set_MPTCP_parameters.sh -p fullmesh -s redundant -c olia -f if_names.txt -u 1 -m -o server -N 10.10.0.0
 cd ~/vagrant/OVS/
 chmod 777 *.sh
 ./proxy_externally_accessible.sh
@@ -316,7 +322,8 @@ chmod 777 *.sh
 - **CPE**:
 ```
 cd ~/free5gc/mptcp_test
-./set_MPTCP_parameters.sh -p fullmesh -s default -s roundrobin -s redundant -c olia -f if_names.txt.scenario1_same_network_CPE -u 3 -m -o client -S 10.1.1.4 -S 10.1.1.5 -S 10.1.1.6
+ln -s if_names.txt.scenario1_same_network_CPE if_names.txt
+./set_MPTCP_parameters.sh -p fullmesh -s default -s roundrobin -s redundant -c olia -f if_names.txt -u 3 -m -o client -S 10.1.1.4 -S 10.1.1.5 -S 10.1.1.6
 cd ~/vagrant/OVS
 chmod 777 *.sh
 ./ovs_start.sh
@@ -367,7 +374,8 @@ In this experiment we will employ an OpenVPN connection between _CPE_ and _proxy
 
 ```
 cd ~/free5gc/mptcp_test
-./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_same_network_proxy1 -u 1 -o server -N 10.8.0.0
+ln -s if_names.txt.scenario1_same_network_proxy1 if_names.txt
+./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt -u 1 -o server -N 10.8.0.0
 cd ~/vagrant/OVS/
 chmod 777 *.sh
 ./proxy_externally_accessible_nons.sh
@@ -378,7 +386,8 @@ chmod 777 *.sh
 
 ```
 cd ~/free5gc/mptcp_test
-./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_same_network_proxy2 -u 1 -o server -N 10.9.0.0
+ln -s if_names.txt.scenario1_same_network_proxy2 if_names.txt
+./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt -u 1 -o server -N 10.9.0.0
 cd ~/vagrant/OVS/
 chmod 777 *.sh
 ./proxy_externally_accessible_nons.sh
@@ -390,7 +399,8 @@ chmod 777 *.sh
 
 ```
 cd ~/free5gc/mptcp_test
-./set_MPTCP_parameters.sh -p fullmesh -s default -s roundrobin -c olia -f if_names.txt.scenario1_same_network_CPE -u 3 -o client -S 10.1.1.4 -S 10.1.1.5
+ln -s if_names.txt.scenario1_same_network_CPE if_names.txt
+./set_MPTCP_parameters.sh -p fullmesh -s default -s roundrobin -c olia -f if_names.txt -u 3 -o client -S 10.1.1.4 -S 10.1.1.5
 cd ~/vagrant/OVS
 chmod 777 *.sh
 ./ovs_start.sh
@@ -440,8 +450,8 @@ sudo route add default gw 66.6.6.1
 ```
 sudo route del default
 cd ~/free5gc/mptcp_test
-sudo ip link set dev eth2 multipath off
-./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_same_network_proxy1 -u 1
+ln -s if_names.txt.scenario1_same_network_proxy1 if_names.txt
+./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt -u 1
 sudo sysctl -w net.ipv4.ip_forward=1
 ```
 
@@ -449,7 +459,8 @@ sudo sysctl -w net.ipv4.ip_forward=1
 ```
 sudo route del default
 cd ~/free5gc/mptcp_test
-./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_same_network_CPE -u 3
+ln -s if_names.txt.scenario1_same_network_CPE if_names.txt
+./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt -u 3
 cd vagrant/SShuttle
 ```
 
@@ -481,8 +492,8 @@ sudo route add default gw 66.6.6.1
 ```
 sudo route del default
 cd ~/free5gc/mptcp_test
-sudo ip link set dev eth2 multipath off
-./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_same_network_proxy1 -u 1
+ln -s if_names.txt.scenario1_same_network_proxy1 if_names.txt
+./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt -u 1
 cd ~/vagrant/ShadowSocks
 ./proxy_shadowsocks.sh
 ```
@@ -491,7 +502,8 @@ cd ~/vagrant/ShadowSocks
 ```
 sudo route del default
 cd ~/free5gc/mptcp_test
-./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_same_network_CPE -u 3
+ln -s if_names.txt.scenario1_same_network_CPE if_names.txt
+./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt -u 3
 cd ~/vagrant/ShadowSocks
 ```
 
