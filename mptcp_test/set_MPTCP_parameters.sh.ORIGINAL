@@ -149,14 +149,6 @@ PATH=$PATH:$GOPATH/bin:$GOROOT/bin
 ##############################
 # CONFIGURATION
 ##############################
-# Initially remove MPTCP from all devices. Later it will be added to devices that belongs to a path.
-listOfDevices=`ifconfig -s | cut -d" " -f1 | sed 1d | sed '/lo/d'`
-arrayOfDevices=($listOfDevices)
-for i in "${arrayOfDevices[@]}"
-do
-  sudo ip link set dev $i multipath off
-done
-
 #./configure.sh
 if [[ $ns == 0 ]]; then
 #  sudo ifconfig eth0 down
@@ -254,6 +246,11 @@ else
     $EXEC_MPTCPNS ip addr add $IP_MPTCP dev $VETH_MPTCP
     $EXEC_MPTCPNS ifconfig $VETH_MPTCP mtu 1400   # done to avoid fragmentation which breaks ovpn setup
   done
+fi
+
+# Disable interfaces for MPTCP (eth0 = NAT connection in VMs, to be modified for real machines)
+if [[ $REAL_MACHINE == 0 ]]; then
+  sudo ip link set dev eth0 multipath off
 fi
 
 # Remove previous rules
