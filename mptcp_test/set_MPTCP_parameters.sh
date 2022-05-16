@@ -35,7 +35,8 @@ OVPN_NETWORK_ADDRESS="10.8.0.0"
 
 s=0
 S=0
-while getopts ":p:s:C:c:f:u:mo:N:S:d" o; do
+#while getopts ":p:s:C:c:f:u:mo:N:S:d" o; do
+while getopts ":p:s:C:c:f:mo:N:S:d" o; do
   case "${o}" in
     p)
       p=1
@@ -62,11 +63,11 @@ while getopts ":p:s:C:c:f:u:mo:N:S:d" o; do
       FILENAME=${OPTARG}
       echo "FILENAME="${OPTARG}
       ;;
-    u)
-      u=1
-      NUM_UES=${OPTARG}
-      echo "NUM_UES="${NUM_UES}
-      ;;
+#    u)
+#      u=1
+#      NUM_UES=${OPTARG}
+#      echo "NUM_UES="${NUM_UES}
+#      ;;
     m)
       ns=1
       MPTCPNS="MPTCPns"
@@ -149,12 +150,17 @@ PATH=$PATH:$GOPATH/bin:$GOROOT/bin
 ##############################
 # CONFIGURATION
 ##############################
+# Read the number of interfaces from if_names.txt
+NUM_UES=`cat $FILENAME | sed '/^[[:space:]]*$/d' | wc -l`
+echo "NUM_UES="${NUM_UES}
+
 # Initially remove MPTCP from all devices. Later it will be added to devices that belongs to a path.
 listOfDevices=`ifconfig -s | cut -d" " -f1 | sed 1d | sed '/lo/d'`
 arrayOfDevices=($listOfDevices)
 for i in "${arrayOfDevices[@]}"
 do
   sudo ip link set dev $i multipath off
+  echo "Removing interface $i from MPTCP connection (later it will be added, if needed)"
 done
 
 #./configure.sh
