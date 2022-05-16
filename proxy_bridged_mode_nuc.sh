@@ -1,7 +1,7 @@
 #!/bin/bash
 # Jorge Navarro-Ortiz (jorgenavarro@ugr.es), University of Granada, 2021
 
-INTERFACETOSERVER='enp89s0'
+IFTOSERVER=`cat if_toserver.txt.nuc`
 
 # Remove previous bridge
 sudo ifconfig toserver-br down 2> /dev/null
@@ -9,10 +9,10 @@ sudo brctl delbr toserver-br 2> /dev/null
 
 # Create new bridge
 #sudo ifconfig mtap0 0 promisc up
-sudo ifconfig ${INTERFACETOSERVER} 0 promisc up
+sudo ifconfig ${IFTOSERVER} 0 promisc up
 sudo brctl addbr toserver-br
 sudo brctl addif toserver-br mtap0
-sudo brctl addif toserver-br ${INTERFACETOSERVER}
+sudo brctl addif toserver-br ${IFTOSERVER}
 sudo ifconfig toserver-br promisc up
 
 # Add STP to current bridges on proxy
