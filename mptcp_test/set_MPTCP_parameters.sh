@@ -155,7 +155,8 @@ NUM_UES=`cat $FILENAME | sed '/^[[:space:]]*$/d' | wc -l`
 echo "NUM_UES="${NUM_UES}
 
 # Initially remove MPTCP from all devices. Later it will be added to devices that belongs to a path.
-listOfDevices=`ifconfig -s | cut -d" " -f1 | sed 1d | sed '/lo/d'`
+#listOfDevices=`ifconfig -s | cut -d" " -f1 | sed 1d | sed '/^lo\b/d'`
+listOfDevices=`ifconfig | grep flags | cut -d":" -f 1 | sed '/^lo\b/d'`
 arrayOfDevices=($listOfDevices)
 for i in "${arrayOfDevices[@]}"
 do
