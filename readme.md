@@ -185,6 +185,7 @@ ln -s if_names.txt.scenario1_same_network_proxy1 if_names.txt
 cd ~/vagrant/OVS/
 chmod 777 *.sh
 ./proxy_externally_accessible.sh
+sudo sysctl -w net.ipv4.ip_forward=1
 ```
 
 - **proxy2** (accessible on localhost, port 32222):
@@ -195,6 +196,7 @@ ln -s if_names.txt.scenario1_same_network_proxy2 if_names.txt
 cd ~/vagrant/OVS/
 chmod 777 *.sh
 ./proxy_externally_accessible.sh
+sudo sysctl -w net.ipv4.ip_forward=1
 ```
 
 - **proxy3** (accessible on localhost, port 42222):
@@ -205,6 +207,7 @@ ln -s if_names.txt.scenario1_same_network_proxy3 if_names.txt
 cd ~/vagrant/OVS/
 chmod 777 *.sh
 ./proxy_externally_accessible.sh
+sudo sysctl -w net.ipv4.ip_forward=1
 ```
 
 - **CPE** (accessible on localhost, port 12222):
