@@ -49,5 +49,5 @@ sudo ip netns exec MPTCPns ifconfig ${tapIF} 0 promisc up -multicast
 sudo ip netns exec MPTCPns ifconfig v${tapIF} 0 promisc up -multicast
 sudo ifconfig m${tapIF} ${IPADDRESS} promisc up -multicast
 
-# Act as a router
-sudo sysctl -w net.ipv4.ip_forward=1
+# Act as a router (done now externally if needed)
+#sudo sysctl -w net.ipv4.ip_forward=1
