@@ -180,6 +180,7 @@ fi
 
 #GlobalEth="eth1"
 GlobalEth=`sed '1q;d' $FILENAME | cut -f 1 -d ' '`
+GW=`sed '1q;d' $FILENAME | cut -f 3 -d ' '`
 GlobalGW=$GW
 
 ##############################
@@ -284,11 +285,15 @@ if [[ $ns == 0 ]]; then
     # Create routing tables for each interface
     if [[ $DEBUG == 1 ]]; then
       sudo ip rule add from $IPcard table $i
+      sudo ip route flush table $i
       sudo ip route add ${NETcard}/24 dev $card scope link table $i
+      echo "sudo ip route add default via $GWcard dev $card table $i"
       sudo ip route add default via $GWcard dev $card table $i
     else
       sudo ip rule add from $IPcard table $i 2> /dev/null
+      sudo ip route flush table $i 2> /dev/null
       sudo ip route add ${NETcard}/24 dev $card scope link table $i 2> /dev/null
+      echo "sudo ip route add default via $GWcard dev $card table $i"
       sudo ip route add default via $GWcard dev $card table $i 2> /dev/null
     fi
   done
@@ -296,8 +301,10 @@ if [[ $ns == 0 ]]; then
   # Default route
   if [[ $DEBUG == 1 ]]; then
     sudo ip route add default scope global nexthop via $GlobalGW dev $GlobalEth
+    echo "sudo ip route add default scope global nexthop via $GlobalGW dev $GlobalEth"
   else
     sudo ip route add default scope global nexthop via $GlobalGW dev $GlobalEth 2> /dev/null
+    echo "sudo ip route add default scope global nexthop via $GlobalGW dev $GlobalEth"
   fi
 
   # Showing routing information
@@ -306,10 +313,15 @@ if [[ $ns == 0 ]]; then
     sudo ip rule show
     echo ""; echo "[INFO] Show routes"
     sudo ip route
-    echo ""; echo "[INFO] Show routing table 1"
-    sudo ip route show table 1
-    echo ""; echo "[INFO] Show routing table 2"
-    sudo ip route show table 2
+    for i in $(seq 1 $NUM_UES)
+    do
+      echo ""; echo "[INFO] Show routing table $i"
+      sudo ip route show table $i
+    done
+#    echo ""; echo "[INFO] Show routing table 1"
+#    sudo ip route show table 1
+#    echo ""; echo "[INFO] Show routing table 2"
+#    sudo ip route show table 2
   fi
 
 else
@@ -345,8 +357,10 @@ else
 
     # Create routing tables for each interface
     $EXEC_MPTCPNS ip rule add from $IP_MPTCP_SIMPLE table $i #2> /dev/null
+    $EXEC_MPTCPNS ip route flush table $i
     $EXEC_MPTCPNS ip route add $NET_IP_MPTCP dev $VETH_MPTCP scope link table $i #2> /dev/null
     $EXEC_MPTCPNS ip route add default via $GW_MPTCP dev $VETH_MPTCP table $i #2> /dev/null
+    echo "$EXEC_MPTCPNS ip route add default via $GW_MPTCP dev $VETH_MPTCP table $i"
 
     # Probably not needed...
     card=`sed ${i}'q;d' $FILENAME | cut -f 1 -d ' '`
@@ -360,6 +374,7 @@ else
     $EXEC_MPTCPNS ip route add default scope global nexthop via $GlobalGW dev v_mp_1
   else
     $EXEC_MPTCPNS ip route add default scope global nexthop via $GlobalGW dev v_mp_1 2> /dev/null
+    echo "$EXEC_MPTCPNS ip route add default scope global nexthop via $GlobalGW dev v_mp_1"
   fi
 
   # Showing routing information
