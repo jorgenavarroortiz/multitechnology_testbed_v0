@@ -8,11 +8,11 @@ We have also included instructions to install MPTCP in NUC (Intel NUC 10 NUC10i7
 
 Similarly, it has also been tested (scenario 1, i.e. without free5gc) using a Raspberry Pi 4 with 4 GB with Raspberry OS (64 bits), based on kernel rpi-5.5.y with support for MPTCP.
 
-You can find the patch for linux kernel 5.5 with MPTCP support in the [MPTCP_patches](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/tree/main/MPTCP_patches) directory. This patch has been submitted to the multipath-tcp.org mailing list following the instructions from [here](https://multipath-tcp.org/pmwiki.php/Developer/SubmitAPatch). Included as a new repo (https://github.com/jorgenavarroortiz/linux-kernel-5.5-mptcp) as suggested by the developers from multipath-tcp.org.
+You can find the patch for linux kernel 5.5 with MPTCP support in the [MPTCP_patches](https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/tree/main/MPTCP_patches) directory. This patch has been submitted to the multipath-tcp.org mailing list following the instructions from [here](https://multipath-tcp.org/pmwiki.php/Developer/SubmitAPatch). Included as a new repo (https://github.com/jorgenavarroortiz/linux-kernel-5.5-mptcp) as suggested by the developers from multipath-tcp.org.
 
-You can watch a [video](https://youtu.be/_7CiYgILo1g) showing how [scenario 1](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-scenario-1-two-virtual-machines-directly-connected) works.
+You can watch a [video](https://youtu.be/_7CiYgILo1g) showing how [scenario 1](https://github.com/jorgenavarroortiz/multitechnology_testbed_v0#launching-scenario-1-two-virtual-machines-directly-connected) works.
 
-You can watch a [video](https://youtu.be/AYZm-uw-ZXU) showing how [scenario 2](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0#launching-scenario-2-ue---free5gc---proxy) works.
+You can watch a [video](https://youtu.be/AYZm-uw-ZXU) showing how [scenario 2](https://github.com/jorgenavarroortiz/multitechnology_testbed_v0#launching-scenario-2-ue---free5gc---proxy) works.
 
 You can watch a [video](https://user-images.githubusercontent.com/17797704/125672786-4ee5dcec-b28b-4b11-885f-fd782e0a948f.mp4) showing how the scenario with OVS and using several MPTCP proxies works. Please download the video first if it is not correctly displayed on your browser.
 
@@ -92,7 +92,7 @@ Copy the content of the directory `free5gc/vagrant` to your computer. Rename the
 
 In this scenario, two machines are directly connected using network interfaces eth1, eth2 and eth3. eth0 is configured with NAT in VirtualBox to connect to Internet. They are accessible through SSH on ports 12222 and 22222, respectively. The image shows both VMs employing a network namespace (MPTCPns) and OpenVPN. You can configure whether namespaces and OpenVPN are used or not.
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1.png" width="800">
+<img src="https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/raw/main/img/mptcp_scenario1.png" width="800">
 
 **Launching scenario 1 (without namespace/OpenVPN)**
 
@@ -108,7 +108,7 @@ To setup this scenario the following scripts have to be run in this order:
 
 NOTE<sub>3</sub>: The OpenVPN configuration files on both server and client are now automatically adjusted.
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1_set_MPTCP_parameters.png" width="1200">
+<img src="https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/raw/main/img/mptcp_scenario1_set_MPTCP_parameters.png" width="1200">
 
 In order to test the correct behaviour of MPTCP, you can run `iperf` and check the throughput in each interface using `ifstat`. For this, you can use:
 
@@ -118,14 +118,14 @@ In order to test the correct behaviour of MPTCP, you can run `iperf` and check t
 
 You can see that there are data sent on both interfaces (`eth1` and `eth2`).
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1_test_throughput.png" width="1200">
+<img src="https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/raw/main/img/mptcp_scenario1_test_throughput.png" width="1200">
 
 Additionally, you can check that each interface can be active (on), inactive (off) or used as backup (backup) on MPTCP. For that purpose, you can use the `change_interface_state.sh` script. In the following example, the test started with both interfaces as active, then 1) changing `eth2` to `backup` (so it would transfer data only if the other interface is inactive), next 2) changing `eth1` to `off` (so data was transferred using `eth2`), and finally 3) `eth1` becoming active again (so data was transferred only using `eth1`). Similarly, you can perform any other similar tests.
 
 
 IMPORTANT**: The `backup` state is only used with the `default` scheduler. In the case of the `roundrobin` scheduler, `backup` is treated as `on` (i.e. the interface remains active).
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1_change_interfaces_state.png" width="1200">
+<img src="https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/raw/main/img/mptcp_scenario1_change_interfaces_state.png" width="1200">
 
 **Launching scenario 1 with namespace MPTCPns and OpenVPN**
 
@@ -139,11 +139,11 @@ To use a namespace (`MTPCPns`) and OpenVPN in both VMs, you have to run:
 
 In order to perform some experiments, remember to use the namespace `MPTCPns` and its network interfaces. For simplicity, you can run `sudo ip netns exec MPTCPns bash`. In the namespace, you can check the network interfaces by executing `ifconfig` (you should have interfaces `v_mp_1`, `v_mp_2` and `v_mp_3` for the three MPTCP paths, with IP addresses 10.1.1.X/24, with X=1..3 on the first machine and X=4..6 on the second machine, and `tun0`, with IP address 10.8.0.1/24 on the server and 10.8.0.2/24 on the client).
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario1_test_namespace_ovpn.png" width="800">
+<img src="https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/raw/main/img/mptcp_scenario1_test_namespace_ovpn.png" width="800">
 
 **Launching scenario 1 with multiple proxies (OVPN servers) with different schedulers**
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/scenario1_2servers.png" width="800">
+<img src="https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/raw/main/img/scenario1_2servers.png" width="800">
 
 In order to create a scneario with several OVPN servers, you have two alternatives:
 
@@ -161,7 +161,7 @@ To launch this scenario, e.g. with two servers, you can follow these steps:
 
 The following image shows how iperf performs different to one server (10.8.0.1 using "default" scheduler) and to another server (10.9.0.1 using "roundrobin" scheduler).
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/scenario1_twoservers.png" width="800">
+<img src="https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/raw/main/img/scenario1_twoservers.png" width="800">
 
 **Launching scenario 1 with multiple proxies (OVPN servers) with different schedulers and using CPE as a switch and proxies as routers (_ip_forward=1_)**
 
@@ -243,11 +243,11 @@ If the client shall send its data through e.g. `proxy1` (or `proxy2` or `proxy3`
 
 Please test the correct behaviour using `ping -R 66.6.6.33`, which returns the path from `client` to `server`. It should go through the IP address of `proxy1` in the VPN (10.8.0.1).
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_vlan_support1.png" width="800">
+<img src="https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/raw/main/img/mptcp_vlan_support1.png" width="800">
 
 Data rate for the different paths (using Grafana and [Node exporter](https://github.com/prometheus/node_exporter) from [Prometheus](https://prometheus.io/)) using the default MPTCP scheduler:
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/MPTCP_grafana_default.png" width="1200">
+<img src="https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/raw/main/img/MPTCP_grafana_default.png" width="1200">
 
 Then, you may want to test sending data through ``proxy2`` (a clone of the ``client`` VM could be used, but we will change the VLAN ID used in order to avoid more VMs being executed). For that, execute:
 
@@ -255,17 +255,17 @@ Then, you may want to test sending data through ``proxy2`` (a clone of the ``cli
 
 Again, please test the correct behaviour using ``ping -R 66.6.6.33``. It should go through the IP address of ``proxy2`` in the VPN (10.9.0.1).
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_vlan_support2.png" width="800">
+<img src="https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/raw/main/img/mptcp_vlan_support2.png" width="800">
 
 Data rate for the different paths using the Round-Robin MPTCP scheduler:
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/MPTCP_grafana_roundrobin.png" width="1200">
+<img src="https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/raw/main/img/MPTCP_grafana_roundrobin.png" width="1200">
 
 Similarly, you can repeat the process for VLAN 300 and `proxy3` (10.10.0.33 for client, 10.10.0.1 as gateway).
 
 Data rate for the different paths using the redundant MPTCP scheduler:
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/MPTCP_grafana_redundant.png" width="1200">
+<img src="https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/raw/main/img/MPTCP_grafana_redundant.png" width="1200">
 
 Additionally, it is possible to have three IP addresses on the `client`. To avoid creating new interfaces on the VM, three virtual interfaces are created on top of `eth1`. Each interface allows to communicate with the server through each of the proxies. To perform a test, execute:
 
@@ -354,7 +354,7 @@ Once that the scenario is launched, you may test it using `iperf -s` on the serv
 If you have intalled the repo for statistics (experimental, not included in this repo), you can execute (you may want to do it within a screen session, using e.g. `screen -S stats`):
 
 ```
-cd ~/vagrant/stats/5g-clarity_testbed_v0_stats
+cd ~/vagrant/stats/multitechnology_testbed_v0_stats
 ./start_stats.sh
 ```
 
@@ -526,7 +526,7 @@ In this scenario, a VM (mptcpUe) employs three network interfaces (`eth1`, `eth2
 
 The following image shows the scenario. You can watch a [video](https://youtu.be/AYZm-uw-ZXU) showing how it works.
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/mptcp_scenario2_free5gc.png" width="1200">
+<img src="https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/raw/main/img/mptcp_scenario2_free5gc.png" width="1200">
 
 To setup this testbed the following scripts need to be run in this order:
 
@@ -556,23 +556,23 @@ To test TCP latency, you could use MTR (https://github.com/traviscross/mtr). It 
 
 We have included a script, `test_latency.sh`, that employs MTR with typical parameters and save results to a file.
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/test_latency_tcp.png" width="800">
+<img src="https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/raw/main/img/test_latency_tcp.png" width="800">
 
 ### Testing TCP throughput
 
 To test TCP throughput, you could use `iperf`. We have included two scripts (`test_tcp_throughput_server.sh` and `test_tcp_throughput_client.sh`) for simplicity, which save the results.
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/test_throughput_tcp.png" width="800">
+<img src="https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/raw/main/img/test_throughput_tcp.png" width="800">
 
 Also we can use the command `ifstat`, which shows us the throughput for the different network interfaces in both directions.
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/ifstat.png" width="400">
+<img src="https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/raw/main/img/ifstat.png" width="400">
 
 ### Changing bandwidth and latency of a network interface
 
 For that purpose, you could use `tc-netem`. We have included two scripts for changing these values (`set_bw_latency.sh`) and for resetting them (`reset_bw_latency.sh`).
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/set_bw_latency.png" width="800">
+<img src="https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/raw/main/img/set_bw_latency.png" width="800">
 
 Additionally, the following helper tools are included:
 
@@ -584,15 +584,15 @@ Additionally, the following helper tools are included:
 
 To capture several (but not all) interfaces, you can use tshark (please check script `pcap_capture.sh`).
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/pcap_capture.png" width="600">
+<img src="https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/raw/main/img/pcap_capture.png" width="600">
 
 Later, you can process the captured trace file with MPTCPTRACE (https://github.com/multipath-tcp/mptcptrace) (please check script `pcap_process.sh`).
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/pcap_process.png" width="400">
+<img src="https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/raw/main/img/pcap_process.png" width="400">
 
 The results can be plotted with xplot.org. **NOTE**: Remember to redirect the DISPLAY to your IP address using `export DISPLAY='<IP address>:0.0'`.
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/pcap_process_plot.png" width="800">
+<img src="https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/raw/main/img/pcap_process_plot.png" width="800">
 
 ### TCP congestion window
 
@@ -600,20 +600,20 @@ TCP congestion window related information is local, i.e. it is not sent in TCP p
 
 First, you have to start TCP cwnd tracing using `tcp_probe_start.sh`. After the experiment, you have to stop TCP cwnd tracing and save the information to a file using `tcp_probe_stop.sh`.
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/tcp_probe_start_stop.png" width="600">
+<img src="https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/raw/main/img/tcp_probe_start_stop.png" width="600">
 
 Later, you can process (`tcp_probe_process.sh`) and plot (`tcp_probe_plot.sh`) the information that you have saved. The last script includes 3 types of plots: 1) congestion window and slow start threshold, 2) smooth RTT, and 3) sender and receiver advertised windows. For plotting, remember first to redirect the DISPLAY to your IP address using `export DISPLAY='<IP address>:0.0'`.
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/tcp_probe_process_plot.png" width="800">
+<img src="https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/raw/main/img/tcp_probe_process_plot.png" width="800">
 
 ## NUC installation
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/nuc.png" width="512">
+<img src="https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/raw/main/img/nuc.png" width="512">
 
 The installation scripts for testbed v0 can be used to setup MPTCP on an Intel's NUC computer (tested on [Intel NUC 10 NUC10i7FNH](https://www.intel.com/content/www/us/en/products/boards-kits/nuc/kits/nuc10i7fnh.html)). Please execute the following steps:
 
 - Fresh install Ubuntu Server 18.04 (64-bit) on the NUC.
-- Copy the `5g-clarity_testbed_v0/vagrant/vagrant` directory from this repository to `$HOME`, so it becomes `$HOME/vagrant`.
+- Copy the `multitechnology_testbed_v0/vagrant/vagrant` directory from this repository to `$HOME`, so it becomes `$HOME/vagrant`.
 - Check that you have network connectivity. For that purpose, you may configure a YAML file at `/etc/netplan`. Please check `$HOME/vagrant/NUC/50-nuc.yaml.1` as an example.
 - Install kernel ~~5.5~~5.4.144 with MPTCP support and reboot:
 ```
@@ -690,7 +690,7 @@ sudo ./nuc.sh
 
 ## Raspberry Pi 4 (64 bits) installation
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/rpi4.jpg" width="368">
+<img src="https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/raw/main/img/rpi4.jpg" width="368">
 
 Currently you can find kernel [rpi-5.5.y](https://github.com/raspberrypi/linux/tree/rpi-5.5.y) with MPTCP support in the ``vagrant/vagrant/MPTCP_kernel5.5_RPi`` directory. Tested with [Raspberry Pi OS (64 bits)](https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2020-08-24/2020-08-20-raspios-buster-arm64-lite.zip).
 
@@ -698,23 +698,23 @@ For this purpose, you should setup 2 Raspberry Pi 4. Currently it has been teste
 
 - Install [Raspberry Pi OS (64 bits)](https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2020-08-24/2020-08-20-raspios-buster-arm64-lite.zip). If you are using Windows on your PC, you could use e.g. [RUFUS](https://rufus.ie/) to save the image to the SD card.
 - Boot and add your network configuration so the RPi4 has Internet connectivity.
-- Copy the directory [MPTCP_kernel5.5_RPi4](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/tree/main/vagrant/vagrant/MPTCP_kernel5.5_RPi4) from this repo to `$HOME`. Enter the directory and execute `sudo ./mptcp_kernel_installation_rpi4.sh`. After a reboot, enter again the directory and execute `sudo ./mptcp_additional_installation_rpi4.sh`  to install `iperf`, `ifstat` and `iproute-mptcp`.
+- Copy the directory [MPTCP_kernel5.5_RPi4](https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/tree/main/vagrant/vagrant/MPTCP_kernel5.5_RPi4) from this repo to `$HOME`. Enter the directory and execute `sudo ./mptcp_kernel_installation_rpi4.sh`. After a reboot, enter again the directory and execute `sudo ./mptcp_additional_installation_rpi4.sh`  to install `iperf`, `ifstat` and `iproute-mptcp`.
 - Copy the directory `mptcp_test` from this repo to `$HOME`.
 - Use if_names.txt.scenario1_different_networks_RPiX, X=1,2, so that the first network cards are `eth0` and `eth1` (you should check the name of the network cards using `ifconfig`).
 - On the first RPi4, we will use IP addresses 1.1.1.1/24 and 1.1.2.1/24. Execute `./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_different_networks_RPi1 -u 2`.
 - On the second RPi4, we will use IP addresses 1.1.1.2/24 and 1.1.2.2/24. Execute `./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_different_networks_RPi2 -u 2`.
 - You can check that it works by executing on the first RPi4 `iperf -s & ifstat` and on the second RPi4 `iperf -c 1.1.1.1 & ifstat`.
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/rpi_scenario1.jpeg" width="512">
+<img src="https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/raw/main/img/rpi_scenario1.jpeg" width="512">
 
-**UPDATE**: An installable kernel 5.5 for Raspbian OS with MPTCP support and Weighted Round-Robin (WRR) v0.5 is available in the [MPTCP_kernel5.5-WRR0.5_RPi4](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/tree/main/vagrant/vagrant/MPTCP_kernel5.5_WRR05_RPi4) directory. **Tested with two network interfaces** (the one from RPi and one USB-Ethernet adapter). Follow these steps for testing WRR v0.5:
+**UPDATE**: An installable kernel 5.5 for Raspbian OS with MPTCP support and Weighted Round-Robin (WRR) v0.5 is available in the [MPTCP_kernel5.5-WRR0.5_RPi4](https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/tree/main/vagrant/vagrant/MPTCP_kernel5.5_WRR05_RPi4) directory. **Tested with two network interfaces** (the one from RPi and one USB-Ethernet adapter). Follow these steps for testing WRR v0.5:
 
 - Install the MPTCP kernel in the RPi4 by executing the script `mptcp_kernel_installation_rpi4.sh`. After reboot, check that it is installed by executing `uname -r`. Then execute the script `mptcp_additional_installation_rpi4.sh` to install the required packages. Repeat this for the second RPi.
 - On the first RPi4, go to the `mptcp_test` directory and execute `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_different_networks_RPi1 -u 2 -m -o server` (we assume that the Ethernet interfaces are `eth0` (10.1.1.1/24) and `eth1` (10.1.2.1/24), update the file `if_names.txt.scenario1_different_networks_RPi1` if needed).
 - On the second RPi4 (`eth0` with IP address 10.1.1.2/24 and `eth1` with IP address 10.1.2.2/24), go to the `mptcp_test` directory and execute `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_different_networks_RPi2 -u 2 -m -o client -S 10.1.1.1`.
-- To modify the weights, on the second RPi4 go to the [mptcp_ctrl](https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/tree/main/vagrant/vagrant/MPTCP_kernel5.5_WRR05_RPi4/mptcp_ctrl) directory and execute `sudo python3 wrr_simple_test2.py`. This will use weight=1 for `eth0` and weight=2 for `eth1`. Repeat for the first RPi4 if you want to test in the other direction (using `wrr_simple_test1.py`).
+- To modify the weights, on the second RPi4 go to the [mptcp_ctrl](https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/tree/main/vagrant/vagrant/MPTCP_kernel5.5_WRR05_RPi4/mptcp_ctrl) directory and execute `sudo python3 wrr_simple_test2.py`. This will use weight=1 for `eth0` and weight=2 for `eth1`. Repeat for the first RPi4 if you want to test in the other direction (using `wrr_simple_test1.py`).
 - Now you can test the proper behaviour using `iperf` within the `MPTCPns` namespace.
 
-<img src="https://github.com/jorgenavarroortiz/5g-clarity_testbed_v0/raw/main/img/rpi4_wrr05_test.jpg" width="512">
+<img src="https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/raw/main/img/rpi4_wrr05_test.jpg" width="512">
 
 **UPDATE**: An installable kernel 5.4 (LTS) for Ubuntu 20.04 (ARM64) with MPTCP support and Weighted Round-Robin (WRR) v0.5 is available in the [rpi-ubuntu-20.04-kernel5.4-mptcp-wrr](https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/tree/main/vagrant/vagrant/rpi-ubuntu-20.04-kernel5.4-mptcp-wrr) directory. There you can find the instructions to install it. **Tested with two network interfaces** (the one from RPi and one USB-Ethernet adapter).
