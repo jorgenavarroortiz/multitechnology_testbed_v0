@@ -98,13 +98,13 @@ In this scenario, two machines are directly connected using network interfaces e
 
 To setup this scenario the following scripts have to be run in this order:
 
-- In the machine `mptcpUe1` change to the directory `$HOME/free5gc/mptcp_test` and launch `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_same_network_UE1 -u 3`. You can add option `-d` if you want to read debug messages.
+- In the machine `mptcpUe1` change to the directory `$HOME/free5gc/mptcp_test` and launch `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_same_network_UE1`. You can add option `-d` if you want to read debug messages.
 
-- In the machine `mptcpUe2` change to the directory `$HOME/free5gc/mptcp_test` and launch `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_same_network_UE2 -u 3`. You can add option `-d` if you want to read debug messages.
+- In the machine `mptcpUe2` change to the directory `$HOME/free5gc/mptcp_test` and launch `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_same_network_UE2`. You can add option `-d` if you want to read debug messages.
 
 **NOTE<sub>1</sub>**: if_names.txt.scenario1_same_network_UEX (X=1 or 2) utilizes IP addresses on the same network (1.1.1.{1,2,3}/24 for eth{1,2,3} on mptcpUE1, and 1.1.1.{4,5,6} for eth{1,2,3} on mptcpUE2), assuming that all network interfaces are connected to the same internal network (ue_ue). if_names.txt.scenario1_different_networks_UEX (X=1 or 2) utilizes IP addresses on different networks (1.1.{1,2,3}.1/24 for eth{1,2,3} on mptcpUE1, and 1.1.{1,2,3}.2/24 on eth{1,2,3} on mptcpUE2) assuming that network interfaces are connected to 3 different internal networks (ue_ue_X, X=1,2,3). This will simplify the usage of these scripts on real machines, which typically use different networks for each interface.
 
-**NOTE<sub>2</sub>**: If you need a client connected with three paths to a server with 1 path, just use `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_same_network_UE2 -u 1 -m` on the machine `mptcpUe2`.
+**NOTE<sub>2</sub>**: If you need a client connected with three paths to a server with 1 path, just use `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_same_network_UE2 -m` on the machine `mptcpUe2`.
 
 NOTE<sub>3</sub>: The OpenVPN configuration files on both server and client are now automatically adjusted.
 
@@ -133,9 +133,9 @@ You can watch a [video](https://youtu.be/_7CiYgILo1g) showing how it works.
 
 To use a namespace (`MTPCPns`) and OpenVPN in both VMs, you have to run:
 
-- In mptcpUe1: `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_same_network_UE1 -u 3 -m -o server`
+- In mptcpUe1: `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_same_network_UE1 -m -o server`
 
-- In mptcpUe2: `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_same_network_UE2 -u 3 -m -o client -S 10.1.1.1`
+- In mptcpUe2: `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_same_network_UE2 -m -o client -S 10.1.1.1`
 
 In order to perform some experiments, remember to use the namespace `MPTCPns` and its network interfaces. For simplicity, you can run `sudo ip netns exec MPTCPns bash`. In the namespace, you can check the network interfaces by executing `ifconfig` (you should have interfaces `v_mp_1`, `v_mp_2` and `v_mp_3` for the three MPTCP paths, with IP addresses 10.1.1.X/24, with X=1..3 on the first machine and X=4..6 on the second machine, and `tun0`, with IP address 10.8.0.1/24 on the server and 10.8.0.2/24 on the client).
 
@@ -153,11 +153,11 @@ In order to create a scneario with several OVPN servers, you have two alternativ
 
 To launch this scenario, e.g. with two servers, you can follow these steps:
 
-- In the machine `mptcpUe1` (which will act as server with scheduler "default") run `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_same_network_UE1 -u 3 -m -o server -N 10.8.0.0`
+- In the machine `mptcpUe1` (which will act as server with scheduler "default") run `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_same_network_UE1 -m -o server -N 10.8.0.0`
 
-- In the machine `mptcpUe2` (which will act as server with scheduler "roundrobin") run `./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_same_network_UE2 -u 3 -m -o server -N 10.9.0.0`
+- In the machine `mptcpUe2` (which will act as server with scheduler "roundrobin") run `./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_same_network_UE2 -m -o server -N 10.9.0.0`
 
-- In the machine `mptcpUe3` (which will act as client, with scheduler "default" for the connection to `mptcpUe1` and scheduler "roundrobin" for the connection to `mptcpUe2`) run `./set_MPTCP_parameters.sh -p fullmesh -s default -s roundrobin -c olia -f if_names.txt.scenario1_same_network_UE3 -u 3 -m -o client -S 10.1.1.1 -S 10.1.1.4`
+- In the machine `mptcpUe3` (which will act as client, with scheduler "default" for the connection to `mptcpUe1` and scheduler "roundrobin" for the connection to `mptcpUe2`) run `./set_MPTCP_parameters.sh -p fullmesh -s default -s roundrobin -c olia -f if_names.txt.scenario1_same_network_UE3 -m -o client -S 10.1.1.1 -S 10.1.1.4`
 
 The following image shows how iperf performs different to one server (10.8.0.1 using "default" scheduler) and to another server (10.9.0.1 using "roundrobin" scheduler).
 
@@ -181,7 +181,7 @@ In order to launch this scenario, please execute these commands in the following
 ```
 cd ~/free5gc/mptcp_test
 ln -s if_names.txt.scenario1_same_network_proxy1 if_names.txt
-./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt -u 1 -m -o server -N 10.8.0.0
+./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt -m -o server -N 10.8.0.0
 cd ~/vagrant/OVS/
 chmod 777 *.sh
 ./proxy_externally_accessible.sh
@@ -192,7 +192,7 @@ sudo sysctl -w net.ipv4.ip_forward=1
 ```
 cd ~/free5gc/mptcp_test
 ln -s if_names.txt.scenario1_same_network_proxy2 if_names.txt
-./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names -u 1 -m -o server -N 10.9.0.0
+./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names -m -o server -N 10.9.0.0
 cd ~/vagrant/OVS/
 chmod 777 *.sh
 ./proxy_externally_accessible.sh
@@ -203,7 +203,7 @@ sudo sysctl -w net.ipv4.ip_forward=1
 ```
 cd ~/free5gc/mptcp_test
 ln -s if_names.txt.scenario1_same_network_proxy3 if_names.txt
-./set_MPTCP_parameters.sh -p fullmesh -s redundant -c olia -f if_names.txt -u 1 -m -o server -N 10.10.0.0
+./set_MPTCP_parameters.sh -p fullmesh -s redundant -c olia -f if_names.txt -m -o server -N 10.10.0.0
 cd ~/vagrant/OVS/
 chmod 777 *.sh
 ./proxy_externally_accessible.sh
@@ -213,7 +213,7 @@ sudo sysctl -w net.ipv4.ip_forward=1
 - **CPE** (accessible on localhost, port 12222):
 ```
 cd ~/free5gc/mptcp_test
-./set_MPTCP_parameters.sh -p fullmesh -s default -s roundrobin -s redundant -c olia -f if_names.txt.scenario1_same_network_CPE -u 3 -m -o client -S 10.1.1.4 -S 10.1.1.5 -S 10.1.1.6
+./set_MPTCP_parameters.sh -p fullmesh -s default -s roundrobin -s redundant -c olia -f if_names.txt.scenario1_same_network_CPE -m -o client -S 10.1.1.4 -S 10.1.1.5 -S 10.1.1.6
 cd ~/vagrant/OVS
 chmod 777 *.sh
 ./ovs_start.sh
@@ -293,7 +293,7 @@ Steps to execute this scenario:
 ```
 cd ~/free5gc/mptcp_test
 ln -s if_names.txt.scenario1_same_network_proxy1 if_names.txt
-./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt -u 1 -m -o server -N 10.8.0.0
+./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt -m -o server -N 10.8.0.0
 cd ~/vagrant/OVS/
 chmod 777 *.sh
 ./proxy_externally_accessible.sh
@@ -304,7 +304,7 @@ chmod 777 *.sh
 ```
 cd ~/free5gc/mptcp_test
 ln -s if_names.txt.scenario1_same_network_proxy2 if_names.txt
-./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt -u 1 -m -o server -N 10.9.0.0
+./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt -m -o server -N 10.9.0.0
 cd ~/vagrant/OVS/
 chmod 777 *.sh
 ./proxy_externally_accessible.sh
@@ -315,7 +315,7 @@ chmod 777 *.sh
 ```
 cd ~/free5gc/mptcp_test
 ln -s if_names.txt.scenario1_same_network_proxy3 if_names.txt
-./set_MPTCP_parameters.sh -p fullmesh -s redundant -c olia -f if_names.txt -u 1 -m -o server -N 10.10.0.0
+./set_MPTCP_parameters.sh -p fullmesh -s redundant -c olia -f if_names.txt -m -o server -N 10.10.0.0
 cd ~/vagrant/OVS/
 chmod 777 *.sh
 ./proxy_externally_accessible.sh
@@ -326,7 +326,7 @@ chmod 777 *.sh
 ```
 cd ~/free5gc/mptcp_test
 ln -s if_names.txt.scenario1_same_network_CPE if_names.txt
-./set_MPTCP_parameters.sh -p fullmesh -s default -s roundrobin -s redundant -c olia -f if_names.txt -u 3 -m -o client -S 10.1.1.4 -S 10.1.1.5 -S 10.1.1.6
+./set_MPTCP_parameters.sh -p fullmesh -s default -s roundrobin -s redundant -c olia -f if_names.txt -m -o client -S 10.1.1.4 -S 10.1.1.5 -S 10.1.1.6
 cd ~/vagrant/OVS
 chmod 777 *.sh
 ./ovs_start.sh
@@ -378,7 +378,7 @@ In this experiment we will employ an OpenVPN connection between _CPE_ and _proxy
 ```
 cd ~/free5gc/mptcp_test
 ln -s if_names.txt.scenario1_same_network_proxy1 if_names.txt
-./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt -u 1 -m -o server -N 10.8.0.0
+./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt -m -o server -N 10.8.0.0
 cd ~/vagrant/OVS/
 chmod 777 *.sh
 ./proxy_externally_accessible.sh
@@ -391,7 +391,7 @@ sudo sysctl -w net.ipv4.ip_forward=0
 ```
 cd ~/free5gc/mptcp_test
 ln -s if_names.txt.scenario1_same_network_proxy2 if_names.txt
-./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt -u 1 -m -o server -N 10.9.0.0
+./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt -m -o server -N 10.9.0.0
 cd ~/vagrant/OVS/
 chmod 777 *.sh
 ./proxy_externally_accessible.sh
@@ -405,7 +405,7 @@ sudo sysctl -w net.ipv4.ip_forward=0
 ```
 cd ~/free5gc/mptcp_test
 ln -s if_names.txt.scenario1_same_network_CPE if_names.txt
-./set_MPTCP_parameters.sh -p fullmesh -s default -s roundrobin -c olia -f if_names.txt -u 3 -o client -S 10.1.1.4 -S 10.1.1.5
+./set_MPTCP_parameters.sh -p fullmesh -s default -s roundrobin -c olia -f if_names.txt -o client -S 10.1.1.4 -S 10.1.1.5
 cd ~/vagrant/OVS
 chmod 777 *.sh
 ./ovs_start.sh
@@ -458,7 +458,7 @@ sudo route add default gw 66.6.6.1
 sudo route del default
 cd ~/free5gc/mptcp_test
 ln -s if_names.txt.scenario1_same_network_proxy1 if_names.txt
-./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt -u 1
+./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt
 sudo sysctl -w net.ipv4.ip_forward=1
 ```
 
@@ -467,7 +467,7 @@ sudo sysctl -w net.ipv4.ip_forward=1
 sudo route del default
 cd ~/free5gc/mptcp_test
 ln -s if_names.txt.scenario1_same_network_CPE if_names.txt
-./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt -u 3
+./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt
 cd vagrant/SShuttle
 ```
 
@@ -500,7 +500,7 @@ sudo route add default gw 66.6.6.1
 sudo route del default
 cd ~/free5gc/mptcp_test
 ln -s if_names.txt.scenario1_same_network_proxy1 if_names.txt
-./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt -u 1
+./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt
 cd ~/vagrant/ShadowSocks
 ./proxy_shadowsocks.sh
 ```
@@ -510,7 +510,7 @@ cd ~/vagrant/ShadowSocks
 sudo route del default
 cd ~/free5gc/mptcp_test
 ln -s if_names.txt.scenario1_same_network_CPE if_names.txt
-./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt -u 3
+./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt
 cd ~/vagrant/ShadowSocks
 ```
 
@@ -701,8 +701,8 @@ For this purpose, you should setup 2 Raspberry Pi 4. Currently it has been teste
 - Copy the directory [MPTCP_kernel5.5_RPi4](https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/tree/main/vagrant/vagrant/MPTCP_kernel5.5_RPi4) from this repo to `$HOME`. Enter the directory and execute `sudo ./mptcp_kernel_installation_rpi4.sh`. After a reboot, enter again the directory and execute `sudo ./mptcp_additional_installation_rpi4.sh`  to install `iperf`, `ifstat` and `iproute-mptcp`.
 - Copy the directory `mptcp_test` from this repo to `$HOME`.
 - Use if_names.txt.scenario1_different_networks_RPiX, X=1,2, so that the first network cards are `eth0` and `eth1` (you should check the name of the network cards using `ifconfig`).
-- On the first RPi4, we will use IP addresses 1.1.1.1/24 and 1.1.2.1/24. Execute `./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_different_networks_RPi1 -u 2`.
-- On the second RPi4, we will use IP addresses 1.1.1.2/24 and 1.1.2.2/24. Execute `./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_different_networks_RPi2 -u 2`.
+- On the first RPi4, we will use IP addresses 1.1.1.1/24 and 1.1.2.1/24. Execute `./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_different_networks_RPi1`.
+- On the second RPi4, we will use IP addresses 1.1.1.2/24 and 1.1.2.2/24. Execute `./set_MPTCP_parameters.sh -p fullmesh -s roundrobin -c olia -f if_names.txt.scenario1_different_networks_RPi2`.
 - You can check that it works by executing on the first RPi4 `iperf -s & ifstat` and on the second RPi4 `iperf -c 1.1.1.1 & ifstat`.
 
 <img src="https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/raw/main/img/rpi_scenario1.jpeg" width="512">
@@ -710,8 +710,8 @@ For this purpose, you should setup 2 Raspberry Pi 4. Currently it has been teste
 **UPDATE**: An installable kernel 5.5 for Raspbian OS with MPTCP support and Weighted Round-Robin (WRR) v0.5 is available in the [MPTCP_kernel5.5-WRR0.5_RPi4](https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/tree/main/vagrant/vagrant/MPTCP_kernel5.5_WRR05_RPi4) directory. **Tested with two network interfaces** (the one from RPi and one USB-Ethernet adapter). Follow these steps for testing WRR v0.5:
 
 - Install the MPTCP kernel in the RPi4 by executing the script `mptcp_kernel_installation_rpi4.sh`. After reboot, check that it is installed by executing `uname -r`. Then execute the script `mptcp_additional_installation_rpi4.sh` to install the required packages. Repeat this for the second RPi.
-- On the first RPi4, go to the `mptcp_test` directory and execute `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_different_networks_RPi1 -u 2 -m -o server` (we assume that the Ethernet interfaces are `eth0` (10.1.1.1/24) and `eth1` (10.1.2.1/24), update the file `if_names.txt.scenario1_different_networks_RPi1` if needed).
-- On the second RPi4 (`eth0` with IP address 10.1.1.2/24 and `eth1` with IP address 10.1.2.2/24), go to the `mptcp_test` directory and execute `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_different_networks_RPi2 -u 2 -m -o client -S 10.1.1.1`.
+- On the first RPi4, go to the `mptcp_test` directory and execute `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_different_networks_RPi1 -m -o server` (we assume that the Ethernet interfaces are `eth0` (10.1.1.1/24) and `eth1` (10.1.2.1/24), update the file `if_names.txt.scenario1_different_networks_RPi1` if needed).
+- On the second RPi4 (`eth0` with IP address 10.1.1.2/24 and `eth1` with IP address 10.1.2.2/24), go to the `mptcp_test` directory and execute `./set_MPTCP_parameters.sh -p fullmesh -s default -c olia -f if_names.txt.scenario1_different_networks_RPi2 -m -o client -S 10.1.1.1`.
 - To modify the weights, on the second RPi4 go to the [mptcp_ctrl](https://github.com/jorgenavarroortiz/multitechnology_testbed_v0/tree/main/vagrant/vagrant/MPTCP_kernel5.5_WRR05_RPi4/mptcp_ctrl) directory and execute `sudo python3 wrr_simple_test2.py`. This will use weight=1 for `eth0` and weight=2 for `eth1`. Repeat for the first RPi4 if you want to test in the other direction (using `wrr_simple_test1.py`).
 - Now you can test the proper behaviour using `iperf` within the `MPTCPns` namespace.
 
